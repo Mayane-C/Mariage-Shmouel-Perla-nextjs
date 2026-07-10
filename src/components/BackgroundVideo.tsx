@@ -16,9 +16,9 @@ import { useEffect, useRef } from 'react';
  *      décodée → instantané, pas de repaint bloquant.
  */
 
-const TOTAL = 379;
-const INTRO_END_IDX = Math.round(TOTAL * 0.72); // était 0.60 → remet le morceau de vidéo qui manquait avant reveal
-const INTRO_DURATION_MS = 3500; // légèrement rallongé pour bien voir la partie ajoutée
+const TOTAL = 506;
+const INTRO_END_IDX = Math.round(TOTAL * 0.72);
+const INTRO_DURATION_MS = 3500;
 const SCROLL_LERP = 0.12;   // interpolation par frame pour le scroll (plus petit = plus doux)
 const INTRO_LERP = 1;        // pas d'interpolation pendant l'intro (l'animation JS s'en charge)
 

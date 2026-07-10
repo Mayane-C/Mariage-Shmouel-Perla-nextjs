@@ -87,14 +87,24 @@ export function Header() {
       {open && (
         <div className="mobile-menu" role="dialog" aria-modal="true">
           <ul>
-            {LINKS.map((l) => (
+            {LINKS.map((l, i) => (
               <li key={l.href}>
                 <a href={l.href} onClick={(e) => handleNav(e, l.href)}>
-                  {l.label}
+                  <span className="menu-index" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="menu-label">{l.label}</span>
+                  <span className="menu-arrow" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="M13 5l7 7-7 7" />
+                    </svg>
+                  </span>
                 </a>
               </li>
             ))}
           </ul>
+          <p className="menu-footer" aria-hidden="true">Shmouel &amp; Perla · 03·09·26</p>
         </div>
       )}
     </header>
