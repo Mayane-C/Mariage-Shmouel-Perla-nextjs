@@ -1,7 +1,21 @@
+'use client';
+
 import { content } from '@/lib/content';
 import { Countdown } from './Countdown';
 
 export function Hero() {
+  const handleReveal = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (!document.body.classList.contains('revealed')) {
+      document.body.classList.add('revealed');
+    }
+    requestAnimationFrame(() => {
+      document
+        .getElementById('invitation')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <section className="hero">
       <div className="hero-inner">
@@ -21,7 +35,12 @@ export function Hero() {
         </div>
         <Countdown />
       </div>
-      <a className="btn btn-hero" href="#invitation" aria-label="Voir l'invitation">
+      <a
+        className="btn btn-hero"
+        href="#invitation"
+        aria-label="Voir l'invitation"
+        onClick={handleReveal}
+      >
         Voir l&apos;invitation
       </a>
     </section>
