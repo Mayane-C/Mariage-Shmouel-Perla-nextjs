@@ -103,14 +103,14 @@
   /* Logo LTD dans le hero */
   .hero-logo {
     display: block;
-    width: 96px;
+    width: 148px;
     height: auto;
-    margin: 0 auto 32px;
+    margin: 0 auto 36px;
     opacity: 0.95;
-    filter: drop-shadow(0 3px 6px rgba(74, 63, 53, 0.22));
+    filter: drop-shadow(0 3px 8px rgba(74, 63, 53, 0.28));
   }
   @media (max-width: 520px) {
-    .hero-logo { width: 76px; margin-bottom: 22px; }
+    .hero-logo { width: 118px; margin-bottom: 26px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .block, footer { transition: none; }
@@ -499,13 +499,13 @@
   /* Logo mariage sous l'arc hébraïque dans le faire-part */
   .faire-part-logo {
     display: block;
-    width: 96px;
+    width: 138px;
     height: auto;
-    margin: 8px auto 24px;
+    margin: 12px auto 28px;
     filter: drop-shadow(0 3px 8px rgba(74, 63, 53, 0.18));
   }
   @media (max-width: 520px) {
-    .faire-part-logo { width: 72px; margin: 4px auto 16px; }
+    .faire-part-logo { width: 108px; margin: 6px auto 20px; }
   }
   .date-line {
     margin-top: 40px;
