@@ -4,11 +4,9 @@ import { useEffect, useState } from 'react';
 
 /**
  * Deux flèches or fixées sur les côtés gauche et droit du viewport.
- * Ne défilent jamais avec la page. Apparaissent quand la vidéo se
- * fige (body.revealed + user proche du haut de la zone blocs) pour
- * inviter à scroller et faire avancer la vidéo. Disparaissent quand
- * l'utilisateur a bien descendu (bas du dernier bloc visible).
- * Reprise du pattern BM Chmouel.
+ * Apparition : ~3.4 s après que body.revealed soit ajouté — le bloc
+ * faire-part est alors en place et la phase B vidéo terminée.
+ * Disparition : dès le premier scroll utilisateur (l'invite a été vue).
  */
 function Arrow() {
   return (
@@ -30,46 +28,43 @@ function Arrow() {
   );
 }
 
+// Durée qu'on attend après body.revealed avant d'afficher l'invite.
+// Correspond à la fin de la phase B vidéo et du glissement du bloc.
+const SHOW_AFTER_REVEALED_MS = 3400;
+
 export function ScrollHint() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let raf = 0;
-    const compute = () => {
-      raf = 0;
-      if (!document.body.classList.contains('revealed')) {
-        setVisible(false);
-        return;
+    let pollInterval: number | null = null;
+    let showTimer: number | null = null;
+    let scrollHandler: (() => void) | null = null;
+
+    // Étape 1 : attend que body.revealed soit ajouté (fin de phase A + 1s)
+    pollInterval = window.setInterval(() => {
+      if (document.body.classList.contains('revealed')) {
+        window.clearInterval(pollInterval!);
+        pollInterval = null;
+        // Étape 2 : attend que le bloc et la vidéo aient fini leur transition
+        showTimer = window.setTimeout(() => {
+          setVisible(true);
+          // Étape 3 : cache dès le premier scroll de l'utilisateur
+          scrollHandler = () => {
+            setVisible(false);
+            if (scrollHandler) {
+              window.removeEventListener('scroll', scrollHandler);
+              scrollHandler = null;
+            }
+          };
+          window.addEventListener('scroll', scrollHandler, { passive: true });
+        }, SHOW_AFTER_REVEALED_MS);
       }
-      const invitation = document.getElementById('invitation');
-      const rsvp = document.querySelector<HTMLElement>('.rsvp');
-      if (!invitation || !rsvp) {
-        setVisible(false);
-        return;
-      }
-      const sy = window.scrollY;
-      const vH = window.innerHeight;
-      // Apparition : le bas du faire-part a atteint le bas du viewport
-      // (l'invité a vu au moins l'essentiel du bloc, la vidéo est figée)
-      const showAt = sy > invitation.offsetTop + invitation.offsetHeight - vH;
-      // Disparition : on est descendu au niveau du bas du bloc RSVP
-      const hideAt = sy > rsvp.offsetTop + rsvp.offsetHeight - vH * 0.6;
-      setVisible(showAt && !hideAt);
-    };
-    const schedule = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(compute);
-    };
-    window.addEventListener('scroll', schedule, { passive: true });
-    // Réévalue régulièrement pendant la 1re seconde après le clic sur
-    // 'Voir l'invitation' — le body.revealed est ajouté à t=4.5s après
-    // le clic, potentiellement sans scroll donc sans event scroll.
-    const interval = window.setInterval(compute, 300);
-    compute();
+    }, 200);
+
     return () => {
-      window.removeEventListener('scroll', schedule, {} as EventListenerOptions);
-      window.clearInterval(interval);
-      if (raf) cancelAnimationFrame(raf);
+      if (pollInterval !== null) window.clearInterval(pollInterval);
+      if (showTimer !== null) window.clearTimeout(showTimer);
+      if (scrollHandler) window.removeEventListener('scroll', scrollHandler);
     };
   }, []);
 
