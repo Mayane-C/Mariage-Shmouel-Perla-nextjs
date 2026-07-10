@@ -96,10 +96,16 @@ export function BackgroundVideo() {
       const step = (now: number) => {
         const t = Math.min(1, (now - start) / INTRO_DURATION_MS);
         const eased = 1 - Math.pow(1 - t, 3);
-        // Pendant l'intro, on force current = target (pas de lerp)
         const v = from + (to - from) * eased;
+        // On force current = target (pas de lerp pendant l'intro)…
         targetIdxRef.current = v;
         currentIdxRef.current = v;
+        // …mais tick est écarté (diff = 0), donc on mute le src ici même.
+        const clamped = Math.max(1, Math.min(TOTAL, Math.round(v)));
+        if (layerRef.current && layerRef.current.dataset.idx !== String(clamped)) {
+          layerRef.current.src = frameSrc(clamped);
+          layerRef.current.dataset.idx = String(clamped);
+        }
         // Déclenche l'apparition du faire-part à 60 % de l'intro
         if (t >= REVEAL_TRIGGER_RATIO && !blocksRevealed) {
           blocksRevealed = true;
