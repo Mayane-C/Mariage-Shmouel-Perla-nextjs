@@ -139,17 +139,34 @@ export default async function OG() {
           <span>Perla</span>
         </div>
 
-        {/* Noms hébreux — chaîne inversée pour rendu RTL sans reordering
-            (Satori ne fait pas de bidi automatique). */}
+        {/* Noms hébreux avec & doré au milieu — chaque mot est inversé
+            (Satori n'a pas de bidi), et flexDirection row-reverse place
+            Shmouel à droite / Perla à gauche pour une lecture RTL correcte. */}
         <div
           style={{
-            fontSize: 32,
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            alignItems: 'baseline',
+            gap: 20,
+            fontSize: 34,
             color: sand,
             letterSpacing: '0.04em',
-            marginBottom: 24,
+            marginBottom: 26,
           }}
         >
-          {Array.from('שמואל ופרלה').reverse().join('')}
+          <span>{Array.from('שמואל').reverse().join('')}</span>
+          <span
+            style={{
+              color: gold,
+              fontStyle: 'italic',
+              fontFamily: 'Georgia, serif',
+              fontSize: 42,
+              lineHeight: 1,
+            }}
+          >
+            &amp;
+          </span>
+          <span>{Array.from('פרלה').reverse().join('')}</span>
         </div>
 
         {/* Date en italique */}

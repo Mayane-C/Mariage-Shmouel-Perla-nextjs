@@ -73,11 +73,11 @@
   }
   /* Offset scroll pour que #invitation ne colle pas au header sticky */
   #invitation, #details, #bracha, #rsvp {
-    scroll-margin-top: 100px;
+    scroll-margin-top: 140px;
   }
   @media (max-width: 720px) {
     #invitation, #details, #bracha, #rsvp {
-      scroll-margin-top: 84px;
+      scroll-margin-top: 118px;
     }
   }
   /* Vidéo de fond scrubbée : présente sur toute la page */
@@ -387,11 +387,11 @@
     .block-ornament-2.bl { bottom: -38px; left: 32px; }
   }
   .block-arch {
-    border-radius: 50% 50% 4px 4px / 22% 22% 4px 4px;
-    padding-top: 130px;
+    border-radius: 24px;
+    padding-top: 64px;
   }
   @media (max-width: 520px) {
-    .block-arch { padding-top: 90px; }
+    .block-arch { padding-top: 48px; }
   }
   .block .label:first-child,
   .block > .eyebrow {
@@ -692,11 +692,11 @@
 
   /* --- Invitation formelle --- */
   .invitation-formal .preamble {
-    max-width: 540px;
-    margin: 28px auto 0;
-    font-size: clamp(22px, 4vw, 32px);
+    max-width: 480px;
+    margin: 24px auto 0;
+    font-size: clamp(17px, 3vw, 22px);
     color: var(--taupe);
-    line-height: 1.35;
+    line-height: 1.45;
   }
   .verse-hebrew {
     font-family: var(--font-hebrew);
