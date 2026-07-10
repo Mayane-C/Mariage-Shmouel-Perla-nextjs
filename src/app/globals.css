@@ -387,13 +387,13 @@
     .block-ornament-2.bl { bottom: -38px; left: 32px; }
   }
   .block-arch {
-    border-radius: 120px 120px 24px 24px / 90px 90px 24px 24px;
-    padding-top: 92px;
+    border-radius: 200px 200px 24px 24px / 150px 150px 24px 24px;
+    padding-top: 128px;
   }
   @media (max-width: 520px) {
     .block-arch {
-      border-radius: 80px 80px 24px 24px / 60px 60px 24px 24px;
-      padding-top: 68px;
+      border-radius: 130px 130px 24px 24px / 100px 100px 24px 24px;
+      padding-top: 92px;
     }
   }
   .block .label:first-child,
