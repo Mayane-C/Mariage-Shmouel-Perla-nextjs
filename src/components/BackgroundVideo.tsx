@@ -32,6 +32,8 @@ export function BackgroundVideo() {
   const targetIdxRef = useRef(1);
   const revealedRef = useRef(false);
   const introPlayingRef = useRef(false);
+  const scrubActiveRef = useRef(false);          // scroll-scrub actif ? (activé après stabilisation de l'auto-scroll)
+  const scrollBaselineYRef = useRef(0);          // scrollY au moment où le scrub s'active — sert d'ancre 0
 
   useEffect(() => {
     // ── Préchargement + décodage de toutes les frames ─────────────────
@@ -72,6 +74,15 @@ export function BackgroundVideo() {
       if (revealedRef.current) return;
       revealedRef.current = true;
       document.body.classList.add('revealed');
+      // Attendre que l'auto-scroll se soit stabilisé avant d'activer le
+      // scroll-scrub. Sinon les events scroll générés par
+      // doScrollToInvitation feraient avancer la vidéo de ~30 frames et
+      // donneraient l'impression qu'elle 'continue de jouer' après la
+      // fin de la phase A.
+      setTimeout(() => {
+        scrollBaselineYRef.current = window.scrollY;
+        scrubActiveRef.current = true;
+      }, 1500);
     };
 
     const doScrollToInvitation = () => {
@@ -152,20 +163,29 @@ export function BackgroundVideo() {
     };
     revealBtn?.addEventListener('click', onRevealClick);
 
-    // ── Scroll → target frame index (après phase B) ───────────────────
+    // ── Scroll → target frame index ──────────────────────────────────
+    // Attendre scrubActiveRef pour ignorer les events scroll générés
+    // par le scroll auto (sinon la vidéo semblerait continuer à jouer
+    // juste après l'apparition du bloc).
     const onScroll = () => {
-      if (!revealedRef.current || introPlayingRef.current) return;
-      const block1 = document.getElementById('invitation');
+      if (!scrubActiveRef.current || introPlayingRef.current) return;
       const lastBlock = document.querySelector('.rsvp');
-      if (!block1 || !lastBlock) return;
+      if (!lastBlock) return;
 
-      const startY = (block1 as HTMLElement).offsetTop - window.innerHeight * 0.6;
+      // Delta par rapport au baseline (scrollY au moment où le scrub s'active).
+      // Delta ≤ 0 → vidéo reste figée sur PAUSE_A_FRAME.
+      const delta = window.scrollY - scrollBaselineYRef.current;
+      if (delta <= 0) {
+        targetIdxRef.current = PAUSE_A_FRAME;
+        return;
+      }
+
       const endY =
         (lastBlock as HTMLElement).offsetTop +
         (lastBlock as HTMLElement).offsetHeight -
         window.innerHeight * 0.4;
-      const range = Math.max(1, endY - startY);
-      const progress = Math.min(1, Math.max(0, (window.scrollY - startY) / range));
+      const endDelta = Math.max(1, endY - scrollBaselineYRef.current);
+      const progress = Math.min(1, delta / endDelta);
       targetIdxRef.current = PAUSE_A_FRAME + progress * (TOTAL - PAUSE_A_FRAME);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
