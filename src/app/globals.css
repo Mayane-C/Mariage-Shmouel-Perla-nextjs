@@ -15,7 +15,11 @@
     font-display: block;
   }
   *, *::before, *::after { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+  }
   body {
     margin: 0;
     background: #F5EFE6;
@@ -26,7 +30,11 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow: hidden;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
     height: 100vh;
+    max-width: 100vw;
   }
   body.revealed {
     overflow: auto;
@@ -35,29 +43,29 @@
   body:not(.revealed) .block,
   body:not(.revealed) footer {
     opacity: 0;
-    transform: translateY(240px);
+    transform: translateY(340px);
     pointer-events: none;
   }
   /* Ressort à la framer-motion (approximation CSS) — durée longue + courbe
      douce = arrivée très lente comme le BM Chmouel. */
   .block, footer {
-    transition: opacity 2.4s ease-out, transform 2.8s cubic-bezier(0.18, 0.88, 0.28, 1);
+    transition: opacity 3.4s ease-out, transform 3.8s cubic-bezier(0.18, 0.88, 0.28, 1);
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
   .invitation-formal {
     transition-delay: 0s, 0s;
   }
   .details {
-    transition-delay: 0.25s, 0.25s;
+    transition-delay: 0.35s, 0.35s;
   }
   .bracha {
-    transition-delay: 0.45s, 0.45s;
+    transition-delay: 0.6s, 0.6s;
   }
   .rsvp {
-    transition-delay: 0.65s, 0.65s;
+    transition-delay: 0.85s, 0.85s;
   }
   footer {
-    transition-delay: 0.85s, 0.85s;
+    transition-delay: 1.1s, 1.1s;
   }
   /* Offset scroll pour que #invitation ne colle pas au header sticky */
   #invitation, #details, #bracha, #rsvp {
@@ -620,13 +628,13 @@
     font-variant-numeric: tabular-nums;
     display: block;
     line-height: 1;
-    font-weight: 400;
-    background: linear-gradient(135deg, #A88962 0%, #C9A87D 30%, #E4C79B 50%, #B8935F 75%, #8A6E4A 100%);
+    font-weight: 500;
+    background: linear-gradient(135deg, #B8791A 0%, #E0A83B 20%, #FFD86B 45%, #FFC24A 55%, #E0A83B 75%, #9C6112 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 1px 3px rgba(74, 63, 53, 0.18));
+    filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.35));
   }
   .cell .unit {
     font-size: 9.5px;
@@ -661,11 +669,11 @@
 
   /* --- Invitation formelle --- */
   .invitation-formal .preamble {
-    max-width: 440px;
-    margin: 24px auto 0;
-    font-size: 14px;
+    max-width: 620px;
+    margin: 28px auto 0;
+    font-size: clamp(32px, 6vw, 48px);
     color: var(--taupe);
-    line-height: 1.8;
+    line-height: 1.25;
   }
   .verse-hebrew {
     font-family: var(--font-hebrew);
