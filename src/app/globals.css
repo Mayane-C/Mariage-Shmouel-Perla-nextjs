@@ -508,7 +508,7 @@
   .arc-wrap {
     width: 100%;
     max-width: 520px;
-    margin: 0 auto 0;
+    margin: -48px auto 0;
     display: block;
   }
   /* Logo mariage sous l'arc hébraïque dans le faire-part */
@@ -695,11 +695,13 @@
 
   /* --- Invitation formelle --- */
   .invitation-formal .preamble {
+    font-family: "Didot", Georgia, serif;
+    font-style: italic;
     max-width: 480px;
     margin: 24px auto 0;
     font-size: clamp(17px, 3vw, 22px);
     color: var(--taupe);
-    line-height: 1.45;
+    line-height: 1.55;
   }
   .verse-hebrew {
     font-family: var(--font-hebrew);
