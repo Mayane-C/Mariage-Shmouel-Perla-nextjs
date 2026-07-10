@@ -20,11 +20,10 @@ import { useEffect, useRef } from 'react';
  */
 
 const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
-const PAUSE_A_FRAME = 270;       // frame à t=9s après trim (= t=10s source) — fin phase A
-const PAUSE_B_FRAME = 500;       // frame à t=16.7s après trim — fin phase B, début scroll-scrub
-const INTRO_A_MS = 4000;         // durée réelle phase A (270 frames en 4s = 67.5 fps ≈ 2.25× native)
-const REVEAL_DELAY_MS = 1000;    // pause entre fin phase A et apparition du bloc faire-part —
-                                 // vidéo figée sur PAUSE_A_FRAME pendant ce délai
+const PAUSE_A_FRAME = 337;       // frame à t=11.2s après trim — fin phase A (5s × 67.5 fps)
+const PAUSE_B_FRAME = 567;       // frame à t=18.9s après trim — fin phase B, début scroll-scrub
+const INTRO_A_MS = 5000;         // durée réelle phase A (337 frames en 5s = 67.5 fps = 2.25× native)
+                                 // Bloc apparaît à la fin — vidéo défile en continu jusque-là.
 const INTRO_B_MS = 3400;         // durée phase B calée sur la transition CSS 3.4s du glissement
                                  // du bloc .invitation-formal — 230 frames en 3.4s = 2.25× native
 
@@ -135,32 +134,29 @@ export function BackgroundVideo() {
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
-      // Phase A : frames 1 → 270 en 4 s (intro accélérée)
+      // Phase A : frames 1 → 337 en 5 s (intro accélérée 2.25× native).
+      // Aucun freeze intermédiaire — la vidéo enchaîne directement sur
+      // phase B au moment où le bloc apparaît.
       animateSegment(1, PAUSE_A_FRAME, INTRO_A_MS, () => {
-        // Fin phase A : la vidéo reste figée sur PAUSE_A_FRAME pendant
-        // REVEAL_DELAY_MS, pour laisser le regard s'installer avant que
-        // le bloc faire-part n'apparaisse.
-        setTimeout(() => {
-          // Révèle les blocs (déclenche la transition CSS 3.4s du glissement
-          // translateY 340 → 0 sur .block/footer) et lance le scroll auto
-          // vers #invitation pour voir le glissement en direct.
-          doRevealBlocks();
-          doScrollToInvitation();
-          // Phase B : la vidéo reprend à la même cadence pendant le
-          // glissement du bloc — se fige à PAUSE_B_FRAME quand le bloc
-          // arrive en position.
-          animateSegment(PAUSE_A_FRAME, PAUSE_B_FRAME, INTRO_B_MS);
-        }, REVEAL_DELAY_MS);
+        // Révèle les blocs (déclenche la transition CSS 3.4s du glissement
+        // translateY 340 → 0 sur .block/footer) et lance le scroll auto
+        // vers #invitation pour voir le glissement en direct.
+        doRevealBlocks();
+        doScrollToInvitation();
+        // Phase B : la vidéo continue à la même cadence pendant le
+        // glissement du bloc — se fige à PAUSE_B_FRAME quand le bloc
+        // arrive en position.
+        animateSegment(PAUSE_A_FRAME, PAUSE_B_FRAME, INTRO_B_MS);
       });
 
       // Filet de sécurité : si l'anim plante pour une raison ou une autre,
-      // on révèle quand même les blocs après le total des deux phases + délai + 3s.
+      // on révèle quand même les blocs après le total des deux phases + 3s.
       setTimeout(() => {
         if (!revealedRef.current) {
           doRevealBlocks();
           doScrollToInvitation();
         }
-      }, INTRO_A_MS + REVEAL_DELAY_MS + INTRO_B_MS + 3000);
+      }, INTRO_A_MS + INTRO_B_MS + 3000);
     };
     revealBtn?.addEventListener('click', onRevealClick);
 
