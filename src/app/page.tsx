@@ -1,3 +1,4 @@
+import { BackgroundMusic } from '@/components/BackgroundMusic';
 import { BackgroundVideo } from '@/components/BackgroundVideo';
 import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
@@ -22,6 +23,7 @@ export default function Home() {
       </div>
       <Footer />
       <ScrollHint />
+      <BackgroundMusic />
     </>
   );
 }

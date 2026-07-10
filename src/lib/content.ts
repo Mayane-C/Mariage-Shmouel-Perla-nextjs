@@ -59,6 +59,7 @@ export const content = {
     rings: '/images/rings.png',
     colombe: '/images/colombe.png',
     video: '/video/intro.mp4',
+    music: '/audio/od-yishama.mp3',
     ornaments: [
       '/images/ornaments/ornament-01.png',
       '/images/ornaments/ornament-02.png',
