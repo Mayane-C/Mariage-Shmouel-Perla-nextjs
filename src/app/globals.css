@@ -36,11 +36,12 @@
     height: 100vh;
     max-width: 100vw;
   }
-  body.revealed {
-    overflow: auto;
-    height: auto;
-  }
-  body.revealed {
+  /* Le déverrouillage du scroll a lieu dès le clic sur « Voir l'invitation »
+     (via body.hero-out), pas à l'apparition des blocs. Cela isole le
+     re-flow layout (overflow + height) de la transition CSS des blocs —
+     essentiel pour que la transition ne soit pas court-circuitée sur
+     mobile Safari. */
+  body.hero-out {
     overflow: auto;
     height: auto;
   }
