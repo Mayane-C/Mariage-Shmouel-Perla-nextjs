@@ -1,9 +1,10 @@
 import { content } from '@/lib/content';
 
 /**
- * Phrase hébraïque courbe en SVG textPath — sens original (non inversé).
+ * Phrase hébraïque courbe en SVG textPath — chaîne inversée pour
+ * compenser l'absence de reordering RTL le long d'un path.
  */
-const arcText = content.kolSasson;
+const arcText = Array.from(content.kolSasson).reverse().join('');
 
 export function HebrewArc() {
   return (

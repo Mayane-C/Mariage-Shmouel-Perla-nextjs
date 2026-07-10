@@ -50,10 +50,10 @@
     transform: translateY(340px);
     pointer-events: none;
   }
-  /* Ressort à la framer-motion (approximation CSS) — durée longue + courbe
-     douce = arrivée très lente comme le BM Chmouel. */
+  /* Glissement d'un seul tenant, sans rebond — expo-out propre,
+     décélération continue jusqu'à l'arrêt. */
   .block, footer {
-    transition: opacity 3.4s ease-out, transform 3.8s cubic-bezier(0.18, 0.88, 0.28, 1);
+    transition: opacity 3.4s ease-out, transform 3.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
   .invitation-formal {
@@ -513,7 +513,7 @@
   }
   @media (max-width: 720px) {
     .arc-wrap {
-      margin-top: 48px;
+      margin-top: -48px;
     }
   }
   /* Logo mariage sous l'arc hébraïque dans le faire-part */
