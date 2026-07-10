@@ -50,10 +50,20 @@
     transform: translateY(340px);
     pointer-events: none;
   }
+  @media (max-width: 720px) {
+    body:not(.revealed) .block,
+    body:not(.revealed) footer {
+      /* Distance réduite en mobile — évite la désynchro entre la
+         transition CSS et le smooth-scroll (le block saute sinon à
+         sa position finale trop vite). */
+      transform: translateY(120px);
+    }
+  }
   /* Glissement d'un seul tenant, sans rebond — expo-out propre,
      décélération continue jusqu'à l'arrêt. */
   .block, footer {
     transition: opacity 3.4s ease-out, transform 3.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
   .invitation-formal {
@@ -513,7 +523,7 @@
   }
   @media (max-width: 720px) {
     .arc-wrap {
-      margin-top: -48px;
+      margin-top: -32px;
     }
   }
   /* Logo mariage sous l'arc hébraïque dans le faire-part */

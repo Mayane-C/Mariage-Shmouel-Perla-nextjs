@@ -81,12 +81,16 @@ export function BackgroundVideo() {
     };
 
     const doScrollToInvitation = () => {
+      // Retard un peu plus grand : la transition CSS du bloc a le temps
+      // de démarrer avant que le scroll ne bouge le viewport. Réduit les
+      // chances que la transition soit court-circuitée par le layout re-flow
+      // (surtout sensible en mobile Safari).
       setTimeout(() => {
         document.getElementById('invitation')?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
-      }, 320);
+      }, 500);
     };
 
     /**
