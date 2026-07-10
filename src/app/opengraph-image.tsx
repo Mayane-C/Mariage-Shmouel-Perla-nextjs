@@ -139,17 +139,17 @@ export default async function OG() {
           <span>Perla</span>
         </div>
 
-        {/* Noms hébreux */}
+        {/* Noms hébreux — chaîne inversée pour rendu RTL sans reordering
+            (Satori ne fait pas de bidi automatique). */}
         <div
           style={{
             fontSize: 32,
             color: sand,
             letterSpacing: '0.04em',
             marginBottom: 24,
-            direction: 'rtl',
           }}
         >
-          שמואל ופרלה
+          {Array.from('שמואל ופרלה').reverse().join('')}
         </div>
 
         {/* Date en italique */}
