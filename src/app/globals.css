@@ -52,12 +52,14 @@
     pointer-events: none;
   }
   @media (max-width: 720px) {
+    /* Mobile : pas de translateY du tout. Uniquement fade opacité.
+       Sur mobile Safari, la transition transform simultanée au smooth-scroll
+       créait un effet visuel où le bloc semblait 'apparaître trop haut puis
+       descendre'. En retirant le transform, on garantit que le bloc reste à
+       sa position finale de layout de bout en bout — seule l'opacité varie. */
     body:not(.revealed) .block,
     body:not(.revealed) footer {
-      /* Distance réduite en mobile — évite la désynchro entre la
-         transition CSS et le smooth-scroll (le block saute sinon à
-         sa position finale trop vite). */
-      transform: translateY(120px);
+      transform: none;
     }
   }
   /* Glissement d'un seul tenant, sans rebond — expo-out propre,
@@ -65,6 +67,14 @@
   .block, footer {
     transition: opacity 3.4s ease-out, transform 3.4s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity;
+  }
+  @media (max-width: 720px) {
+    /* Mobile : durée du fade-in raccourcie car plus de mouvement à
+       accompagner — 3.4 s deviennent inutilement longues sans transform. */
+    .block, footer {
+      transition: opacity 1.6s ease-out;
+      will-change: opacity;
+    }
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
   .invitation-formal {
