@@ -6,6 +6,7 @@ import { Details } from '@/components/Details';
 import { Bracha } from '@/components/Bracha';
 import { RSVP } from '@/components/RSVP';
 import { Footer } from '@/components/Footer';
+import { ScrollHint } from '@/components/ScrollHint';
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
         <RSVP />
       </div>
       <Footer />
+      <ScrollHint />
     </>
   );
 }

@@ -1393,3 +1393,41 @@ body:not(.revealed) .cell:not(:last-child)::after {
     padding-top: 74px !important;
   }
 }
+
+/* ─────────────────────────────────────────
+   Scroll hint (flèches latérales fixes)
+   ───────────────────────────────────────── */
+.scroll-hint {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  color: #B8935F;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.scroll-hint.is-visible {
+  opacity: 1;
+}
+.scroll-hint-side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.scroll-hint-left { left: 12px; }
+.scroll-hint-right { right: 12px; }
+@media (min-width: 720px) {
+  .scroll-hint-left { left: 32px; }
+  .scroll-hint-right { right: 32px; }
+}
+.scroll-hint-arrow {
+  animation: scroll-hint-bounce 1.7s ease-in-out infinite;
+  filter: drop-shadow(0 1px 4px rgba(122, 95, 62, 0.4));
+}
+@keyframes scroll-hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint-arrow { animation: none; }
+}
