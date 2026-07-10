@@ -17,7 +17,7 @@ export function Hero() {
           {content.maries.conjointe}
         </h1>
         <div className="hebrew-names">
-          שמואל <span className="amp">&amp;</span> פרלה
+          שמואל <span className="amp">&amp;</span> פערלה
         </div>
         <Countdown />
       </div>

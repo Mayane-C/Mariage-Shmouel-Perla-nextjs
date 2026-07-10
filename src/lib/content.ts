@@ -5,7 +5,7 @@ export const content = {
   maries: {
     prenomLatin: 'Shmouel',
     conjointe: 'Perla',
-    prenomHebrew: 'שמואל ופרלה',
+    prenomHebrew: 'שמואל ופערלה',
   },
   familles: {
     marie: 'Famille Smadja',

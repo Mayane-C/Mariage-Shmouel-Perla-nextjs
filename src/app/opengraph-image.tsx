@@ -166,7 +166,7 @@ export default async function OG() {
           >
             &amp;
           </span>
-          <span>{Array.from('פרלה').reverse().join('')}</span>
+          <span>{Array.from('פערלה').reverse().join('')}</span>
         </div>
 
         {/* Date en italique */}
