@@ -57,6 +57,7 @@ export const content = {
     weddingLogo: '/images/wedding-logo.png',
     ltdLogo: '/images/ltd-logo.png',
     rings: '/images/rings.png',
+    colombe: '/images/colombe.png',
     video: '/video/intro.mp4',
     ornaments: [
       '/images/ornaments/ornament-01.png',

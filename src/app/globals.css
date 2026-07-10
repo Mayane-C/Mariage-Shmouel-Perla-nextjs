@@ -636,14 +636,33 @@
     color: var(--taupe-deep);
     font-weight: 400;
   }
+  .memorial-dove {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-left: 8px;
+    vertical-align: -0.18em;
+    background: linear-gradient(135deg, #B8935F 0%, #C9A87D 45%, #8A6E4A 100%);
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    opacity: 0.85;
+    filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.15));
+  }
+  @media (min-width: 720px) {
+    .memorial-dove { width: 22px; height: 22px; }
+  }
 
   /* --- Invitation formelle --- */
   .invitation-formal .preamble {
-    max-width: 620px;
+    max-width: 540px;
     margin: 28px auto 0;
-    font-size: clamp(32px, 6vw, 48px);
+    font-size: clamp(22px, 4vw, 32px);
     color: var(--taupe);
-    line-height: 1.25;
+    line-height: 1.35;
   }
   .verse-hebrew {
     font-family: var(--font-hebrew);
@@ -863,11 +882,11 @@
     max-width: 520px;
   }
   .bracha .translation {
-    max-width: 480px;
+    max-width: 520px;
     margin: 32px auto 0;
     font-style: italic;
     color: var(--taupe);
-    font-size: 15px;
+    font-size: 17.5px;
     line-height: 1.85;
   }
 
@@ -889,7 +908,7 @@
     font-size: 10.5px;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--sand-deep);
+    color: #7A5F3E;
     margin: 28px 0 10px;
   }
   .rsvp-form input[type="text"],
@@ -899,7 +918,7 @@
     width: 100%;
     background: transparent;
     border: 0;
-    border-bottom: 1px solid var(--sand);
+    border-bottom: 1px solid #A88962;
     padding: 8px 0;
     font-family: inherit;
     font-size: 15px;
@@ -915,8 +934,8 @@
     min-height: 72px;
   }
   .rsvp-form select {
-    background-image: linear-gradient(45deg, transparent 50%, var(--sand-deep) 50%),
-                      linear-gradient(135deg, var(--sand-deep) 50%, transparent 50%);
+    background-image: linear-gradient(45deg, transparent 50%, #7A5F3E 50%),
+                      linear-gradient(135deg, #7A5F3E 50%, transparent 50%);
     background-position: calc(100% - 14px) 50%, calc(100% - 9px) 50%;
     background-size: 5px 5px, 5px 5px;
     background-repeat: no-repeat;
@@ -925,7 +944,7 @@
   .rsvp-form input:focus,
   .rsvp-form textarea:focus,
   .rsvp-form select:focus {
-    border-bottom-color: var(--sand-deep);
+    border-bottom-color: #5F4A2F;
   }
   .rsvp-form input:focus-visible,
   .rsvp-form select:focus-visible,

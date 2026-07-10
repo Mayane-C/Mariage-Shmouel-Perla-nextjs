@@ -59,6 +59,14 @@ export function FairePart() {
         <strong>
           {content.memorial.nom} <span className="hebrew">{content.memorial.suffixe}</span>
         </strong>
+        <span
+          className="memorial-dove"
+          aria-hidden="true"
+          style={{
+            maskImage: `url(${content.images.colombe})`,
+            WebkitMaskImage: `url(${content.images.colombe})`,
+          }}
+        />
       </p>
     </section>
   );
