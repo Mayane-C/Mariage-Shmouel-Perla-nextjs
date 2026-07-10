@@ -1,0 +1,23 @@
+import { BackgroundVideo } from '@/components/BackgroundVideo';
+import { Hero } from '@/components/Hero';
+import { FairePart } from '@/components/FairePart';
+import { Details } from '@/components/Details';
+import { Bracha } from '@/components/Bracha';
+import { RSVP } from '@/components/RSVP';
+import { Footer } from '@/components/Footer';
+
+export default function Home() {
+  return (
+    <>
+      <BackgroundVideo />
+      <div className="page">
+        <Hero />
+        <FairePart />
+        <Details />
+        <Bracha />
+        <RSVP />
+      </div>
+      <Footer />
+    </>
+  );
+}
