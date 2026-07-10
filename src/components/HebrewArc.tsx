@@ -13,7 +13,10 @@ export function HebrewArc() {
       aria-label={content.kolSasson}
     >
       <defs>
-        <path id="arc-path" d="M 20 138 Q 280 -30 540 138" fill="none" />
+        {/* Path inversé (droite → gauche) pour que l'hébreu se lise
+            dans le bon sens, et arc adouci (Q y = 20 au lieu de -30)
+            pour un dôme moins prononcé. */}
+        <path id="arc-path" d="M 540 138 Q 280 20 20 138" fill="none" />
       </defs>
       <text
         fontFamily="'FrankRuhlLibre','Frank Ruhl Libre','Frank Ruehl','David',serif"

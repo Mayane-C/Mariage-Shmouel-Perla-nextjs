@@ -13,6 +13,13 @@ export function FairePart() {
 
       <HebrewArc />
 
+      <img
+        className="faire-part-logo"
+        src={content.images.weddingLogo}
+        alt=""
+        aria-hidden="true"
+      />
+
       <svg className="ornament" viewBox="0 0 120 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <line x1="0" y1="10" x2="46" y2="10" stroke="currentColor" strokeWidth="0.7" />
         <circle cx="60" cy="10" r="2.5" fill="none" stroke="currentColor" strokeWidth="0.7" />

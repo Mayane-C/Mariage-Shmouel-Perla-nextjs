@@ -35,31 +35,38 @@
   body:not(.revealed) .block,
   body:not(.revealed) footer {
     opacity: 0;
-    transform: translateY(180px);
+    transform: translateY(240px);
     pointer-events: none;
   }
-  /* Ressort à la framer-motion (approximation CSS) — courbe avec léger
-     dépassement + longue durée = arrivée douce, comme le BM Chmouel */
+  /* Ressort à la framer-motion (approximation CSS) — durée longue + courbe
+     douce = arrivée très lente comme le BM Chmouel. */
   .block, footer {
-    transition: opacity 1.4s ease-out, transform 1.9s cubic-bezier(0.22, 1.12, 0.3, 1);
+    transition: opacity 2.4s ease-out, transform 2.8s cubic-bezier(0.18, 0.88, 0.28, 1);
   }
-  /* Bloc faire-part : décollage immédiat pour être bien visible dès la fin
-     de l'intro vidéo. Les autres blocs sont staggerés pour une entrée en
-     cascade souple. */
+  /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
   .invitation-formal {
     transition-delay: 0s, 0s;
   }
   .details {
-    transition-delay: 0.15s, 0.15s;
-  }
-  .bracha {
     transition-delay: 0.25s, 0.25s;
   }
+  .bracha {
+    transition-delay: 0.45s, 0.45s;
+  }
   .rsvp {
-    transition-delay: 0.35s, 0.35s;
+    transition-delay: 0.65s, 0.65s;
   }
   footer {
-    transition-delay: 0.45s, 0.45s;
+    transition-delay: 0.85s, 0.85s;
+  }
+  /* Offset scroll pour que #invitation ne colle pas au header sticky */
+  #invitation, #details, #bracha, #rsvp {
+    scroll-margin-top: 100px;
+  }
+  @media (max-width: 720px) {
+    #invitation, #details, #bracha, #rsvp {
+      scroll-margin-top: 84px;
+    }
   }
   /* Vidéo de fond scrubbée : présente sur toute la page */
   .bg-video {
@@ -206,9 +213,9 @@
   }
   .script-preamble {
     font-family: var(--font-script);
-    font-size: clamp(96px, 20vw, 168px);
+    font-size: clamp(112px, 22vw, 196px);
     color: var(--taupe);
-    line-height: 1.1;
+    line-height: 1.08;
     font-weight: 400;
     font-style: normal;
     letter-spacing: 0;
@@ -383,8 +390,12 @@
   }
 
   @media (max-width: 520px) {
-    .block { padding: 56px 24px; }
-    .page { padding: 0 12px 12px; }
+    .block { padding: 56px 22px; }
+    .page { padding: 0 22px 22px; }
+  }
+  @media (max-width: 380px) {
+    .block { padding: 48px 18px; }
+    .page { padding: 0 16px 16px; }
   }
 
   /* --- Hero --- */
@@ -482,8 +493,19 @@
   .arc-wrap {
     width: 100%;
     max-width: 520px;
-    margin: -40px auto 0;
+    margin: 0 auto 0;
     display: block;
+  }
+  /* Logo mariage sous l'arc hébraïque dans le faire-part */
+  .faire-part-logo {
+    display: block;
+    width: 96px;
+    height: auto;
+    margin: 8px auto 24px;
+    filter: drop-shadow(0 3px 8px rgba(74, 63, 53, 0.18));
+  }
+  @media (max-width: 520px) {
+    .faire-part-logo { width: 72px; margin: 4px auto 16px; }
   }
   .date-line {
     margin-top: 40px;
@@ -1174,36 +1196,58 @@
 .mobile-menu {
   display: none;
   position: fixed;
-  inset: 60px 0 0 0;
+  inset: 0;
   background: rgba(245, 239, 230, 0.98);
-  backdrop-filter: blur(10px);
-  animation: menu-fade 0.25s ease;
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  z-index: 99;
+  animation: menu-fade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mobile-menu ul {
   list-style: none;
-  padding: 40px 24px;
+  padding: 0;
   margin: 0;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 28px;
+  justify-content: center;
+  gap: 42px;
 }
+.mobile-menu li {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: item-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.mobile-menu li:nth-child(1) { animation-delay: 0.10s; }
+.mobile-menu li:nth-child(2) { animation-delay: 0.16s; }
+.mobile-menu li:nth-child(3) { animation-delay: 0.22s; }
+.mobile-menu li:nth-child(4) { animation-delay: 0.28s; }
 .mobile-menu a {
-  font-size: 15px;
-  letter-spacing: 0.2em;
+  font-family: "Didot", Georgia, serif;
+  font-size: 26px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--taupe-deep);
   text-decoration: none;
+  padding: 12px 24px;
+  transition: color 0.3s ease, letter-spacing 0.3s ease;
 }
+.mobile-menu a:active { color: var(--sand-deep); }
 @keyframes menu-fade {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+@keyframes item-in {
+  to { opacity: 1; transform: translateY(0); }
 }
 @media (max-width: 720px) {
   .nav-links { display: none; }
   .nav-burger { display: inline-flex; }
   .mobile-menu { display: block; }
 }
+/* Empêcher le scroll de la page derrière le menu ouvert */
+body:has(.mobile-menu) { overflow: hidden; }
 
 /* ─────────────────────────────────────────
    Overlay renforcé sur le hero pour lisibilité
