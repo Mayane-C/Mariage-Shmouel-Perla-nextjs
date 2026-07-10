@@ -16,9 +16,9 @@ import { useEffect, useRef } from 'react';
  *      décodée → instantané, pas de repaint bloquant.
  */
 
-const TOTAL = 632;
+const TOTAL = 662;
 const INTRO_END_IDX = TOTAL;      // 100 % : toute la vidéo joue au clic, plus rien n'est réservé au scroll-scrub
-const INTRO_DURATION_MS = 5500;
+const INTRO_DURATION_MS = 8000;   // 8 s pour 662 frames = ~2.75× la vitesse native 30 fps — lisible mais dynamique
 const SCROLL_LERP = 0.10;   // interpolation par frame pour le scroll (plus petit = plus doux)
 const INTRO_LERP = 1;        // pas d'interpolation pendant l'intro (l'animation JS s'en charge)
 
