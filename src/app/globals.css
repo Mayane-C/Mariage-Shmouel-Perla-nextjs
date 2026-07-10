@@ -35,11 +35,31 @@
   body:not(.revealed) .block,
   body:not(.revealed) footer {
     opacity: 0;
-    transform: translateY(60px);
+    transform: translateY(180px);
     pointer-events: none;
   }
+  /* Ressort à la framer-motion (approximation CSS) — courbe avec léger
+     dépassement + longue durée = arrivée douce, comme le BM Chmouel */
   .block, footer {
-    transition: opacity 1.1s ease-out, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 1.4s ease-out, transform 1.9s cubic-bezier(0.22, 1.12, 0.3, 1);
+  }
+  /* Bloc faire-part : décollage immédiat pour être bien visible dès la fin
+     de l'intro vidéo. Les autres blocs sont staggerés pour une entrée en
+     cascade souple. */
+  .invitation-formal {
+    transition-delay: 0s, 0s;
+  }
+  .details {
+    transition-delay: 0.15s, 0.15s;
+  }
+  .bracha {
+    transition-delay: 0.25s, 0.25s;
+  }
+  .rsvp {
+    transition-delay: 0.35s, 0.35s;
+  }
+  footer {
+    transition-delay: 0.45s, 0.45s;
   }
   /* Vidéo de fond scrubbée : présente sur toute la page */
   .bg-video {
