@@ -20,9 +20,9 @@ import { useEffect, useRef } from 'react';
  */
 
 const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
-const PAUSE_A_FRAME = 180;       // frame à t=6s après trim (= t=7s source) — fin phase A
-const PAUSE_B_FRAME = 333;       // frame à t=11.1s après trim — fin phase B, début scroll-scrub
-const INTRO_A_MS = 4000;         // durée réelle phase A (180 frames en 4s ≈ 1.5× native)
+const PAUSE_A_FRAME = 270;       // frame à t=9s après trim (= t=10s source) — fin phase A
+const PAUSE_B_FRAME = 423;       // frame à t=14.1s après trim — fin phase B, début scroll-scrub
+const INTRO_A_MS = 6000;         // durée réelle phase A (270 frames en 6s ≈ 1.5× native)
 const INTRO_B_MS = 3400;         // durée réelle phase B (153 frames en 3.4s ≈ 1.5×, calée sur la
                                  // transition CSS 3.4s du glissement du bloc .invitation-formal)
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
@@ -126,6 +126,10 @@ export function BackgroundVideo() {
     const onRevealClick = (e: Event) => {
       e.preventDefault();
       if (revealedRef.current) return;
+      // L'overlay sombre se retire immédiatement, en même temps que le hero
+      // s'estompe. .revealed n'est ajouté qu'à la fin de la phase A pour
+      // déclencher le glissement des blocs.
+      document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
       // Phase A : frames 1 → 90 en 2 s (intro accélérée)

@@ -105,7 +105,7 @@
     z-index: 1;
     pointer-events: none;
     background: linear-gradient(180deg, rgba(245,239,230,0.35) 0%, rgba(245,239,230,0.55) 100%);
-    transition: opacity 0.6s ease;
+    transition: opacity 0.6s ease, background 0.9s ease;
   }
   body:not(.revealed) .bg-veil { opacity: 0.85; }
   body.revealed .bg-veil { opacity: 1; }
@@ -1338,7 +1338,7 @@ body:has(.mobile-menu) { overflow: hidden; }
 /* ─────────────────────────────────────────
    Overlay renforcé sur le hero pour lisibilité
    ───────────────────────────────────────── */
-body:not(.revealed) .bg-veil {
+body:not(.hero-out) .bg-veil {
   background:
     radial-gradient(
       ellipse 80% 90% at center,
