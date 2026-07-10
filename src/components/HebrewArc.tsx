@@ -2,7 +2,14 @@ import { content } from '@/lib/content';
 
 /**
  * Phrase hébraïque courbe en SVG textPath — קול ששון וקול שמחה.
+ *
+ * Pour éviter le retournement des lettres :
+ *   - path dessiné dans le sens normal (gauche → droite)
+ *   - la chaîne hébraïque est inversée (codepoints en ordre visuel inverse)
+ *     pour que la lecture RTL colle à la direction du path.
  */
+const reversedText = Array.from(content.kolSasson).reverse().join('');
+
 export function HebrewArc() {
   return (
     <svg
@@ -13,10 +20,7 @@ export function HebrewArc() {
       aria-label={content.kolSasson}
     >
       <defs>
-        {/* Path inversé (droite → gauche) pour que l'hébreu se lise
-            dans le bon sens, et arc adouci (Q y = 20 au lieu de -30)
-            pour un dôme moins prononcé. */}
-        <path id="arc-path" d="M 540 138 Q 280 20 20 138" fill="none" />
+        <path id="arc-path" d="M 20 138 Q 280 20 540 138" fill="none" />
       </defs>
       <text
         fontFamily="'FrankRuhlLibre','Frank Ruhl Libre','Frank Ruehl','David',serif"
@@ -24,10 +28,9 @@ export function HebrewArc() {
         fontWeight="700"
         fill="#A88962"
         letterSpacing="0.5"
-        direction="rtl"
       >
         <textPath href="#arc-path" startOffset="50%" textAnchor="middle">
-          {content.kolSasson}
+          {reversedText}
         </textPath>
       </text>
     </svg>
