@@ -1,40 +1,56 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { content } from '@/lib/content';
 
 /**
- * Vidéo de fond scrubbée (position: fixed) — pilotée d'abord par une animation
- * JS au clic sur "Voir l'invitation", puis par le scroll après reveal.
+ * Fond d'écran orchestré par séquence de frames JPG (comme le BM Chmouel).
+ *
+ * Pourquoi une séquence d'images plutôt qu'une <video> scrubbée ?
+ *   → Chaque frame est une image statique, décodée une fois puis mise en
+ *     cache par le navigateur. Le scroll qui déclenche un swap de `src`
+ *     est instantané (pas de décodage codec, pas de seek). Le rendu est
+ *     100 % smooth même sur mobile Safari.
+ *
+ * Phases :
+ *   ┌─────────────────────┬──────────────────────────────────────────┐
+ *   │ Hero (avant clic)   │ Frame 1 figée                            │
+ *   │ Intro (2.5 s au clic│ Animation 1 → INTRO_END_IDX (ease-out)   │
+ *   │ Scroll après reveal │ INTRO_END_IDX → TOTAL (piloté par scroll)│
+ *   └─────────────────────┴──────────────────────────────────────────┘
  */
+
+const TOTAL = 253;
+const INTRO_END_IDX = Math.round(TOTAL * 0.65); // ~164
+const INTRO_DURATION_MS = 2500;
+
+const frameSrc = (i: number) =>
+  `/frames/frame-${String(Math.max(1, Math.min(TOTAL, i))).padStart(3, '0')}.jpg`;
+
 export function BackgroundVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const introEndTimeRef = useRef(14); // recalculé à partir de la durée
+  const layerARef = useRef<HTMLImageElement>(null);
+  const layerBRef = useRef<HTMLImageElement>(null);
+  const currentIdxRef = useRef(1);
+  const targetIdxRef = useRef(1);
 
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
+    // ── Préchargement de toutes les frames ──────────────────────────
+    // On les met en cache dès le mount ; le hero reste sur la frame 1
+    // pendant que les autres se téléchargent en arrière-plan.
+    const preloadImages: HTMLImageElement[] = [];
+    for (let i = 1; i <= TOTAL; i++) {
+      const im = new Image();
+      im.src = frameSrc(i);
+      preloadImages.push(im);
+    }
 
-    const safeSetTime = (t: number) => {
-      try {
-        v.currentTime = Math.max(0, Math.min(v.duration || 0, t));
-      } catch {
-        /* noop */
-      }
+    const setFrame = (idx: number) => {
+      const clamped = Math.max(1, Math.min(TOTAL, Math.round(idx)));
+      if (clamped === currentIdxRef.current) return;
+      currentIdxRef.current = clamped;
+      if (layerARef.current) layerARef.current.src = frameSrc(clamped);
     };
 
-    const applyDuration = () => {
-      if (v.duration && !isNaN(v.duration)) {
-        introEndTimeRef.current = v.duration * 0.65;
-      }
-    };
-    if (v.readyState >= 1 || v.duration > 0) applyDuration();
-    v.addEventListener('loadedmetadata', applyDuration);
-    v.addEventListener('loadeddata', () => safeSetTime(0));
-    v.pause();
-    safeSetTime(0);
-
-    // ─── Reveal — animation currentTime + slide du faire-part ─────
+    // ── Reveal + intro animation ────────────────────────────────────
     const doRevealAndScroll = () => {
       document.body.classList.add('revealed');
       setTimeout(() => {
@@ -45,12 +61,12 @@ export function BackgroundVideo() {
       }, 320);
     };
 
-    const animateIntro = (from: number, to: number, durationMs: number, done?: () => void) => {
+    const animateIntro = (from: number, to: number, done?: () => void) => {
       const start = performance.now();
       const run = (now: number) => {
-        const t = Math.min(1, (now - start) / durationMs);
+        const t = Math.min(1, (now - start) / INTRO_DURATION_MS);
         const eased = 1 - Math.pow(1 - t, 3);
-        safeSetTime(from + (to - from) * eased);
+        setFrame(from + (to - from) * eased);
         if (t < 1) requestAnimationFrame(run);
         else done?.();
       };
@@ -61,22 +77,18 @@ export function BackgroundVideo() {
     const onRevealClick = (e: Event) => {
       e.preventDefault();
       if (document.body.classList.contains('revealed')) return;
-      if (!v.duration || v.networkState === 3) {
-        doRevealAndScroll();
-        return;
-      }
       document.querySelector('.hero')?.classList.add('fading-out');
-      animateIntro(0, introEndTimeRef.current, 2500, doRevealAndScroll);
+      animateIntro(1, INTRO_END_IDX, doRevealAndScroll);
       setTimeout(() => {
         if (!document.body.classList.contains('revealed')) doRevealAndScroll();
-      }, 6000);
+      }, INTRO_DURATION_MS + 3000);
     };
     revealBtn?.addEventListener('click', onRevealClick);
 
-    // ─── Scroll → currentTime (après reveal) ──────────────────────
+    // ── Scroll → frame index ─────────────────────────────────────────
     let ticking = false;
     const onScroll = () => {
-      if (!v.duration || !document.body.classList.contains('revealed')) return;
+      if (!document.body.classList.contains('revealed')) return;
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
@@ -93,12 +105,17 @@ export function BackgroundVideo() {
         const range = Math.max(1, endY - startY);
         const progress = Math.min(1, Math.max(0, (window.scrollY - startY) / range));
 
-        const target = introEndTimeRef.current + progress * (v.duration - introEndTimeRef.current);
-        const lerped = v.currentTime + (target - v.currentTime) * 0.3;
-        safeSetTime(lerped);
+        const target = INTRO_END_IDX + progress * (TOTAL - INTRO_END_IDX);
+        targetIdxRef.current = target;
+        // Interpolation douce pour lisser les micro-sauts de scroll
+        const smooth = currentIdxRef.current + (target - currentIdxRef.current) * 0.35;
+        setFrame(smooth);
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Frame initiale
+    setFrame(1);
 
     return () => {
       revealBtn?.removeEventListener('click', onRevealClick);
@@ -108,10 +125,15 @@ export function BackgroundVideo() {
 
   return (
     <>
-      <div className="bg-video" id="bgVideo" aria-hidden="true">
-        <video ref={videoRef} id="bgVideoEl" muted playsInline preload="auto" tabIndex={-1}>
-          <source src={content.images.video} type="video/mp4" />
-        </video>
+      <div className="bg-video" aria-hidden="true">
+        <img
+          ref={layerARef}
+          src={frameSrc(1)}
+          alt=""
+          className="bg-frame"
+          decoding="async"
+        />
+        <img ref={layerBRef} alt="" className="bg-frame" style={{ display: 'none' }} decoding="async" />
       </div>
       <div className="bg-veil" aria-hidden="true" />
     </>
