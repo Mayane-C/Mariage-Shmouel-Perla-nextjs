@@ -20,9 +20,9 @@ import { useEffect, useRef } from 'react';
  */
 
 const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
-const PAUSE_A_FRAME = 90;        // frame à t=3s après trim (= t=4s source) — fin phase A
-const PAUSE_B_FRAME = 243;       // frame à t=8.1s après trim — fin phase B, début scroll-scrub
-const INTRO_A_MS = 2000;         // durée réelle phase A (90 frames en 2s ≈ 1.5× native)
+const PAUSE_A_FRAME = 180;       // frame à t=6s après trim (= t=7s source) — fin phase A
+const PAUSE_B_FRAME = 333;       // frame à t=11.1s après trim — fin phase B, début scroll-scrub
+const INTRO_A_MS = 4000;         // durée réelle phase A (180 frames en 4s ≈ 1.5× native)
 const INTRO_B_MS = 3400;         // durée réelle phase B (153 frames en 3.4s ≈ 1.5×, calée sur la
                                  // transition CSS 3.4s du glissement du bloc .invitation-formal)
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
