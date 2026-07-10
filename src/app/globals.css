@@ -508,7 +508,7 @@
   .arc-wrap {
     width: 100%;
     max-width: 520px;
-    margin: -48px auto 0;
+    margin: -96px auto 0;
     display: block;
   }
   /* Logo mariage sous l'arc hébraïque dans le faire-part */
@@ -867,8 +867,9 @@
     margin-top: 6px;
   }
   .note {
+    font-family: "Didot", Georgia, serif;
     margin-top: 40px;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--sand-deep);
     font-style: italic;
   }
@@ -932,7 +933,8 @@
   /* --- RSVP --- */
   .rsvp .script-heading { margin-bottom: 10px; }
   .deadline {
-    font-size: 13px;
+    font-family: "Didot", Georgia, serif;
+    font-size: 15px;
     color: var(--sand-deep);
     font-style: italic;
     margin: 0;
