@@ -3,7 +3,7 @@ import { Ornament } from './Ornament';
 
 export function Bracha() {
   return (
-    <section className="bracha block">
+    <section id="bracha" className="bracha block">
       <Ornament n={3} className="block-ornament-corner bl" />
       <Ornament n={3} className="block-ornament-accent bl" />
       <Ornament n={7} className="block-ornament tr" />

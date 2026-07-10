@@ -1,4 +1,5 @@
 import { BackgroundVideo } from '@/components/BackgroundVideo';
+import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
 import { FairePart } from '@/components/FairePart';
 import { Details } from '@/components/Details';
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <>
       <BackgroundVideo />
+      <Header />
       <div className="page">
         <Hero />
         <FairePart />

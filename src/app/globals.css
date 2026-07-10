@@ -1065,3 +1065,165 @@
     0%, 100% { background-position: 100% 50%; }
     50% { background-position: 0% 50%; }
   }
+
+/* ─────────────────────────────────────────
+   Header sticky + menu de navigation
+   ───────────────────────────────────────── */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  transition: background-color 0.5s ease, box-shadow 0.5s ease, backdrop-filter 0.5s ease;
+  background: transparent;
+}
+.site-header.scrolled {
+  background: rgba(245, 239, 230, 0.94);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  box-shadow: 0 1px 0 rgba(107, 91, 74, 0.06);
+}
+.site-nav {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.site-header .brand {
+  font-family: "Didot", Georgia, serif;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  text-decoration: none;
+  transition: color 0.5s ease;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.site-header.scrolled .brand {
+  color: var(--taupe-deep);
+  text-shadow: none;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-links a {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  transition: color 0.5s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.nav-links a:hover {
+  color: #FFFFFF;
+}
+.site-header.scrolled .nav-links a {
+  color: rgba(107, 91, 74, 0.85);
+  text-shadow: none;
+}
+.site-header.scrolled .nav-links a:hover {
+  color: var(--taupe-deep);
+}
+.nav-burger {
+  display: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #FFFFFF;
+  padding: 6px;
+  transition: color 0.5s ease;
+}
+.site-header.scrolled .nav-burger,
+.site-header:has(.mobile-menu) .nav-burger {
+  color: var(--taupe-deep);
+}
+.mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 60px 0 0 0;
+  background: rgba(245, 239, 230, 0.98);
+  backdrop-filter: blur(10px);
+  animation: menu-fade 0.25s ease;
+}
+.mobile-menu ul {
+  list-style: none;
+  padding: 40px 24px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+.mobile-menu a {
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--taupe-deep);
+  text-decoration: none;
+}
+@keyframes menu-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (max-width: 720px) {
+  .nav-links { display: none; }
+  .nav-burger { display: inline-flex; }
+  .mobile-menu { display: block; }
+}
+
+/* ─────────────────────────────────────────
+   Overlay renforcé sur le hero pour lisibilité
+   ───────────────────────────────────────── */
+body:not(.revealed) .bg-veil {
+  background:
+    radial-gradient(ellipse at center, rgba(20, 15, 10, 0.55) 0%, rgba(20, 15, 10, 0.30) 40%, rgba(245, 239, 230, 0.15) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.20) 100%);
+  opacity: 1;
+}
+/* Textes du hero en clair par-dessus l'overlay sombre */
+body:not(.revealed) .hero .bsd,
+body:not(.revealed) .hero .script-label,
+body:not(.revealed) .hero .cell .unit {
+  color: rgba(255, 245, 225, 0.85);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+body:not(.revealed) .hero .hebrew-names {
+  color: rgba(255, 245, 225, 0.95);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+body:not(.revealed) .hero .cell .num {
+  color: rgba(255, 250, 235, 1);
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+}
+body:not(.revealed) .hero .btn-hero {
+  color: rgba(255, 250, 235, 1);
+  border-bottom-color: rgba(255, 240, 210, 0.75);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+/* Le monogramme reste visible tel quel (déjà doré) mais glow renforcé */
+body:not(.revealed) .hero .hero-logo {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 24px rgba(255, 220, 160, 0.25));
+}
+/* Le trait vertical du countdown reste visible */
+body:not(.revealed) .cell:not(:last-child)::after {
+  background: rgba(255, 240, 210, 0.35);
+}
+
+/* Décaler légèrement le hero en dessous du header sticky */
+.hero {
+  padding-top: 88px !important;
+}
+@media (max-width: 720px) {
+  .hero {
+    padding-top: 74px !important;
+  }
+}

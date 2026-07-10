@@ -39,7 +39,7 @@ function PinIcon() {
 
 export function Details() {
   return (
-    <section className="details block">
+    <section id="details" className="details block">
       <Ornament n={3} className="block-ornament-corner tr" />
       <Ornament n={3} className="block-ornament-accent tr" />
       <Ornament n={6} className="block-ornament bl" />
