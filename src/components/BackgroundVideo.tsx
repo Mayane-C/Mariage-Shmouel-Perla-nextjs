@@ -17,8 +17,8 @@ import { useEffect, useRef } from 'react';
  */
 
 const TOTAL = 632;
-const INTRO_END_IDX = Math.round(TOTAL * 0.72);
-const INTRO_DURATION_MS = 4200;
+const INTRO_END_IDX = TOTAL;      // 100 % : toute la vidéo joue au clic, plus rien n'est réservé au scroll-scrub
+const INTRO_DURATION_MS = 5500;
 const SCROLL_LERP = 0.10;   // interpolation par frame pour le scroll (plus petit = plus doux)
 const INTRO_LERP = 1;        // pas d'interpolation pendant l'intro (l'animation JS s'en charge)
 

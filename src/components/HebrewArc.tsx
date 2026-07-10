@@ -1,13 +1,9 @@
 import { content } from '@/lib/content';
 
 /**
- * Phrase hébraïque courbe en SVG textPath.
- *
- * Astuce : la chaîne est inversée (dernière lettre → première) pour que
- * la lecture visuelle (de droite à gauche le long de l'arc) donne la
- * phrase dans le bon sens pour un lecteur hébreu.
+ * Phrase hébraïque courbe en SVG textPath — sens original (non inversé).
  */
-const reversedText = Array.from(content.kolSasson).reverse().join('');
+const arcText = content.kolSasson;
 
 export function HebrewArc() {
   return (
@@ -29,7 +25,7 @@ export function HebrewArc() {
         letterSpacing="0.5"
       >
         <textPath href="#arc-path" startOffset="50%" textAnchor="middle">
-          {reversedText}
+          {arcText}
         </textPath>
       </text>
     </svg>
