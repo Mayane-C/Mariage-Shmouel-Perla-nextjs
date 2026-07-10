@@ -387,12 +387,12 @@
     .block-ornament-2.bl { bottom: -38px; left: 32px; }
   }
   .block-arch {
-    border-radius: 280px 280px 24px 24px / 210px 210px 24px 24px;
+    border-radius: 280px 280px 0 0 / 210px 210px 0 0;
     padding-top: 168px;
   }
   @media (max-width: 520px) {
     .block-arch {
-      border-radius: 180px 180px 24px 24px / 140px 140px 24px 24px;
+      border-radius: 180px 180px 0 0 / 140px 140px 0 0;
       padding-top: 118px;
     }
   }
