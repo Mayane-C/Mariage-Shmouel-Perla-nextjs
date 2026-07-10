@@ -29,7 +29,8 @@ function Arrow() {
 }
 
 // Durée qu'on attend après body.revealed avant d'afficher l'invite.
-// Correspond à la fin de la phase B vidéo et du glissement du bloc.
+// Correspond à la fin du glissement du bloc (3.4 s desktop) — la vidéo,
+// elle, se fige immédiatement à body.revealed.
 const SHOW_AFTER_REVEALED_MS = 3400;
 
 export function ScrollHint() {

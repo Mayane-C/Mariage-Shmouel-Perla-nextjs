@@ -3,30 +3,23 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Fond d'écran orchestré par séquence de frames JPG (pattern BM Chmouel),
- * décomposé en deux phases distinctes :
+ * Fond d'écran orchestré par séquence de frames JPG (pattern BM Chmouel).
  *
  *   Phase A — intro accélérée (frame 1 → PAUSE_A_FRAME) en INTRO_A_MS.
  *     Joue automatiquement au clic sur « Voir l'invitation ».
  *
- *   Phase B — continuation à la même cadence (PAUSE_A_FRAME → PAUSE_B_FRAME)
- *     en INTRO_B_MS, déclenchée à la fin de la phase A, en même temps que
- *     le glissement CSS du bloc faire-part (translateY 340 → 0). La vidéo
- *     avance donc « comme un scroll » pendant que le bloc monte, puis se
- *     fige quand le bloc est en place.
+ *   À la fin de phase A — la vidéo se fige EXACTEMENT sur PAUSE_A_FRAME
+ *     au moment où le bloc faire-part apparaît (body.revealed).
  *
- *   Après phase B — le scroll pilote la fin de la vidéo (PAUSE_B_FRAME → TOTAL)
+ *   Ensuite — le scroll pilote la fin de la vidéo (PAUSE_A_FRAME → TOTAL)
  *     au fur et à mesure que l'utilisateur descend dans les blocs suivants.
  */
 
 const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
 const PAUSE_A_FRAME = 300;       // frame à t=10s après trim — fin phase A (3.3s × 90 fps)
-const PAUSE_B_FRAME = 606;       // frame à t=20.2s après trim — fin phase B, vidéo se fige
 const INTRO_A_MS = 3300;         // durée réelle phase A (300 frames en 3.3s ≈ 90 fps = 3× native)
-                                 // Bloc apparaît à la fin — vidéo défile en continu jusque-là.
-const INTRO_B_MS = 3400;         // durée phase B strictement calée sur la transition CSS 3.4s
-                                 // du glissement du bloc — vidéo se fige EXACTEMENT à la fin du
-                                 // glissement (306 frames en 3.4s = 3× native).
+                                 // Bloc apparaît à la fin — vidéo se fige immédiatement à cette
+                                 // frame. Le reste (300 → 632) se dévoile au scroll utilisateur.
 
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
@@ -139,29 +132,23 @@ export function BackgroundVideo() {
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
-      // Phase A : frames 1 → 337 en 5 s (intro accélérée 2.25× native).
-      // Aucun freeze intermédiaire — la vidéo enchaîne directement sur
-      // phase B au moment où le bloc apparaît.
+      // Phase A : frames 1 → PAUSE_A_FRAME en INTRO_A_MS (intro accélérée
+      // 3× native). À la fin, la vidéo se fige EXACTEMENT sur PAUSE_A_FRAME
+      // au moment où le bloc apparaît. Le reste de la vidéo est réservé
+      // au scroll-scrub.
       animateSegment(1, PAUSE_A_FRAME, INTRO_A_MS, () => {
-        // Révèle les blocs (déclenche la transition CSS 3.4s du glissement
-        // translateY 340 → 0 sur .block/footer) et lance le scroll auto
-        // vers #invitation pour voir le glissement en direct.
         doRevealBlocks();
         doScrollToInvitation();
-        // Phase B : la vidéo continue à la même cadence pendant le
-        // glissement du bloc — se fige à PAUSE_B_FRAME quand le bloc
-        // arrive en position.
-        animateSegment(PAUSE_A_FRAME, PAUSE_B_FRAME, INTRO_B_MS);
       });
 
       // Filet de sécurité : si l'anim plante pour une raison ou une autre,
-      // on révèle quand même les blocs après le total des deux phases + 3s.
+      // on révèle quand même les blocs après la phase A + 3 s.
       setTimeout(() => {
         if (!revealedRef.current) {
           doRevealBlocks();
           doScrollToInvitation();
         }
-      }, INTRO_A_MS + INTRO_B_MS + 3000);
+      }, INTRO_A_MS + 3000);
     };
     revealBtn?.addEventListener('click', onRevealClick);
 
@@ -179,7 +166,7 @@ export function BackgroundVideo() {
         window.innerHeight * 0.4;
       const range = Math.max(1, endY - startY);
       const progress = Math.min(1, Math.max(0, (window.scrollY - startY) / range));
-      targetIdxRef.current = PAUSE_B_FRAME + progress * (TOTAL - PAUSE_B_FRAME);
+      targetIdxRef.current = PAUSE_A_FRAME + progress * (TOTAL - PAUSE_A_FRAME);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
