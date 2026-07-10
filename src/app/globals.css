@@ -1185,29 +1185,44 @@
    ───────────────────────────────────────── */
 body:not(.revealed) .bg-veil {
   background:
-    radial-gradient(ellipse at center, rgba(20, 15, 10, 0.55) 0%, rgba(20, 15, 10, 0.30) 40%, rgba(245, 239, 230, 0.15) 100%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.20) 100%);
+    radial-gradient(
+      ellipse 80% 90% at center,
+      rgba(15, 10, 5, 0.78) 0%,
+      rgba(15, 10, 5, 0.65) 30%,
+      rgba(15, 10, 5, 0.45) 55%,
+      rgba(15, 10, 5, 0.25) 80%,
+      rgba(245, 239, 230, 0.10) 100%
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.30) 100%);
   opacity: 1;
 }
 /* Textes du hero en clair par-dessus l'overlay sombre */
 body:not(.revealed) .hero .bsd,
 body:not(.revealed) .hero .script-label,
 body:not(.revealed) .hero .cell .unit {
-  color: rgba(255, 245, 225, 0.85);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 245, 225, 1);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.5);
 }
 body:not(.revealed) .hero .hebrew-names {
-  color: rgba(255, 245, 225, 0.95);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 245, 225, 1);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.5);
+}
+/* Forcer les prénoms Latin en ivoire (pas gold) quand l'overlay est actif */
+body:not(.revealed) .hero .names {
+  -webkit-text-fill-color: rgba(255, 250, 235, 1);
+  background: none;
+  color: rgba(255, 250, 235, 1);
+  filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+  animation: none;
 }
 body:not(.revealed) .hero .cell .num {
   color: rgba(255, 250, 235, 1);
-  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.6);
 }
 body:not(.revealed) .hero .btn-hero {
   color: rgba(255, 250, 235, 1);
-  border-bottom-color: rgba(255, 240, 210, 0.75);
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  border-bottom-color: rgba(255, 240, 210, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
 }
 /* Le monogramme reste visible tel quel (déjà doré) mais glow renforcé */
 body:not(.revealed) .hero .hero-logo {
