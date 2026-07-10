@@ -20,13 +20,13 @@ import { useEffect, useRef } from 'react';
  */
 
 const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
-const PAUSE_A_FRAME = 300;       // frame à t=10s après trim — fin phase A (4s × 75 fps)
-const PAUSE_B_FRAME = 555;       // frame à t=18.5s après trim — fin phase B, vidéo se fige
-const INTRO_A_MS = 4000;         // durée réelle phase A (300 frames en 4s = 75 fps = 2.5× native)
+const PAUSE_A_FRAME = 300;       // frame à t=10s après trim — fin phase A (3.3s × 90 fps)
+const PAUSE_B_FRAME = 606;       // frame à t=20.2s après trim — fin phase B, vidéo se fige
+const INTRO_A_MS = 3300;         // durée réelle phase A (300 frames en 3.3s ≈ 90 fps = 3× native)
                                  // Bloc apparaît à la fin — vidéo défile en continu jusque-là.
 const INTRO_B_MS = 3400;         // durée phase B strictement calée sur la transition CSS 3.4s
                                  // du glissement du bloc — vidéo se fige EXACTEMENT à la fin du
-                                 // glissement (255 frames en 3.4s = 2.5× native).
+                                 // glissement (306 frames en 3.4s = 3× native).
 
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
