@@ -70,9 +70,10 @@
   }
   @media (max-width: 720px) {
     /* Mobile : durée du fade-in raccourcie car plus de mouvement à
-       accompagner — 3.4 s deviennent inutilement longues sans transform. */
+       accompagner. Vitesse constante — pas de décélération en fin
+       de course (linear plutôt que ease-out). */
     .block, footer {
-      transition: opacity 1.6s ease-out;
+      transition: opacity 1.6s linear;
       will-change: opacity;
     }
   }
