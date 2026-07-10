@@ -511,6 +511,11 @@
     margin: -96px auto 0;
     display: block;
   }
+  @media (max-width: 720px) {
+    .arc-wrap {
+      margin-top: 48px;
+    }
+  }
   /* Logo mariage sous l'arc hébraïque dans le faire-part */
   .faire-part-logo {
     display: block;
@@ -636,7 +641,7 @@
     display: block;
     line-height: 1;
     font-weight: 500;
-    background: linear-gradient(135deg, #B8791A 0%, #E0A83B 20%, #FFD86B 45%, #FFC24A 55%, #E0A83B 75%, #9C6112 100%);
+    background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
