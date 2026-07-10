@@ -68,9 +68,19 @@ export function BackgroundVideo() {
     rafId = requestAnimationFrame(tick);
 
     // ── Reveal + intro animation ────────────────────────────────────
-    const doRevealAndScroll = () => {
+    // Le bloc faire-part commence à apparaître AVANT la fin de l'intro
+    // vidéo, pour un effet en simultanée (la caméra approche la tente
+    // + le bloc se lève en même temps). Le scroll vers #invitation
+    // ne se déclenche que quand l'intro est réellement terminée.
+    const REVEAL_TRIGGER_RATIO = 0.60; // 60 % de INTRO_DURATION_MS = 1.5s après le clic
+
+    const doRevealBlocks = () => {
+      if (revealedRef.current) return;
       revealedRef.current = true;
       document.body.classList.add('revealed');
+    };
+
+    const doScrollToInvitation = () => {
       setTimeout(() => {
         document.getElementById('invitation')?.scrollIntoView({
           behavior: 'smooth',
@@ -79,9 +89,10 @@ export function BackgroundVideo() {
       }, 320);
     };
 
-    const animateIntro = (from: number, to: number, done?: () => void) => {
+    const animateIntro = (from: number, to: number, onComplete?: () => void) => {
       introPlayingRef.current = true;
       const start = performance.now();
+      let blocksRevealed = false;
       const step = (now: number) => {
         const t = Math.min(1, (now - start) / INTRO_DURATION_MS);
         const eased = 1 - Math.pow(1 - t, 3);
@@ -89,11 +100,16 @@ export function BackgroundVideo() {
         const v = from + (to - from) * eased;
         targetIdxRef.current = v;
         currentIdxRef.current = v;
+        // Déclenche l'apparition du faire-part à 60 % de l'intro
+        if (t >= REVEAL_TRIGGER_RATIO && !blocksRevealed) {
+          blocksRevealed = true;
+          doRevealBlocks();
+        }
         if (t < 1) {
           requestAnimationFrame(step);
         } else {
           introPlayingRef.current = false;
-          done?.();
+          onComplete?.();
         }
       };
       requestAnimationFrame(step);
@@ -104,9 +120,12 @@ export function BackgroundVideo() {
       e.preventDefault();
       if (revealedRef.current) return;
       document.querySelector('.hero')?.classList.add('fading-out');
-      animateIntro(1, INTRO_END_IDX, doRevealAndScroll);
+      animateIntro(1, INTRO_END_IDX, doScrollToInvitation);
       setTimeout(() => {
-        if (!revealedRef.current) doRevealAndScroll();
+        if (!revealedRef.current) {
+          doRevealBlocks();
+          doScrollToInvitation();
+        }
       }, INTRO_DURATION_MS + 3000);
     };
     revealBtn?.addEventListener('click', onRevealClick);
