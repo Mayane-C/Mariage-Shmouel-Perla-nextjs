@@ -102,8 +102,8 @@ export function BackgroundVideo() {
       const start = performance.now();
       const step = (now: number) => {
         const t = Math.min(1, (now - start) / duration);
-        const eased = 1 - Math.pow(1 - t, 3);
-        const v = from + (to - from) * eased;
+        // Easing linéaire : vitesse constante, pas de décélération en fin de phase.
+        const v = from + (to - from) * t;
         targetIdxRef.current = v;
         currentIdxRef.current = v;
         const clamped = Math.max(1, Math.min(TOTAL, Math.round(v)));
