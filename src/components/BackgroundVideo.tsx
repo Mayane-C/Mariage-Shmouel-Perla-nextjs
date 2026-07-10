@@ -16,10 +16,10 @@ import { useEffect, useRef } from 'react';
  */
 
 const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
-const PAUSE_A_FRAME = 300;       // frame à t=10s après trim — fin phase A (3.3s × 90 fps)
-const INTRO_A_MS = 3300;         // durée réelle phase A (300 frames en 3.3s ≈ 90 fps = 3× native)
+const PAUSE_A_FRAME = 342;       // frame à t=11.4s après trim — fin phase A (3.8s × 90 fps)
+const INTRO_A_MS = 3800;         // durée réelle phase A (342 frames en 3.8s ≈ 90 fps = 3× native)
                                  // Bloc apparaît à la fin — vidéo se fige immédiatement à cette
-                                 // frame. Le reste (300 → 632) se dévoile au scroll utilisateur.
+                                 // frame. Le reste (342 → 632) se dévoile au scroll utilisateur.
 
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
