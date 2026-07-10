@@ -22,19 +22,23 @@
   }
   body {
     margin: 0;
-    background:
-      radial-gradient(ellipse at top, #FBF6EC 0%, #F0E6D2 60%, #E4D5B7 100%);
+    background: #F5EFE6;
     color: #6B5B4A;
     font-family: "Cochin", "Palatino", "Palatino Linotype", "Book Antiqua", Georgia, serif;
     line-height: 1.7;
     letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow: hidden;
     overflow-x: hidden;
     overscroll-behavior-x: none;
     touch-action: pan-y;
+    height: 100vh;
     max-width: 100vw;
-    min-height: 100vh;
+  }
+  body.revealed {
+    overflow: auto;
+    height: auto;
   }
   body.revealed {
     overflow: auto;
@@ -76,6 +80,36 @@
       scroll-margin-top: 84px;
     }
   }
+  /* Vidéo de fond scrubbée : présente sur toute la page */
+  .bg-video {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: #F5EFE6;
+  }
+  .bg-video video,
+  .bg-video .bg-frame {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    inset: 0;
+  }
+  /* Voile pour maintenir la lisibilité du texte au-dessus */
+  .bg-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(245,239,230,0.35) 0%, rgba(245,239,230,0.55) 100%);
+    transition: opacity 0.6s ease;
+  }
+  body:not(.revealed) .bg-veil { opacity: 0.85; }
+  body.revealed .bg-veil { opacity: 1; }
+  /* Le contenu doit passer AU-DESSUS du fond vidéo */
   .page { position: relative; z-index: 2; }
   footer { position: relative; z-index: 2; }
   /* Logo LTD dans le hero */
@@ -1297,6 +1331,58 @@
 }
 /* Empêcher le scroll de la page derrière le menu ouvert */
 body:has(.mobile-menu) { overflow: hidden; }
+
+/* ─────────────────────────────────────────
+   Overlay renforcé sur le hero pour lisibilité
+   ───────────────────────────────────────── */
+body:not(.revealed) .bg-veil {
+  background:
+    radial-gradient(
+      ellipse 80% 90% at center,
+      rgba(15, 10, 5, 0.78) 0%,
+      rgba(15, 10, 5, 0.65) 30%,
+      rgba(15, 10, 5, 0.45) 55%,
+      rgba(15, 10, 5, 0.25) 80%,
+      rgba(245, 239, 230, 0.10) 100%
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.30) 100%);
+  opacity: 1;
+}
+body:not(.revealed) .hero .bsd,
+body:not(.revealed) .hero .script-label,
+body:not(.revealed) .hero .cell .unit {
+  color: rgba(255, 245, 225, 1);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.5);
+}
+body:not(.revealed) .hero .hebrew-names {
+  color: rgba(255, 245, 225, 1);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.5);
+}
+body:not(.revealed) .hero .names {
+  -webkit-text-fill-color: rgba(255, 250, 235, 1);
+  background: none;
+  color: rgba(255, 250, 235, 1);
+  filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+  animation: none;
+}
+body:not(.revealed) .hero .cell .num {
+  color: rgba(255, 250, 235, 1);
+  -webkit-text-fill-color: rgba(255, 250, 235, 1);
+  background: none;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.6);
+  filter: none;
+}
+body:not(.revealed) .hero .btn-hero {
+  color: rgba(255, 250, 235, 1);
+  border-bottom-color: rgba(255, 240, 210, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+}
+body:not(.revealed) .hero .hero-logo {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 24px rgba(255, 220, 160, 0.25));
+}
+body:not(.revealed) .cell:not(:last-child)::after {
+  background: rgba(255, 240, 210, 0.35);
+}
 
 /* Décaler légèrement le hero en dessous du header sticky */
 .hero {
