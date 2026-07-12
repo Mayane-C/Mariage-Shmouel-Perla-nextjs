@@ -17,31 +17,21 @@ const FIN_TOTAL = 2381;
 // Skip les 2.3 premières secondes de « fin » : fin extraite à 240 fps interpolate,
 // donc 2.3 s ≈ 547 frames. Récupère 0.2 s de contenu par rapport à avant.
 const FIN_START_FRAME = 547;
-// Lecture en 4 phases avec ramp d'accélération lisse :
-//   Phase 1a (0 → 2.7 s)   : PHASE A constante (2× native)
-//   Phase 1b (2.7 → 3.0 s) : RAMP linéaire 2× → 5.2× native (300 ms)
-//   Phase 2  (3.0 → 5.0 s) : PHASE B constante (5.2× native)
-//   Phase 3  (5.0 s → fin) : PHASE C constante (6× native)
+// Lecture en 3 phases avec ramp d'accélération lisse :
+//   Phase 1a (0 → 3.0 s)   : PHASE A constante (2× native).
+//     À 2× native, wall 3 s = source 6 s (2 × 3). La phase A s'arrête pile
+//     quand le contenu source atteint la 6ᵉ seconde.
+//   Phase 1b (3.0 → 3.3 s) : RAMP linéaire 2× → 6× native (300 ms).
+//   Phase 2  (3.3 s → fin) : PHASE B constante (6× native).
 const NATIVE_FPMS = 0.24;       // 2× native
-const PEAK_FPMS = 0.624;        // 5.2× native
-const FINAL_FPMS = 0.72;        // 6× native
-const PHASE_1A_END_MS = 2700;
+const PEAK_FPMS = 0.72;         // 6× native
+const PHASE_1A_END_MS = 3000;
 const RAMP_MS = 300;
-const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 3000
-const PHASE_2_END_MS = 5000;    // début de la phase C à 5 s wall
+const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 3300
 const FRAME_AT_1A_END = 1 + NATIVE_FPMS * PHASE_1A_END_MS;
 const FRAME_AT_1B_END = FRAME_AT_1A_END + ((NATIVE_FPMS + PEAK_FPMS) * RAMP_MS) / 2;
-// Frame atteinte à la fin de la phase 2 (5 s wall) — clampée à DEBUT_TOTAL
-// car la phase B à 5.2× vitesse exhausterait le contenu avant 5 s si non capée.
-const FRAME_AT_2_END_RAW =
-  FRAME_AT_1B_END + PEAK_FPMS * (PHASE_2_END_MS - PHASE_1B_END_MS);
-const FRAME_AT_2_END = Math.min(FRAME_AT_2_END_RAW, 1191);
-// Frames restantes pour la phase C, converties en durée.
-const PHASE_3_DURATION_MS = Math.max(
-  0,
-  Math.round((1191 - FRAME_AT_2_END) / FINAL_FPMS)
-);
-const DEBUT_DURATION_MS = PHASE_2_END_MS + PHASE_3_DURATION_MS;
+const PHASE_2_DURATION_MS = Math.round((1191 - FRAME_AT_1B_END) / PEAK_FPMS);
+const DEBUT_DURATION_MS = PHASE_1B_END_MS + PHASE_2_DURATION_MS;
 const SCROLL_LERP = 0.16;
 const CROSSFADE_MS = 800;
 
@@ -158,14 +148,10 @@ export function BackgroundVideo() {
             FRAME_AT_1A_END +
             NATIVE_FPMS * t +
             ((PEAK_FPMS - NATIVE_FPMS) * t * t) / (2 * RAMP_MS);
-        } else if (elapsed < PHASE_2_END_MS) {
-          // Phase 2 : vitesse pic constante 5.2× native
+        } else if (elapsed < DEBUT_DURATION_MS) {
+          // Phase 2 : vitesse pic constante 6× native
           const t = elapsed - PHASE_1B_END_MS;
           v = FRAME_AT_1B_END + PEAK_FPMS * t;
-        } else if (elapsed < DEBUT_DURATION_MS) {
-          // Phase 3 : accélération finale 6× native (à partir de 5 s wall)
-          const t = elapsed - PHASE_2_END_MS;
-          v = FRAME_AT_2_END + FINAL_FPMS * t;
         } else {
           v = DEBUT_TOTAL;
         }
