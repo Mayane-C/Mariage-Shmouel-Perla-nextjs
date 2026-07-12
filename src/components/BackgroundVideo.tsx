@@ -34,7 +34,11 @@ const FRAME_AT_1B_END = FRAME_AT_1A_END + ((NATIVE_FPMS + PEAK_FPMS) * RAMP_MS) 
 const PHASE_2_DURATION_MS = Math.round((1191 - FRAME_AT_1B_END) / PEAK_FPMS);
 const DEBUT_DURATION_MS = PHASE_1B_END_MS + PHASE_2_DURATION_MS;
 const SCROLL_LERP = 0.16;
-const CROSSFADE_MS = 800;
+// Aligne la durée du crossfade debut→fin sur celle du glissement du bloc
+// faire-part (transition CSS transform 3.4 s). Les deux animations démarrent
+// au même instant et finissent au même instant — perçues comme une seule
+// respiration visuelle.
+const CROSSFADE_MS = 3400;
 
 const debutFrame = (i: number) =>
   `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(4, '0')}.jpg`;
