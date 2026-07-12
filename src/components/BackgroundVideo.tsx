@@ -20,9 +20,11 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;        // frames extraites de debut.mp4 (120 fps minterpolate)
 const FIN_TOTAL = 1191;          // frames extraites de fin.mp4 (120 fps minterpolate)
-const DEBUT_DURATION_MS = 10000; // 10 s réelles pour jouer « début » (1191 frames en 10 s
-                                 // = 119.1 fps display : natif sur écrans 120Hz, tous les
-                                 // frames rendus sur 60Hz avec ~1.99 par refresh = très fluide)
+const DEBUT_DURATION_MS = 3000;  // 3 s réelles pour jouer « début » (1191 frames en 3 s
+                                 // = 397 fps virtuel ; l'écran ne peut afficher qu'un sous-
+                                 // ensemble — 60Hz en voit ~180 uniques, 120Hz en voit ~360.
+                                 // Grâce à l'oversampling 120 fps source, le sous-échantillon
+                                 // reste très fluide et sans stutter perceptible.)
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
 const debutFrame = (i: number) =>
