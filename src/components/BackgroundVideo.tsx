@@ -22,8 +22,8 @@ const FIN_START_FRAME = 714;
 //   Phase 1b (3.3 → 3.6 s) : RAMP linéaire de la vitesse — 1× → 5.3× native
 //                            sur 0.3 s. Accélération douce, pas de saut.
 //   Phase 2  (3.6 → ~4.68 s) : vitesse PIC constante (632 fps = 5.3× native)
-const NATIVE_FPMS = 0.168;      // 168 fps display = 1.4× la vitesse native (extract 120 fps)
-const PEAK_FPMS = 0.632;        // 632 fps display = 5.3× native
+const NATIVE_FPMS = 0.192;      // 192 fps display = 1.6× la vitesse native (extract 120 fps)
+const PEAK_FPMS = 0.612;        // 612 fps display = 5.1× native
 const PHASE_1A_END_MS = 3300;   // fin lecture native, début du ramp d'accélération
 const RAMP_MS = 300;            // durée du ramp d'accélération (3.3 → 3.6 s)
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 3600
