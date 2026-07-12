@@ -89,7 +89,7 @@ export function BackgroundVideo() {
 
     // Délai avant que la séquence « fin » ne prenne le relais (le layer
      // debut reste figé sur sa dernière frame pendant ce temps).
-    const FIN_START_DELAY_MS = 2000;
+    const FIN_START_DELAY_MS = 3000;
 
     const activateFinLayer = () => {
       phaseRef.current = 'fin';
