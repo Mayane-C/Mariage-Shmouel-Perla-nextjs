@@ -827,7 +827,7 @@
   }
   .names-formal {
     font-family: "Didot", Georgia, serif;
-    font-size: clamp(38px, 8vw, 56px);
+    font-size: clamp(30px, 7vw, 56px);
     font-weight: 300;
     line-height: 1.05;
     margin: 32px 0 16px;
@@ -861,6 +861,21 @@
     font-style: italic;
     color: var(--sand-deep);
     padding: 0 0.15em;
+  }
+  @media (max-width: 520px) {
+    .names-formal {
+      font-size: clamp(24px, 6vw, 40px);
+      white-space: normal;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+    /* Sur mobile, l'ornement floral bas-gauche du faire-part dépasse
+       visuellement le bord du bloc et flotte sous le viewport. On le
+       masque uniquement pour .invitation-formal (les autres blocs le
+       gardent). */
+    .invitation-formal .block-ornament-accent.bl {
+      display: none;
+    }
   }
   .invite-text {
     max-width: 420px;
