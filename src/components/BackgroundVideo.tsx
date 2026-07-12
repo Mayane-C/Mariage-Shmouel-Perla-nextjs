@@ -128,15 +128,10 @@ export function BackgroundVideo() {
         const elapsed = now - start;
         let v: number;
         if (elapsed < DEBUT_DURATION_MS) {
-          // Ease-in doux sur TOUTE la vidéo, une seule courbe :
-          //   f(t) = 0.3 t + 0.7 t²
-          //   f(0) = 0, f'(0) = 0.3   (démarrage lent)
-          //   f(1) = 1, f'(1) = 1.7   (fin accélérée, ~5.7× plus rapide qu'au départ)
-          // Vitesse initiale ≈ 0.3 × (1190 / 5) ≈ 71 fps display (feutré)
-          // Vitesse finale  ≈ 1.7 × (1190 / 5) ≈ 405 fps display (fast-forward)
+          // Lecture linéaire — vitesse constante sur toute la vidéo début.
+          // 1191 frames en 5 s = 238 fps display uniformes.
           const t = elapsed / DEBUT_DURATION_MS;
-          const eased = 0.3 * t + 0.7 * t * t;
-          v = 1 + (DEBUT_TOTAL - 1) * eased;
+          v = 1 + (DEBUT_TOTAL - 1) * t;
         } else {
           v = DEBUT_TOTAL;
         }
