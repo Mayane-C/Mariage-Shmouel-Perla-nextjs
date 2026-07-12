@@ -570,6 +570,16 @@
     font-size: 1.15em;
     vertical-align: baseline;
     padding: 0.2em 0.16em 0.28em;
+    /* Même gradient que .names-formal (identique aux numéros du
+       compte à rebours). Overrides les couleur/filtres unis hérités
+       de .script-amp. */
+    color: transparent;
+    -webkit-text-stroke: 0;
+    background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.35));
   }
   @media (max-width: 520px) {
     .script-amp {
@@ -855,15 +865,14 @@
     line-height: 1.5;
     margin: 32px 0 16px;
     letter-spacing: -0.005em;
-    /* Couleur UNIFORME — plus de gradient shimmer. Bronze profond
-       identique au hero, avec les mêmes filtres empilés qui donnent
-       l'effet foil-stamped sans dégradé multicolore. */
-    color: #7A5A2C;
-    -webkit-text-stroke: 0.5px rgba(46, 26, 10, 0.35);
-    filter:
-      drop-shadow(0 1px 0 rgba(255, 240, 200, 0.5))
-      drop-shadow(0 4px 8px rgba(46, 26, 10, 0.4))
-      drop-shadow(0 0 14px rgba(210, 160, 90, 0.18));
+    /* Même gradient que les numéros du compte à rebours (.cell .num).
+       Aucun filtre, aucun effet supplémentaire. */
+    background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.35));
     white-space: nowrap;
     overflow: visible;
   }
