@@ -14,9 +14,9 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
-// Skip les 2.5 premières secondes de « fin » : fin extraite à 240 fps interpolate,
-// donc 2.5 s ≈ 595 frames. On récupère 0.5 s de contenu par rapport à avant.
-const FIN_START_FRAME = 595;
+// Skip les 2.3 premières secondes de « fin » : fin extraite à 240 fps interpolate,
+// donc 2.3 s ≈ 547 frames. Récupère 0.2 s de contenu par rapport à avant.
+const FIN_START_FRAME = 547;
 // Lecture en 4 phases avec ramp d'accélération lisse :
 //   Phase 1a (0 → 2.7 s)   : PHASE A constante (2× native)
 //   Phase 1b (2.7 → 3.0 s) : RAMP linéaire 2× → 5.2× native (300 ms)
