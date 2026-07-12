@@ -15,8 +15,8 @@ import { useEffect, useRef } from 'react';
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
 const NATIVE_END_FRAME = 360;    // frame à 3 s natives (3 s × 120 fps interp)
-const NATIVE_PHASE_MS = 3000;    // phase native prolongée d'1 s (2 → 3 s)
-const ACCEL_PHASE_MS = 1000;
+const NATIVE_PHASE_MS = 3000;    // phase native (0 → 3 s, linéaire)
+const ACCEL_PHASE_MS = 2000;     // phase accélérée (3 → 5 s, ease-in doux et continu)
 const DEBUT_DURATION_MS = NATIVE_PHASE_MS + ACCEL_PHASE_MS;
 const SCROLL_LERP = 0.16;
 const CROSSFADE_MS = 800;
@@ -128,11 +128,22 @@ export function BackgroundVideo() {
         const elapsed = now - start;
         let v: number;
         if (elapsed < NATIVE_PHASE_MS) {
+          // Phase 1 : native, linéaire de la frame 1 → NATIVE_END_FRAME.
           const t = elapsed / NATIVE_PHASE_MS;
           v = 1 + (NATIVE_END_FRAME - 1) * t;
         } else if (elapsed < DEBUT_DURATION_MS) {
+          // Phase 2 : ease-in doux et continu — commence à la même vitesse
+          // que la fin de la phase 1 (120 fps display, continuité) puis
+          // accélère progressivement jusqu'à la dernière frame.
+          //
+          // Formule : f(t) = 0.3 t + 0.7 t²
+          //   f(0) = 0, f'(0) = 0.3 (vitesse initiale relative)
+          //   f(1) = 1, f'(1) = 1.7 (vitesse finale, ~5.7× plus rapide)
+          // Vitesse à t=0 : 0.3 × (span/duration) ≈ 125 fps (matche phase 1)
+          // Vitesse à t=1 : 1.7 × (span/duration) ≈ 706 fps (fast-forward final)
           const t = (elapsed - NATIVE_PHASE_MS) / ACCEL_PHASE_MS;
-          v = NATIVE_END_FRAME + (DEBUT_TOTAL - NATIVE_END_FRAME) * t;
+          const eased = 0.3 * t + 0.7 * t * t;
+          v = NATIVE_END_FRAME + (DEBUT_TOTAL - NATIVE_END_FRAME) * eased;
         } else {
           v = DEBUT_TOTAL;
         }

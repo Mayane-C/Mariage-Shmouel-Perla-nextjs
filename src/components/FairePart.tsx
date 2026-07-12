@@ -88,10 +88,11 @@ export function FairePart() {
         aria-hidden="true"
       />
 
-      <svg className="ornament" viewBox="0 0 120 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <line x1="0" y1="10" x2="46" y2="10" stroke="currentColor" strokeWidth="0.7" />
-        <circle cx="60" cy="10" r="2.5" fill="none" stroke="currentColor" strokeWidth="0.7" />
-        <line x1="74" y1="10" x2="120" y2="10" stroke="currentColor" strokeWidth="0.7" />
+      <svg className="ornament fp-divider" viewBox="0 0 220 16" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
+        <line x1="4" y1="8" x2="92" y2="8" stroke="currentColor" strokeWidth="0.7" strokeLinecap="round" />
+        <path d="M 100 8 L 110 2 L 120 8 L 110 14 Z" fill="currentColor" opacity="0.85" />
+        <circle cx="110" cy="8" r="1.2" fill="var(--cream-soft, #FAF7F1)" />
+        <line x1="128" y1="8" x2="216" y2="8" stroke="currentColor" strokeWidth="0.7" strokeLinecap="round" />
       </svg>
 
       <div className="families-formal">

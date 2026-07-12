@@ -558,6 +558,20 @@
     vertical-align: -0.12em;
     padding: 0 0.08em;
   }
+  @media (max-width: 520px) {
+    /* Sur mobile, Zapfino rend le & avec de gros ornements qui prennent
+       trop d'espace horizontal. On réduit à 1em (même taille que le
+       texte environnant) et on serre les paddings. */
+    .script-amp {
+      font-size: 0.95em;
+      padding: 0 0.04em;
+      vertical-align: -0.1em;
+    }
+    .script-amp-sm {
+      font-size: 0.85em;
+      padding: 0 0.04em;
+    }
+  }
   .hebrew-names .amp {
     font-family: "Didot", "Bodoni 72", Georgia, serif;
     font-style: italic;
@@ -1235,6 +1249,13 @@
     width: 120px;
     height: auto;
     color: var(--sand);
+  }
+  /* Séparateur classique wedding : 2 fines lignes dorées + un diamant
+     central creusé. Remplace l'ancien pattern line-cercle-line.  */
+  .fp-divider {
+    width: 200px;
+    color: #B8935F;
+    filter: drop-shadow(0 1px 1px rgba(120, 78, 12, 0.15));
   }
 /* animations.css — @keyframes (shimmer effects) */
 
