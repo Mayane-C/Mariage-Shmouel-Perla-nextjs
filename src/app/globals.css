@@ -1250,12 +1250,37 @@
     height: auto;
     color: var(--sand);
   }
-  /* Séparateur wedding raffiné : petite fleur 5 pétales au centre
-     avec cœur crème + 2 fines lignes dorées. */
+  /* Séparateur wedding : anneaux dorés au centre + 2 fines lignes
+     dorées latérales. */
   .fp-divider {
-    width: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 260px;
+    max-width: 80%;
+    margin: 32px auto;
     color: #B8935F;
-    filter: drop-shadow(0 1px 1px rgba(120, 78, 12, 0.18));
+  }
+  .fp-divider-line {
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
+    max-width: 120px;
+  }
+  .fp-divider-rings {
+    height: 28px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 2px 3px rgba(120, 78, 12, 0.28));
+  }
+  @media (max-width: 520px) {
+    .fp-divider {
+      gap: 12px;
+      width: 220px;
+    }
+    .fp-divider-rings { height: 24px; }
   }
 /* animations.css — @keyframes (shimmer effects) */
 

@@ -88,20 +88,15 @@ export function FairePart() {
         aria-hidden="true"
       />
 
-      <svg className="ornament fp-divider" viewBox="0 0 260 22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        {/* Lignes latérales fines */}
-        <line x1="6" y1="11" x2="112" y2="11" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" opacity="0.65" />
-        <line x1="148" y1="11" x2="254" y2="11" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" opacity="0.65" />
-        {/* Fleur 5 pétales au centre */}
-        <g transform="translate(130, 11)" fill="currentColor">
-          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" />
-          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(72)" />
-          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(144)" />
-          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(216)" />
-          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(288)" />
-          <circle r="1.6" fill="#FAF7F1" stroke="currentColor" strokeWidth="0.6" />
-        </g>
-      </svg>
+      <div className="fp-divider" aria-hidden="true">
+        <span className="fp-divider-line" />
+        <img
+          className="fp-divider-rings"
+          src={content.images.rings}
+          alt=""
+        />
+        <span className="fp-divider-line" />
+      </div>
 
       <div className="families-formal">
         <span className="fam">{content.familles.marie}</span>
