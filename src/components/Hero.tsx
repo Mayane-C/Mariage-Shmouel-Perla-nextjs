@@ -13,7 +13,7 @@ export function Hero() {
         />
         <h1 className="names">
           {content.maries.prenomLatin}{' '}
-          <img className="rings-amp" src={content.images.rings} alt="et" aria-hidden="true" />{' '}
+          <span className="script-amp" aria-hidden="true">&amp;</span>{' '}
           {content.maries.conjointe}
         </h1>
         <div className="hebrew-names">

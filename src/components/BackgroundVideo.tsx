@@ -18,17 +18,18 @@ import { useEffect, useRef } from 'react';
  * bascule entre les deux images sources selon la phase.
  */
 
-const DEBUT_TOTAL = 596;         // frames extraites de debut.mp4 (60 fps minterpolate)
-const FIN_TOTAL = 596;           // frames extraites de fin.mp4 (60 fps minterpolate)
-const DEBUT_DURATION_MS = 10000; // 10 s réelles pour jouer « début » à vitesse native
-                                 // (10 s vidéo native → 10 s réelles → 59.6 fps display).
+const DEBUT_TOTAL = 1191;        // frames extraites de debut.mp4 (120 fps minterpolate)
+const FIN_TOTAL = 1191;          // frames extraites de fin.mp4 (120 fps minterpolate)
+const DEBUT_DURATION_MS = 10000; // 10 s réelles pour jouer « début » (1191 frames en 10 s
+                                 // = 119.1 fps display : natif sur écrans 120Hz, tous les
+                                 // frames rendus sur 60Hz avec ~1.99 par refresh = très fluide)
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
 const debutFrame = (i: number) =>
-  `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(3, '0')}.jpg`;
+  `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(4, '0')}.jpg`;
 
 const finFrame = (i: number) =>
-  `/frames/fin/frame-${String(Math.max(1, Math.min(FIN_TOTAL, i))).padStart(3, '0')}.jpg`;
+  `/frames/fin/frame-${String(Math.max(1, Math.min(FIN_TOTAL, i))).padStart(4, '0')}.jpg`;
 
 export function BackgroundVideo() {
   const layerRef = useRef<HTMLImageElement>(null);

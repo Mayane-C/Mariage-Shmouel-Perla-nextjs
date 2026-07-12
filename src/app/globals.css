@@ -513,6 +513,29 @@
     margin: 0 0.08em;
   }
   .rings-amp-sm { height: 0.8em; vertical-align: -0.1em; }
+  /* & calligraphique doré entre Shmouel et Perla — remplacement des
+     anciens anneaux .rings-amp. Snell Roundhand pour le tracé cursif,
+     gradient or bronze pour rester dans la palette du countdown. */
+  .script-amp {
+    display: inline-block;
+    font-family: "Snell Roundhand", "Apple Chancery", "Zapfino", "Brush Script MT", cursive;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.15em;
+    line-height: 1;
+    vertical-align: -0.14em;
+    padding: 0 0.06em;
+    background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.35));
+  }
+  .script-amp-sm {
+    font-size: 0.95em;
+    vertical-align: -0.08em;
+  }
   .hebrew-names .amp {
     font-family: "Didot", "Bodoni 72", Georgia, serif;
     font-style: italic;

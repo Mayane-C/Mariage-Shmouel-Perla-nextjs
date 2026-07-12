@@ -108,12 +108,7 @@ export function FairePart() {
 
       <div className="names-formal">
         {content.maries.prenomLatin}{' '}
-        <img
-          className="rings-amp rings-amp-sm"
-          src={content.images.rings}
-          alt="et"
-          aria-hidden="true"
-        />{' '}
+        <span className="script-amp script-amp-sm" aria-hidden="true">&amp;</span>{' '}
         {content.maries.conjointe}
       </div>
       <div className="hebrew-names-formal">{content.maries.prenomHebrew}</div>
