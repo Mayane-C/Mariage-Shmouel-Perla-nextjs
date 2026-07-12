@@ -76,6 +76,18 @@
       transition: opacity 1.6s linear;
       will-change: opacity;
     }
+    /* Le faire-part utilise framer-motion en mobile (spring style BM
+       Chmouel). On désactive complètement la transition CSS et le
+       fade géré par body:not(.revealed) pour ne pas entrer en conflit
+       avec les inline styles animés par motion.section. */
+    .invitation-formal[data-spring="on"] {
+      transition: none !important;
+      will-change: transform, opacity;
+    }
+    body:not(.revealed) .invitation-formal[data-spring="on"] {
+      opacity: initial;
+      transform: initial;
+    }
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
   .invitation-formal {

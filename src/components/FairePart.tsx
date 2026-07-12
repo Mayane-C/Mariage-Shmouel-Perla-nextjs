@@ -1,10 +1,78 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { content } from '@/lib/content';
 import { HebrewArc } from './HebrewArc';
 import { Ornament } from './Ornament';
 
+/**
+ * Faire-part avec animation d'apparition en spring — pattern BM Chmouel.
+ * Mobile (≤ 720 px) : contrôlé par framer-motion, initial y=600 → 0
+ * avec spring stiffness 48 / damping 13 / mass 1.1 (identique BM).
+ * Desktop : garde le comportement CSS existant (le motion.section n'ajoute
+ * pas d'inline style — c'est le CSS body:not(.revealed) .block qui gère
+ * l'état initial et la transition).
+ */
 export function FairePart() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (document.body.classList.contains('revealed')) {
+      setRevealed(true);
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      if (document.body.classList.contains('revealed')) {
+        setRevealed(true);
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  // Sur desktop (ou reduced-motion), on laisse le CSS piloter — aucun style
+  // inline n'est ajouté par framer-motion.
+  const useSpring = isMobile && !prefersReducedMotion;
+
+  const springVariants = {
+    hidden: { opacity: 0, y: 600 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 48,
+        damping: 13,
+        mass: 1.1,
+        opacity: { duration: 1.0, ease: 'easeOut' as const },
+      },
+    },
+  };
+
   return (
-    <section id="invitation" className="invitation-formal block block-arch">
+    <motion.section
+      id="invitation"
+      className="invitation-formal block block-arch"
+      // Sur mobile, on force la classe .mobile-spring pour que le CSS
+      // n'applique ni son opacity 0 initial ni sa transition — framer-motion
+      // prend la main.
+      data-spring={useSpring ? 'on' : 'off'}
+      initial={useSpring ? 'hidden' : undefined}
+      animate={useSpring ? (revealed ? 'visible' : 'hidden') : undefined}
+      variants={useSpring ? springVariants : undefined}
+    >
       <Ornament n={1} className="block-ornament-accent bl" />
       <Ornament n={2} className="block-ornament tr" />
       <Ornament n={3} className="block-ornament-2 tr" />
@@ -68,6 +136,6 @@ export function FairePart() {
           }}
         />
       </p>
-    </section>
+    </motion.section>
   );
 }
