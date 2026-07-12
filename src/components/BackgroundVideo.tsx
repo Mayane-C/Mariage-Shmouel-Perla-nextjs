@@ -14,10 +14,15 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
-// Lecture unique en ease-in doux et continu sur toute la vidéo « début » :
-// aucune bascule à mi-course, une seule courbe qui commence lentement et
-// accélère progressivement jusqu'à la dernière frame.
-const DEBUT_DURATION_MS = 5000;
+// Lecture en 2 phases :
+//   Phase 1 (0 → 4 s)   : vitesse CONSTANTE (238 fps display, ~952 frames)
+//   Phase 2 (4 → 4.4 s) : vitesse SUPÉRIEURE (~600 fps display, ~239 frames)
+// La bascule à t=4 s s'accompagne d'un boost linéaire de 2.5× — la fin du
+// plan se déroule en fast-forward alors que le bloc s'apprête à apparaître.
+const CONSTANT_PHASE_MS = 4000;
+const FRAME_AT_T4 = 953;  // frame que la lecture constante 238 fps atteint à t = 4 s
+const ACCEL_PHASE_MS = 400;
+const DEBUT_DURATION_MS = CONSTANT_PHASE_MS + ACCEL_PHASE_MS;
 const SCROLL_LERP = 0.16;
 const CROSSFADE_MS = 800;
 
@@ -127,11 +132,16 @@ export function BackgroundVideo() {
       const step = (now: number) => {
         const elapsed = now - start;
         let v: number;
-        if (elapsed < DEBUT_DURATION_MS) {
-          // Lecture linéaire — vitesse constante sur toute la vidéo début.
-          // 1191 frames en 5 s = 238 fps display uniformes.
-          const t = elapsed / DEBUT_DURATION_MS;
-          v = 1 + (DEBUT_TOTAL - 1) * t;
+        if (elapsed < CONSTANT_PHASE_MS) {
+          // Phase 1 : vitesse constante, frame 1 → FRAME_AT_T4 en 4 s
+          // (952 frames en 4 s = 238 fps display).
+          const t = elapsed / CONSTANT_PHASE_MS;
+          v = 1 + (FRAME_AT_T4 - 1) * t;
+        } else if (elapsed < DEBUT_DURATION_MS) {
+          // Phase 2 : accélération linéaire à ~2.5× la vitesse de phase 1.
+          // 238 frames en 0.4 s = 595 fps display (vs 238 en phase 1).
+          const t = (elapsed - CONSTANT_PHASE_MS) / ACCEL_PHASE_MS;
+          v = FRAME_AT_T4 + (DEBUT_TOTAL - FRAME_AT_T4) * t;
         } else {
           v = DEBUT_TOTAL;
         }
