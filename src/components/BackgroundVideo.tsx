@@ -18,16 +18,17 @@ const FIN_TOTAL = 2381;
 // donc 1.5 s ≈ 357 frames. La séquence démarre à t = 1.5 s du contenu source.
 const FIN_START_FRAME = 357;
 // Lecture en 3 phases avec ramp d'accélération lisse :
-//   Phase 1a (0 → 3.0 s)   : PHASE A constante (2× native).
-//     À 2× native, wall 3 s = source 6 s (2 × 3). La phase A s'arrête pile
-//     quand le contenu source atteint la 6ᵉ seconde.
-//   Phase 1b (3.0 → 3.3 s) : RAMP linéaire 2× → 6× native (300 ms).
-//   Phase 2  (3.3 s → fin) : PHASE B constante (6× native).
+//   Phase 1a (0 → 2.4 s)   : PHASE A constante (2× native)
+//                            → couvre source 0 → 4.8 s (frames 1 → 577)
+//   Phase 1b (2.4 → 2.7 s) : RAMP linéaire 2× → 6× native (300 ms)
+//                            → couvre source 4.8 → 6.0 s (frames 577 → 721)
+//   Phase 2  (2.7 s → fin) : PHASE B constante (6× native)
+//                            → démarre PILE à source 6 s (frame 720)
 const NATIVE_FPMS = 0.24;       // 2× native
 const PEAK_FPMS = 0.72;         // 6× native
-const PHASE_1A_END_MS = 3000;
+const PHASE_1A_END_MS = 2400;
 const RAMP_MS = 300;
-const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 3300
+const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 2700
 const FRAME_AT_1A_END = 1 + NATIVE_FPMS * PHASE_1A_END_MS;
 const FRAME_AT_1B_END = FRAME_AT_1A_END + ((NATIVE_FPMS + PEAK_FPMS) * RAMP_MS) / 2;
 const PHASE_2_DURATION_MS = Math.round((1191 - FRAME_AT_1B_END) / PEAK_FPMS);
