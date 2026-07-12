@@ -18,14 +18,14 @@ const FIN_TOTAL = 2381;
 // donc 1 s = ~238 frames. On démarre la séquence à la 3 s (frame 714).
 const FIN_START_FRAME = 714;
 // Lecture en 3 phases avec ramp d'accélération lisse :
-//   Phase 1a (0 → 3.3 s)   : vitesse NATIVE (120 fps display = 1× native)
-//   Phase 1b (3.3 → 3.6 s) : RAMP linéaire de la vitesse — 1× → 5.3× native
+//   Phase 1a (0 → 3.0 s)   : vitesse PHASE-A CONSTANTE (2× native)
+//   Phase 1b (3.0 → 3.3 s) : RAMP linéaire de la vitesse — 2× → 5.2× native
 //                            sur 0.3 s. Accélération douce, pas de saut.
-//   Phase 2  (3.6 → ~4.68 s) : vitesse PIC constante (632 fps = 5.3× native)
+//   Phase 2  (3.3 → …)     : vitesse PIC constante (5.2× native)
 const NATIVE_FPMS = 0.24;       // 240 fps display = 2× la vitesse native (extract 120 fps)
-const PEAK_FPMS = 0.612;        // 612 fps display = 5.1× native
-const PHASE_1A_END_MS = 3300;   // fin lecture native, début du ramp d'accélération
-const RAMP_MS = 300;            // durée du ramp d'accélération (3.3 → 3.6 s)
+const PEAK_FPMS = 0.624;        // 624 fps display = 5.2× native
+const PHASE_1A_END_MS = 3000;   // fin phase A à 3 s, début du ramp d'accélération
+const RAMP_MS = 300;            // durée du ramp d'accélération (3.0 → 3.3 s)
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 3600
 // Frame atteinte à la fin de la phase 1a : 1 + native × 3300 = 397
 const FRAME_AT_1A_END = 1 + NATIVE_FPMS * PHASE_1A_END_MS;
