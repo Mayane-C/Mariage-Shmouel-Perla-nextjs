@@ -19,7 +19,8 @@ import { useEffect, useRef } from 'react';
  */
 
 const DEBUT_TOTAL = 1191;        // frames extraites de debut.mp4 (120 fps minterpolate)
-const FIN_TOTAL = 1191;          // frames extraites de fin.mp4 (120 fps minterpolate)
+const FIN_TOTAL = 2381;          // frames extraites de fin.mp4 (240 fps minterpolate = 2× la
+                                 // densité de debut, pour un scroll-scrub plus fluide)
 // Lecture en 2 phases :
 //   · Phase 1 (native) : les 2 premières secondes du source video jouent à
 //     vitesse native (visible et lisible : on voit clairement le début).
@@ -31,7 +32,9 @@ const ACCEL_PHASE_MS = 1000;     // durée réelle de la phase accélérée (951
 const DEBUT_DURATION_MS = NATIVE_PHASE_MS + ACCEL_PHASE_MS;
                                  // Durée totale = 3 s (comme demandé) mais avec un début
                                  // lisible plutôt qu'un défilement uniforme trop rapide.
-const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
+const SCROLL_LERP = 0.16;        // interpolation par frame pendant le scroll — un peu plus
+                                 // réactif maintenant qu'on a 2× plus de frames (le pas entre
+                                 // frames est plus petit, donc plus rapide n'est plus jerky)
 
 const debutFrame = (i: number) =>
   `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(4, '0')}.jpg`;
