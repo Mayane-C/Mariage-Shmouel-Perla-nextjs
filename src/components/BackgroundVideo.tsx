@@ -20,11 +20,17 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;        // frames extraites de debut.mp4 (120 fps minterpolate)
 const FIN_TOTAL = 1191;          // frames extraites de fin.mp4 (120 fps minterpolate)
-const DEBUT_DURATION_MS = 3000;  // 3 s réelles pour jouer « début » (1191 frames en 3 s
-                                 // = 397 fps virtuel ; l'écran ne peut afficher qu'un sous-
-                                 // ensemble — 60Hz en voit ~180 uniques, 120Hz en voit ~360.
-                                 // Grâce à l'oversampling 120 fps source, le sous-échantillon
-                                 // reste très fluide et sans stutter perceptible.)
+// Lecture en 2 phases :
+//   · Phase 1 (native) : les 2 premières secondes du source video jouent à
+//     vitesse native (visible et lisible : on voit clairement le début).
+//   · Phase 2 (accélérée) : le reste défile rapidement pour arriver à la
+//     dernière frame et déclencher l'apparition du bloc.
+const NATIVE_END_FRAME = 240;    // frame correspondant à 2 s natives (2 s × 120 fps interp)
+const NATIVE_PHASE_MS = 2000;    // durée réelle de la phase native (matches source timing)
+const ACCEL_PHASE_MS = 1000;     // durée réelle de la phase accélérée (951 frames en 1 s)
+const DEBUT_DURATION_MS = NATIVE_PHASE_MS + ACCEL_PHASE_MS;
+                                 // Durée totale = 3 s (comme demandé) mais avec un début
+                                 // lisible plutôt qu'un défilement uniforme trop rapide.
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
 const debutFrame = (i: number) =>
@@ -116,21 +122,35 @@ export function BackgroundVideo() {
     };
 
     /**
-     * Anime la séquence « début » de la frame `from` à `to` en `duration` ms,
-     * linéaire (aucune décélération). Met à jour layerRef.src à chaque tick.
+     * Anime la séquence « début » en 2 phases :
+     *   · Phase 1 (0 → NATIVE_PHASE_MS)   : frame 1 → NATIVE_END_FRAME, linéaire natif.
+     *   · Phase 2 (native → DEBUT_DURATION_MS) : NATIVE_END_FRAME → DEBUT_TOTAL, linéaire accéléré.
+     * Aucune décélération / easing à l'intérieur des phases — juste un
+     * changement de vitesse au moment de la bascule à t = NATIVE_PHASE_MS.
      */
-    const animateDebut = (from: number, to: number, duration: number, onComplete?: () => void) => {
+    const animateDebut = (onComplete?: () => void) => {
       introPlayingRef.current = true;
       phaseRef.current = 'debut';
       const start = performance.now();
       const step = (now: number) => {
-        const t = Math.min(1, (now - start) / duration);
-        const v = from + (to - from) * t;
+        const elapsed = now - start;
+        let v: number;
+        if (elapsed < NATIVE_PHASE_MS) {
+          // Phase 1 : native, frame 1 → NATIVE_END_FRAME
+          const t = elapsed / NATIVE_PHASE_MS;
+          v = 1 + (NATIVE_END_FRAME - 1) * t;
+        } else if (elapsed < DEBUT_DURATION_MS) {
+          // Phase 2 : accélérée, NATIVE_END_FRAME → DEBUT_TOTAL
+          const t = (elapsed - NATIVE_PHASE_MS) / ACCEL_PHASE_MS;
+          v = NATIVE_END_FRAME + (DEBUT_TOTAL - NATIVE_END_FRAME) * t;
+        } else {
+          v = DEBUT_TOTAL;
+        }
         targetIdxRef.current = v;
         currentIdxRef.current = v;
         const clamped = Math.max(1, Math.min(DEBUT_TOTAL, Math.round(v)));
         setFrameSrc(clamped);
-        if (t < 1) {
+        if (elapsed < DEBUT_DURATION_MS) {
           requestAnimationFrame(step);
         } else {
           introPlayingRef.current = false;
@@ -151,9 +171,9 @@ export function BackgroundVideo() {
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
-      // Joue « début » du début à la fin en DEBUT_DURATION_MS. À la fin,
+      // Joue « début » en 2 phases (natif 2 s puis accéléré 1 s). À la fin,
       // le bloc apparaît et la séquence bascule sur « fin » (scroll-scrub).
-      animateDebut(1, DEBUT_TOTAL, DEBUT_DURATION_MS, () => {
+      animateDebut(() => {
         doRevealBlocks();
         doScrollToInvitation();
       });
