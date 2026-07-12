@@ -14,9 +14,9 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
-// Skip la 1re seconde de « fin » : fin extraite à 240 fps interpolate, donc
-// 1 s = ~238 frames. On démarre la séquence à cette frame plutôt qu'à la 1re.
-const FIN_START_FRAME = 238;
+// Skip les 2 premières secondes de « fin » : fin extraite à 240 fps interpolate,
+// donc 1 s = ~238 frames. On démarre la séquence à la 2 s (frame 476).
+const FIN_START_FRAME = 476;
 // Lecture en 3 phases avec ramp d'accélération lisse :
 //   Phase 1a (0 → 3.3 s)   : vitesse NATIVE (120 fps display = 1× native)
 //   Phase 1b (3.3 → 3.6 s) : RAMP linéaire de la vitesse — 1× → 5.3× native
