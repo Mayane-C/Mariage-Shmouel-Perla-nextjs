@@ -3,28 +3,32 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Fond d'écran orchestré par séquence de frames JPG (pattern BM Chmouel).
+ * Fond d'écran orchestré par DEUX séquences de frames JPG :
  *
- *   Phase A — intro accélérée (frame 1 → PAUSE_A_FRAME) en INTRO_A_MS.
- *     Joue automatiquement au clic sur « Voir l'invitation ».
+ *   1. « début » — joue automatiquement au clic sur « Voir l'invitation »
+ *      via animateDebut. À sa dernière frame, doRevealBlocks() déclenche
+ *      le glissement du bloc faire-part.
  *
- *   À la fin de phase A — la vidéo se fige EXACTEMENT sur PAUSE_A_FRAME
- *     au moment où le bloc faire-part apparaît (body.revealed).
+ *   2. « fin » — pilotée par le scroll utilisateur après l'apparition du
+ *      bloc. Frame 1 = début du scroll (juste après le baseline
+ *      d'auto-scroll), frame N = bas du bloc RSVP.
  *
- *   Ensuite — le scroll pilote la fin de la vidéo (PAUSE_A_FRAME → TOTAL)
- *     au fur et à mesure que l'utilisateur descend dans les blocs suivants.
+ * Chaque séquence a son propre nombre de frames (déterminé par
+ * l'extraction ffmpeg). Le composant garde une frame courante et
+ * bascule entre les deux images sources selon la phase.
  */
 
-const TOTAL = 632;               // frames extraites après -ss 1 (skip 1re s)
-const PAUSE_A_FRAME = 342;       // frame à t=11.4s après trim — fin phase A (3.8s × 90 fps)
-const INTRO_A_MS = 3800;         // durée réelle phase A (342 frames en 3.8s ≈ 90 fps = 3× native)
-                                 // Bloc apparaît à la fin — vidéo se fige immédiatement à cette
-                                 // frame. Le reste (342 → 632) se dévoile au scroll utilisateur.
-
+const DEBUT_TOTAL = 596;         // frames extraites de debut.mp4 (60 fps minterpolate)
+const FIN_TOTAL = 596;           // frames extraites de fin.mp4 (60 fps minterpolate)
+const DEBUT_DURATION_MS = 10000; // 10 s réelles pour jouer « début » à vitesse native
+                                 // (10 s vidéo native → 10 s réelles → 59.6 fps display).
 const SCROLL_LERP = 0.10;        // interpolation par frame pendant le scroll — plus petit = plus doux
 
-const frameSrc = (i: number) =>
-  `/frames/frame-${String(Math.max(1, Math.min(TOTAL, i))).padStart(3, '0')}.jpg`;
+const debutFrame = (i: number) =>
+  `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(3, '0')}.jpg`;
+
+const finFrame = (i: number) =>
+  `/frames/fin/frame-${String(Math.max(1, Math.min(FIN_TOTAL, i))).padStart(3, '0')}.jpg`;
 
 export function BackgroundVideo() {
   const layerRef = useRef<HTMLImageElement>(null);
@@ -33,36 +37,47 @@ export function BackgroundVideo() {
   const revealedRef = useRef(false);
   const introPlayingRef = useRef(false);
   const scrubActiveRef = useRef(false);          // scroll-scrub actif ? (activé après stabilisation de l'auto-scroll)
-  const scrollBaselineYRef = useRef(0);          // scrollY au moment où le scrub s'active — sert d'ancre 0
+  const scrollBaselineYRef = useRef(0);          // scrollY au moment où le scrub s'active
+  const phaseRef = useRef<'debut' | 'fin'>('debut'); // séquence courante affichée
 
   useEffect(() => {
-    // ── Préchargement + décodage de toutes les frames ─────────────────
+    // ── Préchargement + décodage de toutes les frames des DEUX vidéos ──
     let cancelled = false;
     (async () => {
-      for (let i = 1; i <= TOTAL; i++) {
+      for (let i = 1; i <= DEBUT_TOTAL; i++) {
         if (cancelled) return;
         const im = new Image();
-        im.src = frameSrc(i);
-        try {
-          await im.decode();
-        } catch {
-          /* fallback silencieux */
-        }
+        im.src = debutFrame(i);
+        try { await im.decode(); } catch { /* fallback silencieux */ }
+      }
+      for (let i = 1; i <= FIN_TOTAL; i++) {
+        if (cancelled) return;
+        const im = new Image();
+        im.src = finFrame(i);
+        try { await im.decode(); } catch { /* fallback silencieux */ }
       }
     })();
 
-    // ── Boucle rAF pour le scroll-scrub (après phase B) ───────────────
+    // Helper : mute src selon la phase courante.
+    const setFrameSrc = (frameIdx: number) => {
+      const src = phaseRef.current === 'debut' ? debutFrame(frameIdx) : finFrame(frameIdx);
+      const key = `${phaseRef.current}-${frameIdx}`;
+      if (layerRef.current && layerRef.current.dataset.idx !== key) {
+        layerRef.current.src = src;
+        layerRef.current.dataset.idx = key;
+      }
+    };
+
+    // ── Boucle rAF pour le scroll-scrub (uniquement pendant phase « fin ») ──
     let rafId = 0;
     const tick = () => {
       if (!introPlayingRef.current) {
         const diff = targetIdxRef.current - currentIdxRef.current;
         if (Math.abs(diff) > 0.05) {
           currentIdxRef.current += diff * SCROLL_LERP;
-          const clamped = Math.max(1, Math.min(TOTAL, Math.round(currentIdxRef.current)));
-          if (layerRef.current && layerRef.current.dataset.idx !== String(clamped)) {
-            layerRef.current.src = frameSrc(clamped);
-            layerRef.current.dataset.idx = String(clamped);
-          }
+          const total = phaseRef.current === 'debut' ? DEBUT_TOTAL : FIN_TOTAL;
+          const clamped = Math.max(1, Math.min(total, Math.round(currentIdxRef.current)));
+          setFrameSrc(clamped);
         }
       }
       rafId = requestAnimationFrame(tick);
@@ -74,22 +89,21 @@ export function BackgroundVideo() {
       if (revealedRef.current) return;
       revealedRef.current = true;
       document.body.classList.add('revealed');
-      // Attendre que l'auto-scroll se soit stabilisé avant d'activer le
+      // Attendre la stabilisation de l'auto-scroll avant d'activer le
       // scroll-scrub. Sinon les events scroll générés par
-      // doScrollToInvitation feraient avancer la vidéo de ~30 frames et
-      // donneraient l'impression qu'elle 'continue de jouer' après la
-      // fin de la phase A.
+      // doScrollToInvitation feraient avancer la vidéo prématurément.
       setTimeout(() => {
         scrollBaselineYRef.current = window.scrollY;
+        // Passage à la séquence « fin » — frame 1 comme point de départ.
+        phaseRef.current = 'fin';
+        currentIdxRef.current = 1;
+        targetIdxRef.current = 1;
+        setFrameSrc(1);
         scrubActiveRef.current = true;
       }, 1500);
     };
 
     const doScrollToInvitation = () => {
-      // Retard un peu plus grand : la transition CSS du bloc a le temps
-      // de démarrer avant que le scroll ne bouge le viewport. Réduit les
-      // chances que la transition soit court-circuitée par le layout re-flow
-      // (surtout sensible en mobile Safari).
       setTimeout(() => {
         document.getElementById('invitation')?.scrollIntoView({
           behavior: 'smooth',
@@ -99,29 +113,20 @@ export function BackgroundVideo() {
     };
 
     /**
-     * Anime un segment [from, to] de frames en `duration` ms, avec easing
-     * cubic-out. Met à jour directement layerRef.src à chaque tick (pas de
-     * lerp — la boucle tick est écartée par introPlayingRef).
+     * Anime la séquence « début » de la frame `from` à `to` en `duration` ms,
+     * linéaire (aucune décélération). Met à jour layerRef.src à chaque tick.
      */
-    const animateSegment = (
-      from: number,
-      to: number,
-      duration: number,
-      onComplete?: () => void
-    ) => {
+    const animateDebut = (from: number, to: number, duration: number, onComplete?: () => void) => {
       introPlayingRef.current = true;
+      phaseRef.current = 'debut';
       const start = performance.now();
       const step = (now: number) => {
         const t = Math.min(1, (now - start) / duration);
-        // Easing linéaire : vitesse constante, pas de décélération en fin de phase.
         const v = from + (to - from) * t;
         targetIdxRef.current = v;
         currentIdxRef.current = v;
-        const clamped = Math.max(1, Math.min(TOTAL, Math.round(v)));
-        if (layerRef.current && layerRef.current.dataset.idx !== String(clamped)) {
-          layerRef.current.src = frameSrc(clamped);
-          layerRef.current.dataset.idx = String(clamped);
-        }
+        const clamped = Math.max(1, Math.min(DEBUT_TOTAL, Math.round(v)));
+        setFrameSrc(clamped);
         if (t < 1) {
           requestAnimationFrame(step);
         } else {
@@ -132,51 +137,43 @@ export function BackgroundVideo() {
       requestAnimationFrame(step);
     };
 
-    // ── Clic sur « Voir l'invitation » : enchaîne phase A → phase B ───
+    // ── Clic sur « Voir l'invitation » ────────────────────────────────
     const revealBtn = document.querySelector<HTMLElement>('.btn-hero');
     const onRevealClick = (e: Event) => {
       e.preventDefault();
       if (revealedRef.current) return;
       // L'overlay sombre se retire immédiatement, en même temps que le hero
-      // s'estompe. .revealed n'est ajouté qu'à la fin de la phase A pour
-      // déclencher le glissement des blocs.
+      // s'estompe. .revealed n'est ajouté qu'à la fin de « début » pour
+      // déclencher le glissement du bloc.
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
-      // Phase A : frames 1 → PAUSE_A_FRAME en INTRO_A_MS (intro accélérée
-      // 3× native). À la fin, la vidéo se fige EXACTEMENT sur PAUSE_A_FRAME
-      // au moment où le bloc apparaît. Le reste de la vidéo est réservé
-      // au scroll-scrub.
-      animateSegment(1, PAUSE_A_FRAME, INTRO_A_MS, () => {
+      // Joue « début » du début à la fin en DEBUT_DURATION_MS. À la fin,
+      // le bloc apparaît et la séquence bascule sur « fin » (scroll-scrub).
+      animateDebut(1, DEBUT_TOTAL, DEBUT_DURATION_MS, () => {
         doRevealBlocks();
         doScrollToInvitation();
       });
 
-      // Filet de sécurité : si l'anim plante pour une raison ou une autre,
-      // on révèle quand même les blocs après la phase A + 3 s.
+      // Filet de sécurité : si l'anim plante, on révèle quand même.
       setTimeout(() => {
         if (!revealedRef.current) {
           doRevealBlocks();
           doScrollToInvitation();
         }
-      }, INTRO_A_MS + 3000);
+      }, DEBUT_DURATION_MS + 3000);
     };
     revealBtn?.addEventListener('click', onRevealClick);
 
-    // ── Scroll → target frame index ──────────────────────────────────
-    // Attendre scrubActiveRef pour ignorer les events scroll générés
-    // par le scroll auto (sinon la vidéo semblerait continuer à jouer
-    // juste après l'apparition du bloc).
+    // ── Scroll → target frame index dans la séquence « fin » ─────────
     const onScroll = () => {
       if (!scrubActiveRef.current || introPlayingRef.current) return;
       const lastBlock = document.querySelector('.rsvp');
       if (!lastBlock) return;
 
-      // Delta par rapport au baseline (scrollY au moment où le scrub s'active).
-      // Delta ≤ 0 → vidéo reste figée sur PAUSE_A_FRAME.
       const delta = window.scrollY - scrollBaselineYRef.current;
       if (delta <= 0) {
-        targetIdxRef.current = PAUSE_A_FRAME;
+        targetIdxRef.current = 1;
         return;
       }
 
@@ -186,7 +183,7 @@ export function BackgroundVideo() {
         window.innerHeight * 0.4;
       const endDelta = Math.max(1, endY - scrollBaselineYRef.current);
       const progress = Math.min(1, delta / endDelta);
-      targetIdxRef.current = PAUSE_A_FRAME + progress * (TOTAL - PAUSE_A_FRAME);
+      targetIdxRef.current = 1 + progress * (FIN_TOTAL - 1);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
@@ -203,11 +200,11 @@ export function BackgroundVideo() {
       <div className="bg-video" aria-hidden="true">
         <img
           ref={layerRef}
-          src={frameSrc(1)}
+          src={debutFrame(1)}
           alt=""
           className="bg-frame"
           decoding="sync"
-          data-idx="1"
+          data-idx="debut-1"
         />
       </div>
       <div className="bg-veil" aria-hidden="true" />

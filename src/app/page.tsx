@@ -1,4 +1,5 @@
 import { BackgroundMusic } from '@/components/BackgroundMusic';
+import { BackgroundVideo } from '@/components/BackgroundVideo';
 import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
 import { FairePart } from '@/components/FairePart';
@@ -11,6 +12,7 @@ import { ScrollHint } from '@/components/ScrollHint';
 export default function Home() {
   return (
     <>
+      <BackgroundVideo />
       <Header />
       <div className="page">
         <Hero />
