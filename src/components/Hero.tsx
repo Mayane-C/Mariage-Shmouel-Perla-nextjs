@@ -1,7 +1,23 @@
+'use client';
+
 import { content } from '@/lib/content';
 import { Countdown } from './Countdown';
 
 export function Hero() {
+  const handleReveal = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (document.body.classList.contains('revealed')) return;
+    // Sans vidéo de fond, on retire l'overlay et on révèle les blocs immédiatement.
+    document.body.classList.add('hero-out');
+    document.querySelector('.hero')?.classList.add('fading-out');
+    document.body.classList.add('revealed');
+    requestAnimationFrame(() => {
+      document
+        .getElementById('invitation')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <section className="hero">
       <div className="hero-inner">
@@ -21,7 +37,12 @@ export function Hero() {
         </div>
         <Countdown />
       </div>
-      <a className="btn btn-hero" href="#invitation" aria-label="Voir l'invitation">
+      <a
+        className="btn btn-hero"
+        href="#invitation"
+        aria-label="Voir l'invitation"
+        onClick={handleReveal}
+      >
         Voir l&apos;invitation
       </a>
     </section>
