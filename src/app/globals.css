@@ -33,7 +33,12 @@
     overflow-x: hidden;
     overscroll-behavior-x: none;
     touch-action: pan-y;
+    /* dvh = dynamic viewport height : suit la vraie hauteur visible
+       même quand la barre URL du navigateur mobile bouge. Empêche
+       de voir un bout de la page en dessous du hero. Fallback 100vh
+       pour les navigateurs anciens. */
     height: 100vh;
+    height: 100dvh;
     max-width: 100vw;
   }
   /* Le déverrouillage du scroll a lieu dès le clic sur « Voir l'invitation »
@@ -84,8 +89,12 @@
       transition: none !important;
       will-change: transform, opacity;
     }
+    /* On garde opacity:0 même quand framer-motion prend la main —
+       évite le flash de visibilité pendant l'hydratation React
+       (entre le 1er render SSR et l'ajout de data-spring='on' au 2nd).
+       framer-motion posera son inline opacity ensuite. */
     body:not(.revealed) .invitation-formal[data-spring="on"] {
-      opacity: initial;
+      opacity: 0;
       transform: initial;
     }
   }
@@ -461,6 +470,7 @@
   /* --- Hero --- */
   .hero {
     min-height: 100vh;
+    min-height: 100dvh;
     padding: 56px 0 72px;
     display: flex;
     flex-direction: column;
