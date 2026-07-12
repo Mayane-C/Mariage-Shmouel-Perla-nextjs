@@ -80,12 +80,11 @@ export function BackgroundVideo() {
     };
     rafId = requestAnimationFrame(tick);
 
-    const doRevealBlocks = () => {
-      if (revealedRef.current) return;
-      revealedRef.current = true;
-      document.body.classList.add('revealed');
-      // Crossfade debut → fin : on prépare la frame 1 de fin AVANT de bascule
-      // et on déclenche le fade de opacité via .is-active toggle.
+    // Délai avant que la séquence « fin » ne prenne le relais (le layer
+     // debut reste figé sur sa dernière frame pendant ce temps).
+    const FIN_START_DELAY_MS = 1000;
+
+    const activateFinLayer = () => {
       phaseRef.current = 'fin';
       currentIdxRef.current = 1;
       targetIdxRef.current = 1;
@@ -93,16 +92,23 @@ export function BackgroundVideo() {
         finLayerRef.current.src = finFrame(1);
         finLayerRef.current.dataset.idx = 'fin-1';
       }
-      // Fait apparaître le layer fin par-dessus le layer debut (fade in).
       finLayerRef.current?.classList.add('is-active');
       debutLayerRef.current?.classList.remove('is-active');
-
-      // Après stabilisation de l'auto-scroll (et fin du crossfade), on
-      // active le scroll-scrub.
+      // Après stabilisation du crossfade + auto-scroll, activation du scrub.
       setTimeout(() => {
         scrollBaselineYRef.current = window.scrollY;
         scrubActiveRef.current = true;
       }, 1500);
+    };
+
+    const doRevealBlocks = () => {
+      if (revealedRef.current) return;
+      revealedRef.current = true;
+      document.body.classList.add('revealed');
+      // La séquence « fin » démarre FIN_START_DELAY_MS après l'apparition
+      // du bloc. Le layer debut reste visible (dernière frame figée)
+      // pendant ce délai, avant le crossfade doux vers fin.
+      setTimeout(activateFinLayer, FIN_START_DELAY_MS);
     };
 
     const doScrollToInvitation = () => {
