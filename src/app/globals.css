@@ -508,14 +508,26 @@
   }
   .names {
     font-family: "Didot", "Bodoni 72", Georgia, serif;
-    font-weight: 300;
+    font-weight: 400;
     font-size: clamp(38px, 8.5vw, 82px);
     line-height: 1;
     margin: 0;
     letter-spacing: -0.005em;
     white-space: nowrap;
-    color: #A88962;
-    filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.22));
+    /* Premium uniform bronze — couleur pleine et unie (aucun gradient)
+       mais avec des filtres empilés pour donner de la profondeur type
+       'foil-stamped luxe' :
+         · highlight fin au-dessus (semi-opaque or clair)
+         · ombre chaude douce en dessous (bronze profond)
+         · halo doré léger tout autour pour luminosité
+       Rendu : caractères pleins qui accrochent la lumière, effet foil
+       sans effet dégradé multicolore. */
+    color: #7A5A2C;
+    -webkit-text-stroke: 0.5px rgba(46, 26, 10, 0.35);
+    filter:
+      drop-shadow(0 1px 0 rgba(255, 240, 200, 0.5))
+      drop-shadow(0 4px 8px rgba(46, 26, 10, 0.4))
+      drop-shadow(0 0 14px rgba(210, 160, 90, 0.18));
   }
   .names .rings-amp {
     filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.22));
@@ -542,41 +554,31 @@
     font-family: "Snell Roundhand", "Apple Chancery", "Edwardian Script ITC", "Brush Script MT", "Zapfino", cursive;
     font-style: italic;
     font-weight: 400;
-    font-size: 1em;
+    font-size: 1.2em;
     line-height: 1.3;
     vertical-align: baseline;
-    padding: 0.2em 0.18em 0.3em;
-    /* Or profond très saturé — bien plus visible sur crème que l'or clair
-       (qui se noyait). Contraste fort avec le bronze foncé des prénoms. */
-    background: linear-gradient(135deg,
-      #5C3A0F 0%,
-      #8F5F1E 20%,
-      #C69144 42%,
-      #F0C866 50%,
-      #C69144 58%,
-      #8F5F1E 80%,
-      #5C3A0F 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    padding: 0.22em 0.2em 0.32em;
+    /* Même couleur uniforme que les prénoms — cohérence visuelle. */
+    color: #7A5A2C;
+    -webkit-text-stroke: 0.3px rgba(46, 26, 10, 0.3);
     filter:
-      drop-shadow(0 2px 3px rgba(92, 58, 15, 0.55))
-      drop-shadow(0 0 1px rgba(92, 58, 15, 0.4));
+      drop-shadow(0 1px 0 rgba(255, 240, 200, 0.45))
+      drop-shadow(0 3px 6px rgba(46, 26, 10, 0.45))
+      drop-shadow(0 0 8px rgba(210, 160, 90, 0.2));
   }
   .script-amp-sm {
-    font-size: 1em;
-    vertical-align: -0.12em;
-    padding: 0 0.08em;
+    font-size: 1.15em;
+    vertical-align: baseline;
+    padding: 0.2em 0.16em 0.28em;
   }
   @media (max-width: 520px) {
     .script-amp {
-      font-size: 0.9em;
-      padding: 0.18em 0.14em 0.26em;
+      font-size: 1.1em;
+      padding: 0.2em 0.16em 0.28em;
     }
     .script-amp-sm {
-      font-size: 0.85em;
-      padding: 0.15em 0.1em 0.22em;
+      font-size: 1em;
+      padding: 0.18em 0.14em 0.26em;
     }
   }
   .hebrew-names .amp {
@@ -849,44 +851,21 @@
   .names-formal {
     font-family: "Didot", Georgia, serif;
     font-size: clamp(40px, 10vw, 82px);
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.5;
     margin: 32px 0 16px;
     letter-spacing: -0.005em;
-    /* Bronze premium foil-stamped — dégradé multi-strates avec highlight
-       très lumineux au centre (rendu 'métal poli haut de gamme') +
-       animation shimmer subtile qui fait 'jouer la lumière'. */
-    background: linear-gradient(180deg,
-      #2E1A0A 0%,
-      #5A3418 12%,
-      #8E5D2A 26%,
-      #C48A45 42%,
-      #F0D19A 49%,
-      #FFF3D6 51%,
-      #F0D19A 53%,
-      #C48A45 60%,
-      #8E5D2A 76%,
-      #5A3418 90%,
-      #2E1A0A 100%);
-    background-size: 100% 220%;
-    background-position: 50% 50%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    /* Couleur UNIFORME — plus de gradient shimmer. Bronze profond
+       identique au hero, avec les mêmes filtres empilés qui donnent
+       l'effet foil-stamped sans dégradé multicolore. */
+    color: #7A5A2C;
+    -webkit-text-stroke: 0.5px rgba(46, 26, 10, 0.35);
     filter:
-      drop-shadow(0 4px 8px rgba(46, 26, 10, 0.38))
-      drop-shadow(0 1px 0 rgba(255, 224, 176, 0.22));
+      drop-shadow(0 1px 0 rgba(255, 240, 200, 0.5))
+      drop-shadow(0 4px 8px rgba(46, 26, 10, 0.4))
+      drop-shadow(0 0 14px rgba(210, 160, 90, 0.18));
     white-space: nowrap;
     overflow: visible;
-    animation: shimmer-bronze 7s ease-in-out infinite;
-  }
-  @keyframes shimmer-bronze {
-    0%, 100% { background-position: 50% 44%; }
-    50%      { background-position: 50% 56%; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .names-formal { animation: none; background-position: 50% 50%; }
   }
   .names-formal .rings-amp-sm {
     filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.22));
@@ -1331,7 +1310,7 @@
   font-family: "Didot", Georgia, serif;
   font-size: 20px;
   letter-spacing: 0.05em;
-  color: #FFFFFF;
+  color: #FBF3E4;
   text-decoration: none;
   transition: color 0.5s ease;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
@@ -1352,13 +1331,13 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(251, 243, 228, 0.92);
   text-decoration: none;
   transition: color 0.5s ease;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 .nav-links a:hover {
-  color: #FFFFFF;
+  color: #FBF3E4;
 }
 .site-header.scrolled .nav-links a {
   color: rgba(107, 91, 74, 0.85);
@@ -1372,7 +1351,7 @@
   background: transparent;
   border: 0;
   cursor: pointer;
-  color: #FFFFFF;
+  color: #FBF3E4;
   padding: 6px;
   transition: color 0.5s ease;
 }

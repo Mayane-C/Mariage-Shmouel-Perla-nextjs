@@ -15,13 +15,15 @@ import { useEffect, useRef } from 'react';
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
 // Lecture en 2 phases :
-//   Phase 1 (0 → 3.6 s)   : vitesse CONSTANTE (238 fps display, ~858 frames)
-//   Phase 2 (3.6 → 4.16 s): vitesse SUPÉRIEURE (~595 fps display, ~333 frames)
-// La bascule à t=3.6 s s'accompagne d'un boost linéaire de 2.5× — la fin du
-// plan se déroule en fast-forward alors que le bloc s'apprête à apparaître.
+//   Phase 1 (0 → 3.6 s)   : vitesse NATIVE (120 fps display = 1× native)
+//                           → wall t = source t. À 3.6 s wall, on est bien
+//                           à la seconde 3.6 du contenu source.
+//   Phase 2 (3.6 → 4.8 s) : vitesse SUPÉRIEURE (~632 fps display = 5.3× native)
+// La bascule à t=3.6 s s'accompagne d'un fast-forward franchement plus rapide
+// qui amène rapidement le plan à sa dernière frame.
 const CONSTANT_PHASE_MS = 3600;
-const FRAME_AT_TRANSITION = 858;  // frame atteinte par 238 fps constants à t = 3.6 s
-const ACCEL_PHASE_MS = 560;       // (1191 − 858) frames à 595 fps = ~560 ms
+const FRAME_AT_TRANSITION = 432; // frame source à t=3.6 s (source 3.6 s × 120 fps interp)
+const ACCEL_PHASE_MS = 1200;     // (1191 − 432) frames en 1.2 s = 632 fps display
 const DEBUT_DURATION_MS = CONSTANT_PHASE_MS + ACCEL_PHASE_MS;
 const SCROLL_LERP = 0.16;
 const CROSSFADE_MS = 800;
