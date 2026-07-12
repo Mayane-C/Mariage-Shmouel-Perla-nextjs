@@ -539,13 +539,15 @@
      gradient or bronze pour rester dans la palette du countdown. */
   .script-amp {
     display: inline-block;
-    font-family: "Zapfino", "Snell Roundhand", "Apple Chancery", "Edwardian Script ITC", "Brush Script MT", cursive;
+    /* Snell Roundhand a un & avec glyphe compact (pas de descender géant
+       comme Zapfino qui débordait de la ligne). */
+    font-family: "Snell Roundhand", "Apple Chancery", "Edwardian Script ITC", "Brush Script MT", "Zapfino", cursive;
     font-style: italic;
     font-weight: 400;
-    font-size: 0.9em;
-    line-height: 1;
+    font-size: 0.75em;
+    line-height: 1.2;
     vertical-align: baseline;
-    padding: 0 0.15em;
+    padding: 0.15em 0.15em 0.2em;
     /* Or vif doré (pas bronze) — plus clair et lumineux que les prénoms
        qui sont en bronze foncé. Contraste visuel entre les deux. */
     background: linear-gradient(135deg, #A87A20 0%, #E0B04A 30%, #FFDA7D 50%, #E0B04A 70%, #966A18 100%);
@@ -561,17 +563,15 @@
     padding: 0 0.08em;
   }
   @media (max-width: 520px) {
-    /* Sur mobile, Zapfino rend le & avec de gros ornements qui prennent
-       trop d'espace horizontal. On réduit à 1em (même taille que le
-       texte environnant) et on serre les paddings. */
+    /* Mobile : même règle que desktop mais un chouïa plus petit
+       encore pour ne rien risquer sur les petits viewports. */
     .script-amp {
-      font-size: 0.95em;
-      padding: 0 0.04em;
-      vertical-align: -0.1em;
+      font-size: 0.65em;
+      padding: 0.12em 0.1em 0.16em;
     }
     .script-amp-sm {
-      font-size: 0.85em;
-      padding: 0 0.04em;
+      font-size: 0.7em;
+      padding: 0.1em 0.08em 0.14em;
     }
   }
   .hebrew-names .amp {
