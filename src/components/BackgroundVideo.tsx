@@ -14,17 +14,23 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
-// Lecture en 2 phases :
-//   Phase 1 (0 → 3.6 s)   : vitesse NATIVE (120 fps display = 1× native)
-//                           → wall t = source t. À 3.6 s wall, on est bien
-//                           à la seconde 3.6 du contenu source.
-//   Phase 2 (3.6 → 4.8 s) : vitesse SUPÉRIEURE (~632 fps display = 5.3× native)
-// La bascule à t=3.6 s s'accompagne d'un fast-forward franchement plus rapide
-// qui amène rapidement le plan à sa dernière frame.
-const CONSTANT_PHASE_MS = 3600;
-const FRAME_AT_TRANSITION = 432; // frame source à t=3.6 s (source 3.6 s × 120 fps interp)
-const ACCEL_PHASE_MS = 1200;     // (1191 − 432) frames en 1.2 s = 632 fps display
-const DEBUT_DURATION_MS = CONSTANT_PHASE_MS + ACCEL_PHASE_MS;
+// Lecture en 3 phases avec ramp d'accélération lisse :
+//   Phase 1a (0 → 3.3 s)   : vitesse NATIVE (120 fps display = 1× native)
+//   Phase 1b (3.3 → 3.6 s) : RAMP linéaire de la vitesse — 1× → 5.3× native
+//                            sur 0.3 s. Accélération douce, pas de saut.
+//   Phase 2  (3.6 → ~4.68 s) : vitesse PIC constante (632 fps = 5.3× native)
+const NATIVE_FPMS = 0.12;       // 120 fps display = 0.12 frames/ms (natif de l'extraction 120 fps)
+const PEAK_FPMS = 0.632;        // 632 fps display = 5.3× native
+const PHASE_1A_END_MS = 3300;   // fin lecture native, début du ramp d'accélération
+const RAMP_MS = 300;            // durée du ramp d'accélération (3.3 → 3.6 s)
+const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 3600
+// Frame atteinte à la fin de la phase 1a : 1 + native × 3300 = 397
+const FRAME_AT_1A_END = 1 + NATIVE_FPMS * PHASE_1A_END_MS;
+// Frame atteinte à la fin du ramp : intégrale de la vitesse linéaire
+// FRAME_AT_1A_END + (v_start + v_end) × Δt / 2 = FRAME_AT_1A_END + 112.8
+const FRAME_AT_1B_END = FRAME_AT_1A_END + ((NATIVE_FPMS + PEAK_FPMS) * RAMP_MS) / 2;
+const PHASE_2_DURATION_MS = Math.round((1191 - FRAME_AT_1B_END) / PEAK_FPMS);
+const DEBUT_DURATION_MS = PHASE_1B_END_MS + PHASE_2_DURATION_MS;
 const SCROLL_LERP = 0.16;
 const CROSSFADE_MS = 800;
 
@@ -134,16 +140,22 @@ export function BackgroundVideo() {
       const step = (now: number) => {
         const elapsed = now - start;
         let v: number;
-        if (elapsed < CONSTANT_PHASE_MS) {
-          // Phase 1 : vitesse constante, frame 1 → FRAME_AT_TRANSITION en 4 s
-          // (952 frames en 4 s = 238 fps display).
-          const t = elapsed / CONSTANT_PHASE_MS;
-          v = 1 + (FRAME_AT_TRANSITION - 1) * t;
+        if (elapsed < PHASE_1A_END_MS) {
+          // Phase 1a : vitesse native constante
+          v = 1 + NATIVE_FPMS * elapsed;
+        } else if (elapsed < PHASE_1B_END_MS) {
+          // Phase 1b : ramp d'accélération linéaire de la vitesse
+          // v_start = NATIVE_FPMS, v_end = PEAK_FPMS
+          // Intégrale : f(t) = f_start + v_start × t + (v_end − v_start) × t² / (2 × T)
+          const t = elapsed - PHASE_1A_END_MS;
+          v =
+            FRAME_AT_1A_END +
+            NATIVE_FPMS * t +
+            ((PEAK_FPMS - NATIVE_FPMS) * t * t) / (2 * RAMP_MS);
         } else if (elapsed < DEBUT_DURATION_MS) {
-          // Phase 2 : accélération linéaire à ~2.5× la vitesse de phase 1.
-          // 238 frames en 0.4 s = 595 fps display (vs 238 en phase 1).
-          const t = (elapsed - CONSTANT_PHASE_MS) / ACCEL_PHASE_MS;
-          v = FRAME_AT_TRANSITION + (DEBUT_TOTAL - FRAME_AT_TRANSITION) * t;
+          // Phase 2 : vitesse pic constante 5.3× native
+          const t = elapsed - PHASE_1B_END_MS;
+          v = FRAME_AT_1B_END + PEAK_FPMS * t;
         } else {
           v = DEBUT_TOTAL;
         }
