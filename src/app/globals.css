@@ -542,16 +542,18 @@
     font-family: "Zapfino", "Snell Roundhand", "Apple Chancery", "Edwardian Script ITC", "Brush Script MT", cursive;
     font-style: italic;
     font-weight: 400;
-    font-size: 1.15em;
-    line-height: 1.1;
-    vertical-align: -0.16em;
-    padding: 0 0.1em;
-    background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
+    font-size: 0.9em;
+    line-height: 1;
+    vertical-align: baseline;
+    padding: 0 0.15em;
+    /* Or vif doré (pas bronze) — plus clair et lumineux que les prénoms
+       qui sont en bronze foncé. Contraste visuel entre les deux. */
+    background: linear-gradient(135deg, #A87A20 0%, #E0B04A 30%, #FFDA7D 50%, #E0B04A 70%, #966A18 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.35));
+    filter: drop-shadow(0 1px 2px rgba(180, 130, 20, 0.5));
   }
   .script-amp-sm {
     font-size: 1em;
@@ -841,32 +843,31 @@
   }
   .names-formal {
     font-family: "Didot", Georgia, serif;
-    font-size: clamp(30px, 7vw, 56px);
+    /* Prend toute la largeur possible du bloc (avec cap desktop 82px).
+       Min 40px, scale 10vw. */
+    font-size: clamp(40px, 10vw, 82px);
     font-weight: 300;
-    line-height: 1.05;
+    /* Ligne haute pour que le & (Zapfino) ne soit pas coupé haut/bas. */
+    line-height: 1.5;
     margin: 32px 0 16px;
     letter-spacing: -0.005em;
-    background: linear-gradient(100deg,
-      #A88962 0%,
-      #A88962 35%,
-      #F0DDB0 48%,
-      #FFFFFF 50%,
-      #F0DDB0 52%,
-      #A88962 65%,
-      #A88962 100%);
-    background-size: 250% 100%;
-    background-position: 100% 50%;
+    /* Bronze métallique — dégradé vertical avec highlight central pour
+       simuler la lumière sur du métal poli. Pas d'animation shimmer. */
+    background: linear-gradient(180deg,
+      #3D2412 0%,
+      #6B3E1F 18%,
+      #A9743F 40%,
+      #D9AF7A 52%,
+      #B08258 68%,
+      #6B3E1F 90%,
+      #3D2412 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.22));
+    filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.28));
     white-space: nowrap;
-    animation: shimmer-luxe 5.5s ease-in-out infinite;
-  }
-  
-  @media (prefers-reduced-motion: reduce) {
-    .names-formal { animation: none; background-position: 50% 50%; }
+    overflow: visible;
   }
   .names-formal .rings-amp-sm {
     filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.22));
@@ -878,15 +879,19 @@
   }
   @media (max-width: 520px) {
     .names-formal {
-      font-size: clamp(24px, 6vw, 40px);
+      /* Prend toute la largeur du bloc en mobile (9vw = ~34 px sur
+         375 px viewport). Un peu de marge de sécurité pour que le
+         « & » Zapfino ne cause pas de débordement. */
+      font-size: clamp(30px, 9vw, 52px);
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      /* white-space: normal en fallback si vraiment trop long — permet
+         un retour à la ligne au niveau du &. */
       white-space: normal;
-      line-height: 1.15;
-      letter-spacing: 0;
     }
     /* Sur mobile, l'ornement floral bas-gauche du faire-part dépasse
        visuellement le bord du bloc et flotte sous le viewport. On le
-       masque uniquement pour .invitation-formal (les autres blocs le
-       gardent). */
+       masque uniquement pour .invitation-formal. */
     .invitation-formal .block-ornament-accent.bl {
       display: none;
     }
