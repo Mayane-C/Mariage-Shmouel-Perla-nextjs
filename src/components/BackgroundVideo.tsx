@@ -14,8 +14,8 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
-const NATIVE_END_FRAME = 240;
-const NATIVE_PHASE_MS = 2000;
+const NATIVE_END_FRAME = 360;    // frame à 3 s natives (3 s × 120 fps interp)
+const NATIVE_PHASE_MS = 3000;    // phase native prolongée d'1 s (2 → 3 s)
 const ACCEL_PHASE_MS = 1000;
 const DEBUT_DURATION_MS = NATIVE_PHASE_MS + ACCEL_PHASE_MS;
 const SCROLL_LERP = 0.16;
