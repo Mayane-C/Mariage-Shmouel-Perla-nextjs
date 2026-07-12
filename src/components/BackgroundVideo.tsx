@@ -14,6 +14,9 @@ import { useEffect, useRef } from 'react';
 
 const DEBUT_TOTAL = 1191;
 const FIN_TOTAL = 2381;
+// Skip la 1re seconde de « fin » : fin extraite à 240 fps interpolate, donc
+// 1 s = ~238 frames. On démarre la séquence à cette frame plutôt qu'à la 1re.
+const FIN_START_FRAME = 238;
 // Lecture en 3 phases avec ramp d'accélération lisse :
 //   Phase 1a (0 → 3.3 s)   : vitesse NATIVE (120 fps display = 1× native)
 //   Phase 1b (3.3 → 3.6 s) : RAMP linéaire de la vitesse — 1× → 5.3× native
@@ -93,17 +96,13 @@ export function BackgroundVideo() {
     };
     rafId = requestAnimationFrame(tick);
 
-    // Délai avant que la séquence « fin » ne prenne le relais (le layer
-     // debut reste figé sur sa dernière frame pendant ce temps).
-    const FIN_START_DELAY_MS = 3000;
-
     const activateFinLayer = () => {
       phaseRef.current = 'fin';
-      currentIdxRef.current = 1;
-      targetIdxRef.current = 1;
+      currentIdxRef.current = FIN_START_FRAME;
+      targetIdxRef.current = FIN_START_FRAME;
       if (finLayerRef.current) {
-        finLayerRef.current.src = finFrame(1);
-        finLayerRef.current.dataset.idx = 'fin-1';
+        finLayerRef.current.src = finFrame(FIN_START_FRAME);
+        finLayerRef.current.dataset.idx = `fin-${FIN_START_FRAME}`;
       }
       finLayerRef.current?.classList.add('is-active');
       debutLayerRef.current?.classList.remove('is-active');
@@ -118,10 +117,9 @@ export function BackgroundVideo() {
       if (revealedRef.current) return;
       revealedRef.current = true;
       document.body.classList.add('revealed');
-      // La séquence « fin » démarre FIN_START_DELAY_MS après l'apparition
-      // du bloc. Le layer debut reste visible (dernière frame figée)
-      // pendant ce délai, avant le crossfade doux vers fin.
-      setTimeout(activateFinLayer, FIN_START_DELAY_MS);
+      // La séquence « fin » prend le relais immédiatement — plus de
+      // délai. Crossfade doux debut → fin déclenché maintenant.
+      activateFinLayer();
     };
 
     const doScrollToInvitation = () => {
@@ -211,7 +209,7 @@ export function BackgroundVideo() {
         window.innerHeight * 0.4;
       const endDelta = Math.max(1, endY - scrollBaselineYRef.current);
       const progress = Math.min(1, delta / endDelta);
-      targetIdxRef.current = 1 + progress * (FIN_TOTAL - 1);
+      targetIdxRef.current = FIN_START_FRAME + progress * (FIN_TOTAL - FIN_START_FRAME);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
