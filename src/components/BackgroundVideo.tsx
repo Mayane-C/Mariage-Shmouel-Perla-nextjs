@@ -3,38 +3,23 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * Fond d'écran orchestré par DEUX séquences de frames JPG :
+ * Fond d'écran orchestré par DEUX séquences de frames JPG (« début » puis
+ * « fin »), avec crossfade doux à la bascule pour que la transition ne se
+ * voit pas.
  *
- *   1. « début » — joue automatiquement au clic sur « Voir l'invitation »
- *      via animateDebut. À sa dernière frame, doRevealBlocks() déclenche
- *      le glissement du bloc faire-part.
- *
- *   2. « fin » — pilotée par le scroll utilisateur après l'apparition du
- *      bloc. Frame 1 = début du scroll (juste après le baseline
- *      d'auto-scroll), frame N = bas du bloc RSVP.
- *
- * Chaque séquence a son propre nombre de frames (déterminé par
- * l'extraction ffmpeg). Le composant garde une frame courante et
- * bascule entre les deux images sources selon la phase.
+ * Rendu : deux <img> superposés (debut / fin), chacun avec sa propre src
+ * pilotée par sa phase. À la bascule, on fait fondre le layer sortant
+ * (opacité 1 → 0) pendant que l'entrant apparaît (0 → 1) sur ~800 ms.
  */
 
-const DEBUT_TOTAL = 1191;        // frames extraites de debut.mp4 (120 fps minterpolate)
-const FIN_TOTAL = 2381;          // frames extraites de fin.mp4 (240 fps minterpolate = 2× la
-                                 // densité de debut, pour un scroll-scrub plus fluide)
-// Lecture en 2 phases :
-//   · Phase 1 (native) : les 2 premières secondes du source video jouent à
-//     vitesse native (visible et lisible : on voit clairement le début).
-//   · Phase 2 (accélérée) : le reste défile rapidement pour arriver à la
-//     dernière frame et déclencher l'apparition du bloc.
-const NATIVE_END_FRAME = 240;    // frame correspondant à 2 s natives (2 s × 120 fps interp)
-const NATIVE_PHASE_MS = 2000;    // durée réelle de la phase native (matches source timing)
-const ACCEL_PHASE_MS = 1000;     // durée réelle de la phase accélérée (951 frames en 1 s)
+const DEBUT_TOTAL = 1191;
+const FIN_TOTAL = 2381;
+const NATIVE_END_FRAME = 240;
+const NATIVE_PHASE_MS = 2000;
+const ACCEL_PHASE_MS = 1000;
 const DEBUT_DURATION_MS = NATIVE_PHASE_MS + ACCEL_PHASE_MS;
-                                 // Durée totale = 3 s (comme demandé) mais avec un début
-                                 // lisible plutôt qu'un défilement uniforme trop rapide.
-const SCROLL_LERP = 0.16;        // interpolation par frame pendant le scroll — un peu plus
-                                 // réactif maintenant qu'on a 2× plus de frames (le pas entre
-                                 // frames est plus petit, donc plus rapide n'est plus jerky)
+const SCROLL_LERP = 0.16;
+const CROSSFADE_MS = 800;
 
 const debutFrame = (i: number) =>
   `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(4, '0')}.jpg`;
@@ -43,44 +28,43 @@ const finFrame = (i: number) =>
   `/frames/fin/frame-${String(Math.max(1, Math.min(FIN_TOTAL, i))).padStart(4, '0')}.jpg`;
 
 export function BackgroundVideo() {
-  const layerRef = useRef<HTMLImageElement>(null);
+  const debutLayerRef = useRef<HTMLImageElement>(null);
+  const finLayerRef = useRef<HTMLImageElement>(null);
   const currentIdxRef = useRef(1);
   const targetIdxRef = useRef(1);
   const revealedRef = useRef(false);
   const introPlayingRef = useRef(false);
-  const scrubActiveRef = useRef(false);          // scroll-scrub actif ? (activé après stabilisation de l'auto-scroll)
-  const scrollBaselineYRef = useRef(0);          // scrollY au moment où le scrub s'active
-  const phaseRef = useRef<'debut' | 'fin'>('debut'); // séquence courante affichée
+  const scrubActiveRef = useRef(false);
+  const scrollBaselineYRef = useRef(0);
+  const phaseRef = useRef<'debut' | 'fin'>('debut');
 
   useEffect(() => {
-    // ── Préchargement + décodage de toutes les frames des DEUX vidéos ──
     let cancelled = false;
     (async () => {
       for (let i = 1; i <= DEBUT_TOTAL; i++) {
         if (cancelled) return;
         const im = new Image();
         im.src = debutFrame(i);
-        try { await im.decode(); } catch { /* fallback silencieux */ }
+        try { await im.decode(); } catch { /* silent */ }
       }
       for (let i = 1; i <= FIN_TOTAL; i++) {
         if (cancelled) return;
         const im = new Image();
         im.src = finFrame(i);
-        try { await im.decode(); } catch { /* fallback silencieux */ }
+        try { await im.decode(); } catch { /* silent */ }
       }
     })();
 
-    // Helper : mute src selon la phase courante.
+    // Helper : mute la src du layer correspondant à la phase courante.
     const setFrameSrc = (frameIdx: number) => {
-      const src = phaseRef.current === 'debut' ? debutFrame(frameIdx) : finFrame(frameIdx);
+      const el = phaseRef.current === 'debut' ? debutLayerRef.current : finLayerRef.current;
       const key = `${phaseRef.current}-${frameIdx}`;
-      if (layerRef.current && layerRef.current.dataset.idx !== key) {
-        layerRef.current.src = src;
-        layerRef.current.dataset.idx = key;
+      if (el && el.dataset.idx !== key) {
+        el.src = phaseRef.current === 'debut' ? debutFrame(frameIdx) : finFrame(frameIdx);
+        el.dataset.idx = key;
       }
     };
 
-    // ── Boucle rAF pour le scroll-scrub (uniquement pendant phase « fin ») ──
     let rafId = 0;
     const tick = () => {
       if (!introPlayingRef.current) {
@@ -96,21 +80,27 @@ export function BackgroundVideo() {
     };
     rafId = requestAnimationFrame(tick);
 
-    // ── Utilitaires ───────────────────────────────────────────────────
     const doRevealBlocks = () => {
       if (revealedRef.current) return;
       revealedRef.current = true;
       document.body.classList.add('revealed');
-      // Attendre la stabilisation de l'auto-scroll avant d'activer le
-      // scroll-scrub. Sinon les events scroll générés par
-      // doScrollToInvitation feraient avancer la vidéo prématurément.
+      // Crossfade debut → fin : on prépare la frame 1 de fin AVANT de bascule
+      // et on déclenche le fade de opacité via .is-active toggle.
+      phaseRef.current = 'fin';
+      currentIdxRef.current = 1;
+      targetIdxRef.current = 1;
+      if (finLayerRef.current) {
+        finLayerRef.current.src = finFrame(1);
+        finLayerRef.current.dataset.idx = 'fin-1';
+      }
+      // Fait apparaître le layer fin par-dessus le layer debut (fade in).
+      finLayerRef.current?.classList.add('is-active');
+      debutLayerRef.current?.classList.remove('is-active');
+
+      // Après stabilisation de l'auto-scroll (et fin du crossfade), on
+      // active le scroll-scrub.
       setTimeout(() => {
         scrollBaselineYRef.current = window.scrollY;
-        // Passage à la séquence « fin » — frame 1 comme point de départ.
-        phaseRef.current = 'fin';
-        currentIdxRef.current = 1;
-        targetIdxRef.current = 1;
-        setFrameSrc(1);
         scrubActiveRef.current = true;
       }, 1500);
     };
@@ -124,13 +114,6 @@ export function BackgroundVideo() {
       }, 500);
     };
 
-    /**
-     * Anime la séquence « début » en 2 phases :
-     *   · Phase 1 (0 → NATIVE_PHASE_MS)   : frame 1 → NATIVE_END_FRAME, linéaire natif.
-     *   · Phase 2 (native → DEBUT_DURATION_MS) : NATIVE_END_FRAME → DEBUT_TOTAL, linéaire accéléré.
-     * Aucune décélération / easing à l'intérieur des phases — juste un
-     * changement de vitesse au moment de la bascule à t = NATIVE_PHASE_MS.
-     */
     const animateDebut = (onComplete?: () => void) => {
       introPlayingRef.current = true;
       phaseRef.current = 'debut';
@@ -139,11 +122,9 @@ export function BackgroundVideo() {
         const elapsed = now - start;
         let v: number;
         if (elapsed < NATIVE_PHASE_MS) {
-          // Phase 1 : native, frame 1 → NATIVE_END_FRAME
           const t = elapsed / NATIVE_PHASE_MS;
           v = 1 + (NATIVE_END_FRAME - 1) * t;
         } else if (elapsed < DEBUT_DURATION_MS) {
-          // Phase 2 : accélérée, NATIVE_END_FRAME → DEBUT_TOTAL
           const t = (elapsed - NATIVE_PHASE_MS) / ACCEL_PHASE_MS;
           v = NATIVE_END_FRAME + (DEBUT_TOTAL - NATIVE_END_FRAME) * t;
         } else {
@@ -163,25 +144,18 @@ export function BackgroundVideo() {
       requestAnimationFrame(step);
     };
 
-    // ── Clic sur « Voir l'invitation » ────────────────────────────────
     const revealBtn = document.querySelector<HTMLElement>('.btn-hero');
     const onRevealClick = (e: Event) => {
       e.preventDefault();
       if (revealedRef.current) return;
-      // L'overlay sombre se retire immédiatement, en même temps que le hero
-      // s'estompe. .revealed n'est ajouté qu'à la fin de « début » pour
-      // déclencher le glissement du bloc.
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
-      // Joue « début » en 2 phases (natif 2 s puis accéléré 1 s). À la fin,
-      // le bloc apparaît et la séquence bascule sur « fin » (scroll-scrub).
       animateDebut(() => {
         doRevealBlocks();
         doScrollToInvitation();
       });
 
-      // Filet de sécurité : si l'anim plante, on révèle quand même.
       setTimeout(() => {
         if (!revealedRef.current) {
           doRevealBlocks();
@@ -191,7 +165,6 @@ export function BackgroundVideo() {
     };
     revealBtn?.addEventListener('click', onRevealClick);
 
-    // ── Scroll → target frame index dans la séquence « fin » ─────────
     const onScroll = () => {
       if (!scrubActiveRef.current || introPlayingRef.current) return;
       const lastBlock = document.querySelector('.rsvp');
@@ -223,14 +196,22 @@ export function BackgroundVideo() {
 
   return (
     <>
-      <div className="bg-video" aria-hidden="true">
+      <div className="bg-video" aria-hidden="true" style={{ ['--crossfade-ms' as string]: `${CROSSFADE_MS}ms` }}>
         <img
-          ref={layerRef}
+          ref={debutLayerRef}
           src={debutFrame(1)}
           alt=""
-          className="bg-frame"
+          className="bg-frame bg-frame-debut is-active"
           decoding="sync"
           data-idx="debut-1"
+        />
+        <img
+          ref={finLayerRef}
+          src={finFrame(1)}
+          alt=""
+          className="bg-frame bg-frame-fin"
+          decoding="sync"
+          data-idx="fin-1"
         />
       </div>
       <div className="bg-veil" aria-hidden="true" />

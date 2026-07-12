@@ -132,6 +132,17 @@
     position: absolute;
     inset: 0;
   }
+  /* Crossfade entre les 2 séquences debut/fin. Chaque frame est un
+     <img> stacké — celui qui a .is-active passe à opacity 1, l'autre
+     à opacity 0, via une transition douce de --crossfade-ms. */
+  .bg-frame {
+    opacity: 0;
+    transition: opacity var(--crossfade-ms, 800ms) ease-in-out;
+    will-change: opacity;
+  }
+  .bg-frame.is-active {
+    opacity: 1;
+  }
   /* Voile pour maintenir la lisibilité du texte au-dessus */
   .bg-veil {
     position: fixed;
@@ -518,13 +529,13 @@
      gradient or bronze pour rester dans la palette du countdown. */
   .script-amp {
     display: inline-block;
-    font-family: "Snell Roundhand", "Apple Chancery", "Zapfino", "Brush Script MT", cursive;
+    font-family: "Zapfino", "Snell Roundhand", "Apple Chancery", "Edwardian Script ITC", "Brush Script MT", cursive;
     font-style: italic;
     font-weight: 400;
-    font-size: 1.15em;
-    line-height: 1;
-    vertical-align: -0.14em;
-    padding: 0 0.06em;
+    font-size: 1.55em;
+    line-height: 0.9;
+    vertical-align: -0.28em;
+    padding: 0 0.18em;
     background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -533,8 +544,9 @@
     filter: drop-shadow(0 1px 2px rgba(120, 78, 12, 0.35));
   }
   .script-amp-sm {
-    font-size: 0.95em;
-    vertical-align: -0.08em;
+    font-size: 1.3em;
+    vertical-align: -0.22em;
+    padding: 0 0.12em;
   }
   .hebrew-names .amp {
     font-family: "Didot", "Bodoni 72", Georgia, serif;
@@ -1302,9 +1314,10 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(245, 239, 230, 0.98);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  /* Fond de couleur unie (opaque) — plus de backdrop-blur qui laissait
+     transparaître la vidéo derrière. Reprise de la même teinte crème
+     que le fond de base du site. Pattern BM Chmouel. */
+  background: #F5EFE6;
   z-index: 99;
   padding: 88px 32px 32px;
   animation: menu-fade 0.35s cubic-bezier(0.16, 1, 0.3, 1);
