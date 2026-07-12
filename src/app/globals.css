@@ -539,8 +539,6 @@
      gradient or bronze pour rester dans la palette du countdown. */
   .script-amp {
     display: inline-block;
-    /* Snell Roundhand a un & avec glyphe compact (pas de descender géant
-       comme Zapfino qui débordait de la ligne). */
     font-family: "Snell Roundhand", "Apple Chancery", "Edwardian Script ITC", "Brush Script MT", "Zapfino", cursive;
     font-style: italic;
     font-weight: 400;
@@ -548,14 +546,23 @@
     line-height: 1.3;
     vertical-align: baseline;
     padding: 0.2em 0.18em 0.3em;
-    /* Or vif doré (pas bronze) — plus clair et lumineux que les prénoms
-       qui sont en bronze foncé. Contraste visuel entre les deux. */
-    background: linear-gradient(135deg, #A87A20 0%, #E0B04A 30%, #FFDA7D 50%, #E0B04A 70%, #966A18 100%);
+    /* Or profond très saturé — bien plus visible sur crème que l'or clair
+       (qui se noyait). Contraste fort avec le bronze foncé des prénoms. */
+    background: linear-gradient(135deg,
+      #5C3A0F 0%,
+      #8F5F1E 20%,
+      #C69144 42%,
+      #F0C866 50%,
+      #C69144 58%,
+      #8F5F1E 80%,
+      #5C3A0F 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 1px 2px rgba(180, 130, 20, 0.5));
+    filter:
+      drop-shadow(0 2px 3px rgba(92, 58, 15, 0.55))
+      drop-shadow(0 0 1px rgba(92, 58, 15, 0.4));
   }
   .script-amp-sm {
     font-size: 1em;
@@ -841,31 +848,45 @@
   }
   .names-formal {
     font-family: "Didot", Georgia, serif;
-    /* Prend toute la largeur possible du bloc (avec cap desktop 82px).
-       Min 40px, scale 10vw. */
     font-size: clamp(40px, 10vw, 82px);
     font-weight: 300;
-    /* Ligne haute pour que le & (Zapfino) ne soit pas coupé haut/bas. */
     line-height: 1.5;
     margin: 32px 0 16px;
     letter-spacing: -0.005em;
-    /* Bronze métallique — dégradé vertical avec highlight central pour
-       simuler la lumière sur du métal poli. Pas d'animation shimmer. */
+    /* Bronze premium foil-stamped — dégradé multi-strates avec highlight
+       très lumineux au centre (rendu 'métal poli haut de gamme') +
+       animation shimmer subtile qui fait 'jouer la lumière'. */
     background: linear-gradient(180deg,
-      #3D2412 0%,
-      #6B3E1F 18%,
-      #A9743F 40%,
-      #D9AF7A 52%,
-      #B08258 68%,
-      #6B3E1F 90%,
-      #3D2412 100%);
+      #2E1A0A 0%,
+      #5A3418 12%,
+      #8E5D2A 26%,
+      #C48A45 42%,
+      #F0D19A 49%,
+      #FFF3D6 51%,
+      #F0D19A 53%,
+      #C48A45 60%,
+      #8E5D2A 76%,
+      #5A3418 90%,
+      #2E1A0A 100%);
+    background-size: 100% 220%;
+    background-position: 50% 50%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.28));
+    filter:
+      drop-shadow(0 4px 8px rgba(46, 26, 10, 0.38))
+      drop-shadow(0 1px 0 rgba(255, 224, 176, 0.22));
     white-space: nowrap;
     overflow: visible;
+    animation: shimmer-bronze 7s ease-in-out infinite;
+  }
+  @keyframes shimmer-bronze {
+    0%, 100% { background-position: 50% 44%; }
+    50%      { background-position: 50% 56%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .names-formal { animation: none; background-position: 50% 50%; }
   }
   .names-formal .rings-amp-sm {
     filter: drop-shadow(0 3px 5px rgba(74, 63, 53, 0.22));
@@ -1253,12 +1274,12 @@
     height: auto;
     color: var(--sand);
   }
-  /* Séparateur classique wedding : 2 fines lignes dorées + un diamant
-     central creusé. Remplace l'ancien pattern line-cercle-line.  */
+  /* Séparateur wedding raffiné : petite fleur 5 pétales au centre
+     avec cœur crème + 2 fines lignes dorées. */
   .fp-divider {
-    width: 200px;
+    width: 210px;
     color: #B8935F;
-    filter: drop-shadow(0 1px 1px rgba(120, 78, 12, 0.15));
+    filter: drop-shadow(0 1px 1px rgba(120, 78, 12, 0.18));
   }
 /* animations.css — @keyframes (shimmer effects) */
 

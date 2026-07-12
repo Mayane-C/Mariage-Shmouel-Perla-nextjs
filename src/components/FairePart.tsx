@@ -88,11 +88,19 @@ export function FairePart() {
         aria-hidden="true"
       />
 
-      <svg className="ornament fp-divider" viewBox="0 0 220 16" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true">
-        <line x1="4" y1="8" x2="92" y2="8" stroke="currentColor" strokeWidth="0.7" strokeLinecap="round" />
-        <path d="M 100 8 L 110 2 L 120 8 L 110 14 Z" fill="currentColor" opacity="0.85" />
-        <circle cx="110" cy="8" r="1.2" fill="var(--cream-soft, #FAF7F1)" />
-        <line x1="128" y1="8" x2="216" y2="8" stroke="currentColor" strokeWidth="0.7" strokeLinecap="round" />
+      <svg className="ornament fp-divider" viewBox="0 0 260 22" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        {/* Lignes latérales fines */}
+        <line x1="6" y1="11" x2="112" y2="11" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" opacity="0.65" />
+        <line x1="148" y1="11" x2="254" y2="11" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" opacity="0.65" />
+        {/* Fleur 5 pétales au centre */}
+        <g transform="translate(130, 11)" fill="currentColor">
+          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" />
+          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(72)" />
+          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(144)" />
+          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(216)" />
+          <ellipse cx="0" cy="-5" rx="1.7" ry="4.2" opacity="0.85" transform="rotate(288)" />
+          <circle r="1.6" fill="#FAF7F1" stroke="currentColor" strokeWidth="0.6" />
+        </g>
       </svg>
 
       <div className="families-formal">
