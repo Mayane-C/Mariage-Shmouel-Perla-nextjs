@@ -5,10 +5,23 @@ import { content } from '@/lib/content';
 import { Ornament } from './Ornament';
 
 type Status = 'idle' | 'sending' | 'success' | 'error';
+type Presence = '' | 'oui' | 'non';
 
 export function RSVP() {
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
+  const [presence, setPresence] = useState<Presence>('');
+  const [adultes, setAdultes] = useState<number>(0);
+  const [enfants, setEnfants] = useState<number>(0);
+
+  // Quand l'invité coche « Non, absent(e) », on force les compteurs à 0.
+  const handlePresenceChange = (value: Presence) => {
+    setPresence(value);
+    if (value === 'non') {
+      setAdultes(0);
+      setEnfants(0);
+    }
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,8 +35,8 @@ export function RSVP() {
       prenom: String(data.get('prenom') || ''),
       nom: String(data.get('nom') || ''),
       presence: String(data.get('presence') || ''),
-      adultes: String(data.get('nb-adulte') || '0'),
-      enfants: String(data.get('nb-enfant') || '0'),
+      adultes: String(adultes),
+      enfants: String(enfants),
       message: String(data.get('mot') || ''),
     };
 
@@ -47,6 +60,7 @@ export function RSVP() {
   }
 
   const disabled = status === 'sending' || status === 'success';
+  const numbersLocked = disabled || presence === 'non';
 
   return (
     <section id="rsvp" className="rsvp block">
@@ -81,10 +95,27 @@ export function RSVP() {
         <span className="field-label">Confirmez-vous votre présence à la Houppa ?</span>
         <div className="radio-group">
           <label>
-            <input type="radio" name="presence" value="oui" required disabled={disabled} /> Oui, avec joie
+            <input
+              type="radio"
+              name="presence"
+              value="oui"
+              required
+              disabled={disabled}
+              checked={presence === 'oui'}
+              onChange={() => handlePresenceChange('oui')}
+            />{' '}
+            Oui, avec joie
           </label>
           <label>
-            <input type="radio" name="presence" value="non" disabled={disabled} /> Non, absent(e)
+            <input
+              type="radio"
+              name="presence"
+              value="non"
+              disabled={disabled}
+              checked={presence === 'non'}
+              onChange={() => handlePresenceChange('non')}
+            />{' '}
+            Non, absent(e)
           </label>
         </div>
 
@@ -93,13 +124,29 @@ export function RSVP() {
             <label className="field-label" htmlFor="nb-adulte">
               Nombre d&apos;adultes
             </label>
-            <input type="number" id="nb-adulte" name="nb-adulte" min="0" defaultValue={1} disabled={disabled} />
+            <input
+              type="number"
+              id="nb-adulte"
+              name="nb-adulte"
+              min="0"
+              value={adultes}
+              onChange={(e) => setAdultes(Math.max(0, Number(e.target.value) || 0))}
+              disabled={numbersLocked}
+            />
           </div>
           <div>
             <label className="field-label" htmlFor="nb-enfant">
               Nombre d&apos;enfants
             </label>
-            <input type="number" id="nb-enfant" name="nb-enfant" min="0" defaultValue={0} disabled={disabled} />
+            <input
+              type="number"
+              id="nb-enfant"
+              name="nb-enfant"
+              min="0"
+              value={enfants}
+              onChange={(e) => setEnfants(Math.max(0, Number(e.target.value) || 0))}
+              disabled={numbersLocked}
+            />
           </div>
         </div>
 
