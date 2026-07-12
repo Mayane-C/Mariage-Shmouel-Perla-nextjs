@@ -10,15 +10,57 @@ export const alt =
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default async function OG() {
-  const logoPath = path.join(process.cwd(), 'public/images/wedding-logo.png');
-  const logoBase64 = `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`;
+/**
+ * Récupère un fichier de police depuis Google Fonts au moment du build.
+ * Playfair Display sert de substitut à Didot (Didot n'est pas OFL/libre) —
+ * même famille Didone, mêmes proportions élégantes.
+ */
+async function fetchGoogleFont(
+  family: string,
+  opts: { weight?: number; italic?: boolean } = {}
+): Promise<ArrayBuffer> {
+  const { weight = 400, italic = false } = opts;
+  const params = italic ? `ital,wght@1,${weight}` : `wght@${weight}`;
+  const cssUrl = `https://fonts.googleapis.com/css2?family=${family.replace(
+    / /g,
+    '+'
+  )}:${params}&display=swap`;
+  const css = await fetch(cssUrl, {
+    headers: {
+      // UA moderne pour obtenir du woff2 (supporté par Satori v0.4+).
+      'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+    },
+  }).then((r) => r.text());
+  const match = css.match(/src:\s*url\(([^)]+)\)\s*format/);
+  if (!match) throw new Error(`Font URL not found for ${family}`);
+  return fetch(match[1]).then((r) => r.arrayBuffer());
+}
 
-  // Palette Sable Chaud (nude) — cohérente avec le site.
+export default async function OG() {
+  // Fonts : Playfair Display (substitut Didot, Didone élégant) + FrankRuhlLibre
+  // pour l'hébreu (identique au site).
+  const [playfairRegular, playfairItalic, playfairBold] = await Promise.all([
+    fetchGoogleFont('Playfair Display', { weight: 500 }),
+    fetchGoogleFont('Playfair Display', { weight: 400, italic: true }),
+    fetchGoogleFont('Playfair Display', { weight: 700 }),
+  ]);
+
+  const logoPath = path.join(process.cwd(), 'public/images/wedding-logo.png');
+  const frankPath = path.join(
+    process.cwd(),
+    'public/fonts/FrankRuhlLibre-Regular.ttf'
+  );
+  const logoBase64 = `data:image/png;base64,${fs
+    .readFileSync(logoPath)
+    .toString('base64')}`;
+  const frankFont = fs.readFileSync(frankPath);
+
+  // Palette Sable Chaud (cohérente avec le site).
   const cream = '#FAF7F1';
-  const gold = '#B8935F';         // filets latéraux
-  const sandDeep = '#A88962';     // & italique (comme .families-formal .amp du site)
-  const bronze = '#7A5A2C';       // prénoms bronze (couleur médiane du gradient countdown)
+  const gold = '#B8935F';
+  const sandDeep = '#A88962';
+  const bronze = '#7A5A2C';
   const taupe = '#4A3F35';
   const sand = '#C9A87D';
 
@@ -33,7 +75,7 @@ export default async function OG() {
           alignItems: 'center',
           justifyContent: 'center',
           background: cream,
-          fontFamily: 'Georgia, serif',
+          fontFamily: 'Playfair',
           color: taupe,
           position: 'relative',
         }}
@@ -69,15 +111,14 @@ export default async function OG() {
             letterSpacing: '0.22em',
             textTransform: 'uppercase',
             color: taupe,
-            fontWeight: 400,
+            fontWeight: 500,
             marginBottom: 24,
           }}
         >
           Mariage
         </div>
 
-        {/* Shmouel & Perla — bronze plein (couleur médiane du gradient
-            countdown du site) + & italique sand-deep. Plus d'image anneaux. */}
+        {/* Shmouel & Perla — bronze plein + & italique sand-deep. */}
         <div
           style={{
             display: 'flex',
@@ -86,8 +127,7 @@ export default async function OG() {
             fontSize: 82,
             color: bronze,
             marginBottom: 16,
-            fontFamily: 'Georgia, serif',
-            fontWeight: 500,
+            fontWeight: 700,
           }}
         >
           <span>Shmouel</span>
@@ -95,6 +135,7 @@ export default async function OG() {
             style={{
               color: sandDeep,
               fontStyle: 'italic',
+              fontWeight: 400,
               fontSize: 62,
               lineHeight: 1,
             }}
@@ -104,9 +145,7 @@ export default async function OG() {
           <span>Perla</span>
         </div>
 
-        {/* Noms hébreux avec & italique sand-deep au milieu — chaque mot
-            est inversé (Satori n'a pas de bidi), et flexDirection row-reverse
-            place שמואל à droite / פערלה à gauche pour une lecture RTL. */}
+        {/* Noms hébreux — FrankRuhlLibre + & italique sand-deep central. */}
         <div
           style={{
             display: 'flex',
@@ -117,6 +156,7 @@ export default async function OG() {
             color: sand,
             letterSpacing: '0.04em',
             marginBottom: 26,
+            fontFamily: 'FrankRuhlLibre',
           }}
         >
           <span>{Array.from('שמואל').reverse().join('')}</span>
@@ -124,7 +164,7 @@ export default async function OG() {
             style={{
               color: sandDeep,
               fontStyle: 'italic',
-              fontFamily: 'Georgia, serif',
+              fontFamily: 'Playfair',
               fontSize: 38,
               lineHeight: 1,
             }}
@@ -147,6 +187,14 @@ export default async function OG() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        { name: 'Playfair', data: playfairRegular, weight: 500, style: 'normal' },
+        { name: 'Playfair', data: playfairItalic, weight: 400, style: 'italic' },
+        { name: 'Playfair', data: playfairBold, weight: 700, style: 'normal' },
+        { name: 'FrankRuhlLibre', data: frankFont, weight: 400, style: 'normal' },
+      ],
+    }
   );
 }
