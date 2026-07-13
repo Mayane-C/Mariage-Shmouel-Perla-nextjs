@@ -157,13 +157,14 @@ export function BackgroundVideo() {
       }, 1500);
     };
 
+    // Révèle uniquement le bloc + auto-scroll (pas le crossfade fin).
+    // Le crossfade vers « fin » est déclenché séparément, au vrai END de
+    // l'animation debut, pour ne pas gâcher le fast-forward phase B qui
+    // continue à jouer pendant que le bloc glisse.
     const doRevealBlocks = () => {
       if (revealedRef.current) return;
       revealedRef.current = true;
       document.body.classList.add('revealed');
-      // La séquence « fin » prend le relais immédiatement — plus de
-      // délai. Crossfade doux debut → fin déclenché maintenant.
-      activateFinLayer();
     };
 
     const doScrollToInvitation = () => {
@@ -178,27 +179,26 @@ export function BackgroundVideo() {
       });
     };
 
-    const animateDebut = (onComplete?: () => void) => {
+    const animateDebut = (
+      onReveal?: () => void,
+      onComplete?: () => void
+    ) => {
       introPlayingRef.current = true;
       phaseRef.current = 'debut';
       const start = performance.now();
+      let revealFired = false;
       const step = (now: number) => {
         const elapsed = now - start;
         let v: number;
         if (elapsed < PHASE_1A_END_MS) {
-          // Phase 1a : vitesse native constante
           v = 1 + NATIVE_FPMS * elapsed;
         } else if (elapsed < PHASE_1B_END_MS) {
-          // Phase 1b : ramp d'accélération linéaire de la vitesse
-          // v_start = NATIVE_FPMS, v_end = PEAK_FPMS
-          // Intégrale : f(t) = f_start + v_start × t + (v_end − v_start) × t² / (2 × T)
           const t = elapsed - PHASE_1A_END_MS;
           v =
             FRAME_AT_1A_END +
             NATIVE_FPMS * t +
             ((PEAK_FPMS - NATIVE_FPMS) * t * t) / (2 * RAMP_MS);
         } else if (elapsed < DEBUT_DURATION_MS) {
-          // Phase 2 : vitesse pic constante 6× native
           const t = elapsed - PHASE_1B_END_MS;
           v = FRAME_AT_1B_END + PEAK_FPMS * t;
         } else {
@@ -208,6 +208,13 @@ export function BackgroundVideo() {
         currentIdxRef.current = v;
         const clamped = Math.max(1, Math.min(DEBUT_TOTAL, Math.round(v)));
         setFrameSrc(clamped);
+        // Reveal EARLY : dès que le ramp est terminé (début de la phase B).
+        // Le bloc glisse en parallèle du fast-forward, sans attendre la
+        // dernière frame — pas de temps mort perçu.
+        if (!revealFired && elapsed >= PHASE_1B_END_MS) {
+          revealFired = true;
+          onReveal?.();
+        }
         if (elapsed < DEBUT_DURATION_MS) {
           requestAnimationFrame(step);
         } else {
@@ -225,15 +232,25 @@ export function BackgroundVideo() {
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
-      animateDebut(() => {
-        doRevealBlocks();
-        doScrollToInvitation();
-      });
+      animateDebut(
+        // onReveal : fin du ramp (t=1.95 s wall) — bloc glisse en parallèle
+        // du fast-forward final de la vidéo debut, pas de temps mort.
+        () => {
+          doRevealBlocks();
+          doScrollToInvitation();
+        },
+        // onComplete : vrai END de debut (t=2.85 s wall) — crossfade
+        // debut → fin. La vidéo « fin » prend le relais.
+        () => {
+          activateFinLayer();
+        }
+      );
 
       setTimeout(() => {
         if (!revealedRef.current) {
           doRevealBlocks();
           doScrollToInvitation();
+          activateFinLayer();
         }
       }, DEBUT_DURATION_MS + 3000);
     };
