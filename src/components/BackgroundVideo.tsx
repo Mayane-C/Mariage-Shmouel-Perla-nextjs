@@ -74,9 +74,6 @@ export function BackgroundVideo() {
 
     // Préchargement style BM Chmouel : feu-et-oublie, sans await im.decode().
     // Le navigateur télécharge en tâche de fond à son propre rythme.
-    // Pas de sérialisation, pas d'attente de décodage — quasi instantané.
-    // On considère « début » prêt dès que les fetches sont *lancés* :
-    // l'onload de la 1re frame confirme que le navigateur peut afficher.
     const kickoffPreload = (count: number, frameFn: (i: number) => string) => {
       for (let i = 1; i <= count; i++) {
         if (cancelled) return;
@@ -85,11 +82,25 @@ export function BackgroundVideo() {
       }
     };
 
-    // Attend juste que la 1re frame soit prête (garantit un rendu propre
-    // au démarrage de l'animation), puis considère debut prêt.
-    const firstFrame = new Image();
-    firstFrame.src = debutFrame(1);
-    const onFirstReady = () => {
+    // Frames CRITIQUES à décoder explicitement AVANT de signaler prêt :
+    //   · debut frame 1 : première image visible du hero
+    //   · fin frame FIN_START_FRAME : première image affichée après le
+    //     crossfade debut→fin, sinon flash blanc pendant la bascule
+    // Ces 2 décodages sont rapides (2 promesses en parallèle) et fiabilisent
+    // le moment critique où le bloc apparaît en même temps que le crossfade.
+    (async () => {
+      const criticalSrcs = [debutFrame(1), finFrame(FIN_START_FRAME)];
+      await Promise.all(
+        criticalSrcs.map(async (src) => {
+          const im = new Image();
+          im.src = src;
+          try {
+            await im.decode();
+          } catch {
+            /* silent */
+          }
+        })
+      );
       if (cancelled) return;
       debutReadyRef.current = true;
       document.body.classList.remove('loading');
@@ -97,15 +108,10 @@ export function BackgroundVideo() {
         pendingIntroRef.current = false;
         startIntro();
       }
-    };
-    if (firstFrame.complete) {
-      onFirstReady();
-    } else {
-      firstFrame.addEventListener('load', onFirstReady, { once: true });
-      firstFrame.addEventListener('error', onFirstReady, { once: true });
-    }
+    })();
 
-    // Lance les 2 séquences de frames en tâche de fond, sans attendre le décodage.
+    // En parallèle, lance TOUS les fetches en tâche de fond sans décoder —
+    // le navigateur les récupère et les met en cache, prêts à l'affichage.
     kickoffPreload(DEBUT_TOTAL, debutFrame);
     kickoffPreload(FIN_TOTAL, finFrame);
 
