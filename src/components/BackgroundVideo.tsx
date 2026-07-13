@@ -12,21 +12,21 @@ import { useEffect, useRef } from 'react';
  * (opacité 1 → 0) pendant que l'entrant apparaît (0 → 1) sur ~800 ms.
  */
 
-const DEBUT_TOTAL = 893;
-const FIN_TOTAL = 1786;
-// Skip les 1.5 premières secondes de « fin » : fin extraite à 180 fps interpolate,
-// donc 1.5 s = 270 frames.
-const FIN_START_FRAME = 270;
+const DEBUT_TOTAL = 596;
+const FIN_TOTAL = 1191;
+// Skip les 1.5 premières secondes de « fin » : fin extraite à 120 fps interpolate,
+// donc 1.5 s = 180 frames.
+const FIN_START_FRAME = 180;
 // Lecture en 3 phases avec ramp d'accélération lisse.
-// À 90 fps d'extraction, 1× native = 0.09 fpms display.
-//   Phase 1a (0 → 1.65 s)  : PHASE A constante (2× native = 0.18 fpms)
-//                            → couvre source 0 → 3.3 s (frames 1 → 298)
+// À 60 fps d'extraction, 1× native = 0.06 fpms display.
+//   Phase 1a (0 → 1.65 s)  : PHASE A constante (2× native = 0.12 fpms)
+//                            → couvre source 0 → 3.3 s (frames 1 → 199)
 //   Phase 1b (1.65 → 1.95 s): RAMP linéaire 2× → 6× native (300 ms)
-//                            → couvre source 3.3 → 4.5 s (frames 298 → 406)
-//   Phase 2  (1.95 s → fin) : PHASE B constante (6× native = 0.54 fpms)
-//                            → démarre PILE à source 4.5 s (frame 405)
-const NATIVE_FPMS = 0.18;       // 2× native (2 × 90 fps extract)
-const PEAK_FPMS = 0.54;         // 6× native (6 × 90 fps extract)
+//                            → couvre source 3.3 → 4.5 s (frames 199 → 271)
+//   Phase 2  (1.95 s → fin) : PHASE B constante (6× native = 0.36 fpms)
+//                            → démarre PILE à source 4.5 s (frame 270)
+const NATIVE_FPMS = 0.12;       // 2× native (2 × 60 fps extract)
+const PEAK_FPMS = 0.36;         // 6× native (6 × 60 fps extract)
 const PHASE_1A_END_MS = 1650;
 const RAMP_MS = 300;
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 1950
@@ -72,45 +72,42 @@ export function BackgroundVideo() {
     // sans risque si un clic arrive avant.
     let startIntro: () => void = () => {};
 
-    // Préchargement PARALLÈLE avec un pool de workers concurrents. Sur HTTP/2
-    // le navigateur peut multiplexer, donc 12 workers accélèrent x8-10 vs
-    // le for-loop séquentiel qui bloquait sur chaque img.decode().
-    const CONCURRENCY = 12;
-    const preloadFramesParallel = async (
-      count: number,
-      frameFn: (i: number) => string
-    ): Promise<void> => {
-      let next = 1;
-      const worker = async () => {
-        while (next <= count) {
-          const i = next++;
-          if (cancelled) return;
-          const im = new Image();
-          im.src = frameFn(i);
-          try {
-            await im.decode();
-          } catch {
-            /* silent */
-          }
-        }
-      };
-      await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+    // Préchargement style BM Chmouel : feu-et-oublie, sans await im.decode().
+    // Le navigateur télécharge en tâche de fond à son propre rythme.
+    // Pas de sérialisation, pas d'attente de décodage — quasi instantané.
+    // On considère « début » prêt dès que les fetches sont *lancés* :
+    // l'onload de la 1re frame confirme que le navigateur peut afficher.
+    const kickoffPreload = (count: number, frameFn: (i: number) => string) => {
+      for (let i = 1; i <= count; i++) {
+        if (cancelled) return;
+        const im = new Image();
+        im.src = frameFn(i);
+      }
     };
 
-    (async () => {
-      // 1) Priorité : préchargement + décodage complet de « début » en parallèle.
-      await preloadFramesParallel(DEBUT_TOTAL, debutFrame);
+    // Attend juste que la 1re frame soit prête (garantit un rendu propre
+    // au démarrage de l'animation), puis considère debut prêt.
+    const firstFrame = new Image();
+    firstFrame.src = debutFrame(1);
+    const onFirstReady = () => {
       if (cancelled) return;
       debutReadyRef.current = true;
       document.body.classList.remove('loading');
-      // Si l'utilisateur a cliqué en attendant, on démarre maintenant.
       if (pendingIntroRef.current) {
         pendingIntroRef.current = false;
         startIntro();
       }
-      // 2) « fin » ensuite, en tâche de fond — pas de blocage sur son chargement.
-      await preloadFramesParallel(FIN_TOTAL, finFrame);
-    })();
+    };
+    if (firstFrame.complete) {
+      onFirstReady();
+    } else {
+      firstFrame.addEventListener('load', onFirstReady, { once: true });
+      firstFrame.addEventListener('error', onFirstReady, { once: true });
+    }
+
+    // Lance les 2 séquences de frames en tâche de fond, sans attendre le décodage.
+    kickoffPreload(DEBUT_TOTAL, debutFrame);
+    kickoffPreload(FIN_TOTAL, finFrame);
 
     // Helper : mute la src du layer correspondant à la phase courante.
     const setFrameSrc = (frameIdx: number) => {
