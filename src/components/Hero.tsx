@@ -21,9 +21,23 @@ export function Hero() {
         </div>
         <Countdown />
       </div>
-      <a className="btn btn-hero" href="#invitation" aria-label="Voir l'invitation">
-        Voir l&apos;invitation
-      </a>
+      <div className="hero-cta">
+        <a
+          className="btn btn-hero btn-hero-fr"
+          href="#invitation"
+          aria-label="Voir l'invitation en français"
+        >
+          Voir l&apos;invitation
+        </a>
+        <a
+          className="btn btn-hero btn-hero-he"
+          href="/hebrew"
+          aria-label="להזמנה בעברית"
+          dir="rtl"
+        >
+          להזמנה בעברית
+        </a>
+      </div>
       <div className="hero-loading" aria-hidden="true">
         Chargement de l&apos;invitation<span>…</span>
       </div>

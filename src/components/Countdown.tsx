@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { content } from '@/lib/content';
+import { TypewriterDate } from './TypewriterDate';
 
 function computeDiff(target: number) {
   const diff = Math.max(0, target - Date.now());
@@ -27,7 +28,7 @@ export function Countdown() {
 
   return (
     <div className="hero-countdown">
-      <p className="script-label">Se marient dans</p>
+      <p className="script-label typewriter-line"><TypewriterDate /></p>
       <div className="countdown" aria-live="polite">
         <div className="cell">
           <span className="num">{pad(t.d)}</span>

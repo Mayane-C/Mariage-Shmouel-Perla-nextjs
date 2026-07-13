@@ -1023,6 +1023,24 @@
     border-bottom-color: var(--taupe-deep);
     outline: none;
   }
+  /* Groupe des deux boutons FR + HE côte à côte */
+  .hero-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .btn-hero-he {
+    font-family: var(--font-hebrew), "FrankRuhlLibre", serif;
+    letter-spacing: 0.05em;
+    font-size: 1.05em;
+  }
+  @media (max-width: 520px) {
+    .hero-cta { gap: 18px; }
+    .btn-hero { font-size: 0.9em; }
+  }
 
   /* --- Bracha --- */
   .bracha .hebrew-blessing {
@@ -1561,6 +1579,160 @@ body:not(.revealed) .cell:not(:last-child)::after {
 }
 @media (prefers-reduced-motion: reduce) {
   .scroll-hint-arrow { animation: none; }
+}
+
+/* ─────────────────────────────────────────
+   Typewriter date — machine à écrire FR ↔ HE
+   ───────────────────────────────────────── */
+.typewriter-line {
+  min-height: 1.6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.typewriter-date {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-script), "Snell Roundhand", cursive;
+  font-size: inherit;
+  line-height: 1;
+}
+.typewriter-date.is-hebrew {
+  font-family: var(--font-hebrew, "FrankRuhlLibre"), serif;
+  font-style: normal;
+}
+.typewriter-text {
+  white-space: pre;
+}
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 3px;
+  background: currentColor;
+  animation: typewriter-blink 1s steps(2, jump-none) infinite;
+  vertical-align: middle;
+}
+.typewriter-date.is-hebrew .typewriter-cursor {
+  margin-left: 0;
+  margin-right: 3px;
+}
+@keyframes typewriter-blink {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-cursor { animation: none; }
+}
+
+/* ─────────────────────────────────────────
+   Page /hebrew — invitation miroir en hébreu
+   ───────────────────────────────────────── */
+.hebrew-page {
+  font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
+  min-height: 100vh;
+  background: #F5EFE6;
+}
+.hebrew-page .hebrew-content {
+  padding-top: 80px;
+}
+.hebrew-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(245, 239, 230, 0.94);
+  backdrop-filter: saturate(1.4) blur(10px);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid rgba(184, 147, 95, 0.2);
+}
+.hebrew-header .brand.hebrew {
+  font-family: "FrankRuhlLibre", serif;
+  font-size: 22px;
+  color: var(--taupe-deep);
+  text-decoration: none;
+  text-shadow: none;
+  letter-spacing: 0;
+}
+.hebrew-back-link {
+  font-family: "Didot", Georgia, serif;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sand-deep);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.hebrew-back-link:hover {
+  color: var(--taupe-deep);
+}
+.hebrew-preamble {
+  font-family: "FrankRuhlLibre", serif;
+  font-style: normal;
+  font-size: clamp(20px, 4vw, 28px);
+  color: var(--taupe);
+  line-height: 1.6;
+  text-align: center;
+}
+.hebrew-names-block {
+  font-family: "FrankRuhlLibre", serif;
+  direction: rtl;
+}
+.names-formal-latin {
+  font-family: "Didot", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(24px, 5vw, 40px);
+  color: var(--sand-deep);
+  text-align: center;
+  margin-top: 8px;
+  direction: ltr;
+}
+.hebrew-label {
+  font-family: "FrankRuhlLibre", serif;
+  font-size: 22px;
+  color: var(--sand-deep);
+}
+.date-he-large {
+  font-family: "FrankRuhlLibre", serif;
+  font-size: clamp(28px, 5vw, 44px);
+  color: var(--taupe-deep);
+  margin: 20px 0 8px;
+  text-align: center;
+}
+.hebrew-form {
+  direction: rtl;
+  text-align: right;
+}
+.hebrew-form .field-label {
+  text-align: right;
+}
+.hebrew-form .radio-group,
+.hebrew-form .nb-row {
+  direction: rtl;
+}
+.hebrew-footer {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--taupe);
+  font-family: "FrankRuhlLibre", serif;
+  font-size: 14px;
+  border-top: 1px solid rgba(184, 147, 95, 0.2);
+  margin-top: 40px;
+}
+.hebrew-footer .ltd-line {
+  margin-top: 12px;
+  font-family: "Didot", Georgia, serif;
+  font-style: italic;
+}
+.hebrew-footer .ltd-line a {
+  color: var(--sand-deep);
+  text-decoration: none;
+}
+.hebrew-footer .ltd-rights {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--sand-deep);
+  margin-top: 8px;
 }
 
 /* ─────────────────────────────────────────
