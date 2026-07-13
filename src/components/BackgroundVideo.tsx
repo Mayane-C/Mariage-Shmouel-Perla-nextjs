@@ -67,9 +67,10 @@ export function BackgroundVideo() {
 
   useEffect(() => {
     let cancelled = false;
-    // Fonction qui démarre l'intro — définie plus bas, référencée ici via
-    // closure. Le préchargement l'appelle si un clic est en attente.
-    let startIntro: (() => void) | null = null;
+    // Fonction qui démarre l'intro — assignée plus bas dans ce useEffect.
+    // Initialisée en no-op pour que le préchargement puisse l'appeler
+    // sans risque si un clic arrive avant.
+    let startIntro: () => void = () => {};
 
     (async () => {
       // 1) Priorité : préchargement + décodage complet de « début ».
@@ -84,7 +85,7 @@ export function BackgroundVideo() {
       // Si l'utilisateur a cliqué en attendant, on démarre maintenant.
       if (pendingIntroRef.current) {
         pendingIntroRef.current = false;
-        startIntro?.();
+        startIntro();
       }
       // 2) « fin » ensuite, en tâche de fond — pas de blocage sur son chargement.
       for (let i = 1; i <= FIN_TOTAL; i++) {
@@ -222,7 +223,7 @@ export function BackgroundVideo() {
 
       if (debutReadyRef.current) {
         // Frames prêtes → démarre tout de suite.
-        startIntro?.();
+        startIntro();
       } else {
         // Pas encore prêt → affiche l'indicateur de chargement et
         // retiendra le clic. Le préchargement lancera startIntro dès qu'il
