@@ -70,7 +70,7 @@
   /* Glissement d'un seul tenant, sans rebond — expo-out propre,
      décélération continue jusqu'à l'arrêt. */
   .block, footer {
-    transition: opacity 2s ease-out, transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 1.6s ease-out, transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity;
   }
   @media (max-width: 720px) {

@@ -36,10 +36,10 @@ const PHASE_2_DURATION_MS = Math.round((1191 - FRAME_AT_1B_END) / PEAK_FPMS);
 const DEBUT_DURATION_MS = PHASE_1B_END_MS + PHASE_2_DURATION_MS;
 const SCROLL_LERP = 0.16;
 // Aligne la durée du crossfade debut→fin sur celle du glissement du bloc
-// faire-part (transition CSS transform 2 s). Les deux animations démarrent
+// faire-part (transition CSS transform 1.6 s). Les deux animations démarrent
 // au même instant et finissent au même instant — perçues comme une seule
 // respiration visuelle.
-const CROSSFADE_MS = 2000;
+const CROSSFADE_MS = 1600;
 
 const debutFrame = (i: number) =>
   `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(4, '0')}.jpg`;
@@ -167,12 +167,15 @@ export function BackgroundVideo() {
     };
 
     const doScrollToInvitation = () => {
-      setTimeout(() => {
+      // Scroll immédiat via requestAnimationFrame — la transition CSS du
+      // bloc et le scroll partent au même moment, l'utilisateur voit le
+      // bloc glisser dès qu'il entre dans le viewport (pas de temps mort).
+      requestAnimationFrame(() => {
         document.getElementById('invitation')?.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
-      }, 500);
+      });
     };
 
     const animateDebut = (onComplete?: () => void) => {
