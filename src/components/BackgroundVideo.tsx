@@ -32,7 +32,11 @@ const RAMP_MS = 300;
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 1950
 const FRAME_AT_1A_END = 1 + NATIVE_FPMS * PHASE_1A_END_MS;
 const FRAME_AT_1B_END = FRAME_AT_1A_END + ((NATIVE_FPMS + PEAK_FPMS) * RAMP_MS) / 2;
-const PHASE_2_DURATION_MS = Math.round((1191 - FRAME_AT_1B_END) / PEAK_FPMS);
+// Cut 0.2 s en fin de vidéo debut — on arrête l'anim 200 ms avant que la
+// dernière frame naturelle soit atteinte, pour éviter la traîne de fin.
+const DEBUT_TAIL_CUT_MS = 200;
+const PHASE_2_DURATION_MS =
+  Math.round((DEBUT_TOTAL - FRAME_AT_1B_END) / PEAK_FPMS) - DEBUT_TAIL_CUT_MS;
 const DEBUT_DURATION_MS = PHASE_1B_END_MS + PHASE_2_DURATION_MS;
 const SCROLL_LERP = 0.16;
 // Aligne la durée du crossfade debut→fin sur celle du glissement du bloc
