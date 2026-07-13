@@ -36,14 +36,38 @@ export function BackgroundMusic() {
         });
     };
 
+    // Attend que le body ne soit plus en cours de chargement, puis démarre.
+    // Utile quand le clic arrive avant que les frames de l'intro soient
+    // décodées — la musique attend l'indicateur de chargement se retire.
+    let classObserver: MutationObserver | null = null;
+    const startWhenReady = () => {
+      if (started) return;
+      if (!document.body.classList.contains('loading')) {
+        play();
+        return;
+      }
+      // body.loading est actif → attend qu'il disparaisse.
+      classObserver = new MutationObserver(() => {
+        if (!document.body.classList.contains('loading')) {
+          classObserver?.disconnect();
+          classObserver = null;
+          play();
+        }
+      });
+      classObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+    };
+
     const revealBtn = document.querySelector<HTMLElement>('.btn-hero');
     const onRevealClick = () => {
-      if (started) return;
-      play();
+      startWhenReady();
     };
     revealBtn?.addEventListener('click', onRevealClick);
     return () => {
       revealBtn?.removeEventListener('click', onRevealClick);
+      classObserver?.disconnect();
     };
   }, [started]);
 
