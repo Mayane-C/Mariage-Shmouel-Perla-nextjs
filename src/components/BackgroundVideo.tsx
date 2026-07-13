@@ -208,10 +208,10 @@ export function BackgroundVideo() {
         currentIdxRef.current = v;
         const clamped = Math.max(1, Math.min(DEBUT_TOTAL, Math.round(v)));
         setFrameSrc(clamped);
-        // Reveal EARLY : dès que le ramp est terminé (début de la phase B).
-        // Le bloc glisse en parallèle du fast-forward, sans attendre la
-        // dernière frame — pas de temps mort perçu.
-        if (!revealFired && elapsed >= PHASE_1B_END_MS) {
+        // Reveal 0.2 s AVANT la fin de la vidéo debut — le bloc glisse
+        // juste avant que le crossfade vers fin ne démarre, apparition
+        // synchronisée sans temps mort perçu.
+        if (!revealFired && elapsed >= DEBUT_DURATION_MS - 200) {
           revealFired = true;
           onReveal?.();
         }
@@ -269,6 +269,16 @@ export function BackgroundVideo() {
         // aura terminé debut.
         document.body.classList.add('loading');
         pendingIntroRef.current = true;
+        // Filet de sécurité : si le chargement traîne > 2 s (réseau lent,
+        // appareil serré), on démarre quand même — mieux vaut un léger
+        // saccade au début que faire attendre l'utilisateur indéfiniment.
+        setTimeout(() => {
+          if (pendingIntroRef.current) {
+            pendingIntroRef.current = false;
+            document.body.classList.remove('loading');
+            startIntro();
+          }
+        }, 2000);
       }
     };
     revealBtn?.addEventListener('click', onRevealClick);
