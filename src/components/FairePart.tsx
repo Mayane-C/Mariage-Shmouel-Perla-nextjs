@@ -53,10 +53,10 @@ export function FairePart() {
       y: 0,
       transition: {
         type: 'spring' as const,
-        stiffness: 48,
-        damping: 13,
-        mass: 1.1,
-        opacity: { duration: 1.0, ease: 'easeOut' as const },
+        stiffness: 85,
+        damping: 16,
+        mass: 1,
+        opacity: { duration: 0.7, ease: 'easeOut' as const },
       },
     },
   };
