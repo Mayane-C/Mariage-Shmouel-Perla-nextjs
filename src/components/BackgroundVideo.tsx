@@ -72,14 +72,35 @@ export function BackgroundVideo() {
     // sans risque si un clic arrive avant.
     let startIntro: () => void = () => {};
 
+    // Préchargement PARALLÈLE avec un pool de workers concurrents. Sur HTTP/2
+    // le navigateur peut multiplexer, donc 12 workers accélèrent x8-10 vs
+    // le for-loop séquentiel qui bloquait sur chaque img.decode().
+    const CONCURRENCY = 12;
+    const preloadFramesParallel = async (
+      count: number,
+      frameFn: (i: number) => string
+    ): Promise<void> => {
+      let next = 1;
+      const worker = async () => {
+        while (next <= count) {
+          const i = next++;
+          if (cancelled) return;
+          const im = new Image();
+          im.src = frameFn(i);
+          try {
+            await im.decode();
+          } catch {
+            /* silent */
+          }
+        }
+      };
+      await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+    };
+
     (async () => {
-      // 1) Priorité : préchargement + décodage complet de « début ».
-      for (let i = 1; i <= DEBUT_TOTAL; i++) {
-        if (cancelled) return;
-        const im = new Image();
-        im.src = debutFrame(i);
-        try { await im.decode(); } catch { /* silent */ }
-      }
+      // 1) Priorité : préchargement + décodage complet de « début » en parallèle.
+      await preloadFramesParallel(DEBUT_TOTAL, debutFrame);
+      if (cancelled) return;
       debutReadyRef.current = true;
       document.body.classList.remove('loading');
       // Si l'utilisateur a cliqué en attendant, on démarre maintenant.
@@ -88,12 +109,7 @@ export function BackgroundVideo() {
         startIntro();
       }
       // 2) « fin » ensuite, en tâche de fond — pas de blocage sur son chargement.
-      for (let i = 1; i <= FIN_TOTAL; i++) {
-        if (cancelled) return;
-        const im = new Image();
-        im.src = finFrame(i);
-        try { await im.decode(); } catch { /* silent */ }
-      }
+      await preloadFramesParallel(FIN_TOTAL, finFrame);
     })();
 
     // Helper : mute la src du layer correspondant à la phase courante.
