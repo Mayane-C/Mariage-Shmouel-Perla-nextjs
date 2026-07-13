@@ -24,6 +24,9 @@ export function Hero() {
       <a className="btn btn-hero" href="#invitation" aria-label="Voir l'invitation">
         Voir l&apos;invitation
       </a>
+      <div className="hero-loading" aria-hidden="true">
+        Chargement de l&apos;invitation<span>…</span>
+      </div>
     </section>
   );
 }

@@ -12,20 +12,21 @@ import { useEffect, useRef } from 'react';
  * (opacité 1 → 0) pendant que l'entrant apparaît (0 → 1) sur ~800 ms.
  */
 
-const DEBUT_TOTAL = 1191;
-const FIN_TOTAL = 2381;
-// Skip les 1.5 premières secondes de « fin » : fin extraite à 240 fps interpolate,
-// donc 1.5 s ≈ 357 frames. La séquence démarre à t = 1.5 s du contenu source.
-const FIN_START_FRAME = 357;
-// Lecture en 3 phases avec ramp d'accélération lisse :
-//   Phase 1a (0 → 1.65 s)  : PHASE A constante (2× native)
-//                            → couvre source 0 → 3.3 s (frames 1 → 397)
+const DEBUT_TOTAL = 893;
+const FIN_TOTAL = 1786;
+// Skip les 1.5 premières secondes de « fin » : fin extraite à 180 fps interpolate,
+// donc 1.5 s = 270 frames.
+const FIN_START_FRAME = 270;
+// Lecture en 3 phases avec ramp d'accélération lisse.
+// À 90 fps d'extraction, 1× native = 0.09 fpms display.
+//   Phase 1a (0 → 1.65 s)  : PHASE A constante (2× native = 0.18 fpms)
+//                            → couvre source 0 → 3.3 s (frames 1 → 298)
 //   Phase 1b (1.65 → 1.95 s): RAMP linéaire 2× → 6× native (300 ms)
-//                            → couvre source 3.3 → 4.5 s (frames 397 → 541)
-//   Phase 2  (1.95 s → fin) : PHASE B constante (6× native)
-//                            → démarre PILE à source 4.5 s (frame 540)
-const NATIVE_FPMS = 0.24;       // 2× native
-const PEAK_FPMS = 0.72;         // 6× native
+//                            → couvre source 3.3 → 4.5 s (frames 298 → 406)
+//   Phase 2  (1.95 s → fin) : PHASE B constante (6× native = 0.54 fpms)
+//                            → démarre PILE à source 4.5 s (frame 405)
+const NATIVE_FPMS = 0.18;       // 2× native (2 × 90 fps extract)
+const PEAK_FPMS = 0.54;         // 6× native (6 × 90 fps extract)
 const PHASE_1A_END_MS = 1650;
 const RAMP_MS = 300;
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 1950
@@ -56,16 +57,36 @@ export function BackgroundVideo() {
   const scrubActiveRef = useRef(false);
   const scrollBaselineYRef = useRef(0);
   const phaseRef = useRef<'debut' | 'fin'>('debut');
+  // Devient true quand toutes les frames de « début » sont décodées.
+  // « fin » peut se charger en arrière-plan pendant que l'utilisateur regarde
+  // le début — inutile de bloquer le clic dessus.
+  const debutReadyRef = useRef(false);
+  // Si l'utilisateur clique AVANT que debut soit prêt, on garde le clic en
+  // attente et on démarre l'intro dès que le préchargement est terminé.
+  const pendingIntroRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
+    // Fonction qui démarre l'intro — définie plus bas, référencée ici via
+    // closure. Le préchargement l'appelle si un clic est en attente.
+    let startIntro: (() => void) | null = null;
+
     (async () => {
+      // 1) Priorité : préchargement + décodage complet de « début ».
       for (let i = 1; i <= DEBUT_TOTAL; i++) {
         if (cancelled) return;
         const im = new Image();
         im.src = debutFrame(i);
         try { await im.decode(); } catch { /* silent */ }
       }
+      debutReadyRef.current = true;
+      document.body.classList.remove('loading');
+      // Si l'utilisateur a cliqué en attendant, on démarre maintenant.
+      if (pendingIntroRef.current) {
+        pendingIntroRef.current = false;
+        startIntro?.();
+      }
+      // 2) « fin » ensuite, en tâche de fond — pas de blocage sur son chargement.
       for (let i = 1; i <= FIN_TOTAL; i++) {
         if (cancelled) return;
         const im = new Image();
@@ -174,10 +195,10 @@ export function BackgroundVideo() {
       requestAnimationFrame(step);
     };
 
-    const revealBtn = document.querySelector<HTMLElement>('.btn-hero');
-    const onRevealClick = (e: Event) => {
-      e.preventDefault();
-      if (revealedRef.current) return;
+    // Fonction extraite : démarre l'intro (fade hero, animateDebut, filet
+     // de sécurité). Appelée soit au clic si tout est prêt, soit à la fin
+     // du préchargement si l'utilisateur avait cliqué en avance.
+    startIntro = () => {
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
@@ -192,6 +213,23 @@ export function BackgroundVideo() {
           doScrollToInvitation();
         }
       }, DEBUT_DURATION_MS + 3000);
+    };
+
+    const revealBtn = document.querySelector<HTMLElement>('.btn-hero');
+    const onRevealClick = (e: Event) => {
+      e.preventDefault();
+      if (revealedRef.current || pendingIntroRef.current) return;
+
+      if (debutReadyRef.current) {
+        // Frames prêtes → démarre tout de suite.
+        startIntro?.();
+      } else {
+        // Pas encore prêt → affiche l'indicateur de chargement et
+        // retiendra le clic. Le préchargement lancera startIntro dès qu'il
+        // aura terminé debut.
+        document.body.classList.add('loading');
+        pendingIntroRef.current = true;
+      }
     };
     revealBtn?.addEventListener('click', onRevealClick);
 

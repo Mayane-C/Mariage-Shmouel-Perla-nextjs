@@ -1562,3 +1562,52 @@ body:not(.revealed) .cell:not(:last-child)::after {
 @media (prefers-reduced-motion: reduce) {
   .scroll-hint-arrow { animation: none; }
 }
+
+/* ─────────────────────────────────────────
+   Loading indicator sous le bouton hero
+   Visible uniquement quand body.loading est présent
+   (clic reçu mais frames pas encore préchargées).
+   ───────────────────────────────────────── */
+.hero-loading {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Didot", Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 245, 225, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  white-space: nowrap;
+}
+.hero-loading span {
+  display: inline-block;
+  min-width: 1.4em;
+  animation: hero-loading-dots 1.4s steps(4, end) infinite;
+  text-align: left;
+}
+body.loading .hero-loading {
+  opacity: 1;
+}
+/* Quand le clic est reçu mais frames pas prêtes, on estompe le bouton
+   pour signaler qu'il ne réagira plus. */
+body.loading .hero .btn-hero {
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+@keyframes hero-loading-dots {
+  0%   { content: "."; }
+  25%  { content: ".."; }
+  50%  { content: "..."; }
+  75%  { content: "…"; }
+  100% { content: "."; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-loading span { animation: none; }
+}
