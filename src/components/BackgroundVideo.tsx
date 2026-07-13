@@ -161,10 +161,21 @@ export function BackgroundVideo() {
     // Le crossfade vers « fin » est déclenché séparément, au vrai END de
     // l'animation debut, pour ne pas gâcher le fast-forward phase B qui
     // continue à jouer pendant que le bloc glisse.
+    //
+    // Isolation de la mutation classList dans un rAF dédié + lecture de
+    // offsetHeight du bloc AVANT le class change. Ces 2 mesures garantissent
+    // que le browser enregistre l'état initial (opacity 0, translateY 340px)
+    // et met en place la transition CSS proprement avant que la classe soit
+    // ajoutée. Sans ça, le browser peut « sauter » la transition parce que
+    // la mutation arrive dans le même frame que le rAF précédent.
     const doRevealBlocks = () => {
       if (revealedRef.current) return;
       revealedRef.current = true;
-      document.body.classList.add('revealed');
+      const block = document.querySelector<HTMLElement>('.invitation-formal');
+      if (block) void block.offsetHeight;
+      requestAnimationFrame(() => {
+        document.body.classList.add('revealed');
+      });
     };
 
     const doScrollToInvitation = () => {
