@@ -1023,23 +1023,22 @@
     border-bottom-color: var(--taupe-deep);
     outline: none;
   }
-  /* Groupe des deux boutons FR + HE côte à côte */
+  /* Groupe des deux boutons FR + HE strictement côte à côte,
+     en bas du hero. */
   .hero-cta {
     display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
+    gap: 28px;
     margin-top: 32px;
     width: 100%;
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
   }
   /* Reset la margin-top des .btn-hero une fois qu'ils sont dans .hero-cta
      — sinon le margin de chaque bouton pousse indépendamment le layout. */
   .hero-cta .btn-hero {
     margin-top: 0;
+    white-space: nowrap;
   }
   .btn-hero-he {
     font-family: var(--font-hebrew), "FrankRuhlLibre", "David", serif;
@@ -1049,10 +1048,18 @@
   }
   @media (max-width: 520px) {
     .hero-cta {
-      gap: 24px;
-      flex-direction: column;
+      gap: 16px;
+      padding: 0 12px;
     }
-    .hero-cta .btn-hero { font-size: 0.95em; }
+    .hero-cta .btn-hero {
+      font-size: 0.8em;
+      padding: 10px 2px;
+      letter-spacing: 0.18em;
+    }
+    .hero-cta .btn-hero-he {
+      font-size: 0.95em;
+      letter-spacing: 0.03em;
+    }
   }
 
   /* --- Bracha --- */
