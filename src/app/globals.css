@@ -1647,6 +1647,25 @@ body:not(.revealed) .cell:not(:last-child)::after {
 /* ─────────────────────────────────────────
    Page /hebrew — invitation miroir en hébreu
    ───────────────────────────────────────── */
+/* La page /hebrew n'a pas de mécanisme click-to-reveal (pas de vidéo
+   d'intro). On force donc le body à scroller et on rend les .block
+   directement visibles sur cette page — annulation des règles
+   destinées au hero de la page principale. */
+body:has(.hebrew-page) {
+  overflow: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+}
+body:has(.hebrew-page) .block,
+body:has(.hebrew-page) footer {
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+body:has(.hebrew-page) .invitation-formal[data-spring="on"] {
+  opacity: 1 !important;
+  transform: none !important;
+}
 .hebrew-page {
   font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
   min-height: 100vh;
