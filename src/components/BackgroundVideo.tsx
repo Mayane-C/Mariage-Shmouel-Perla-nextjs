@@ -26,9 +26,8 @@ const FIN_START_FRAME = 180;
 //   Phase 2  (1.95 s → fin) : PHASE B constante (6× native = 0.36 fpms)
 //                            → démarre PILE à source 4.5 s (frame 270)
 const NATIVE_FPMS = 0.12;       // 2× native (2 × 60 fps extract = 120 fps display)
-const PEAK_FPMS = 0.24;         // 4× native (4 × 60 fps = 240 fps display) — abaissé de
-                                // 6× à 4× pour réduire la pression de décodage JPG pendant
-                                // le fast-forward. BM Chmouel plafonne à ~60 fps display.
+const PEAK_FPMS = 0.18;         // 3× native (3 × 60 fps = 180 fps display) — 3 décodes JPG
+                                // par frame écran 60Hz au lieu de 4. Compromis fluidité/dynamisme.
 const PHASE_1A_END_MS = 1650;
 const RAMP_MS = 300;
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 1950
@@ -92,16 +91,20 @@ export function BackgroundVideo() {
     // On prewarme aussi des frames espacées dans debut pour que le fast-forward
     // ne fasse pas décoder des JPG à la volée (source de saccades) —
     // philosophie similaire à BM Chmouel qui décode tout en amont.
+    // Prewarm decode MASSIF : toutes les frames debut espacées de 30
+     // (=~20 frames) + 8 frames fin espacées. Le browser garde ces images
+     // en mémoire GPU décodées, ce qui évite qu'il ait à décoder à la volée
+     // pendant le fast-forward (source principale des saccades).
     (async () => {
-      const debutPrewarm = [1, 100, 200, 300, 400, 500, DEBUT_TOTAL].filter(
-        (i) => i >= 1 && i <= DEBUT_TOTAL
-      );
-      const finPrewarm = [
-        FIN_START_FRAME,
-        Math.round(FIN_TOTAL * 0.3),
-        Math.round(FIN_TOTAL * 0.6),
-        Math.round(FIN_TOTAL * 0.9),
-      ].filter((i) => i >= 1 && i <= FIN_TOTAL);
+      const debutPrewarm: number[] = [];
+      for (let i = 1; i <= DEBUT_TOTAL; i += 30) debutPrewarm.push(i);
+      if (debutPrewarm[debutPrewarm.length - 1] !== DEBUT_TOTAL) {
+        debutPrewarm.push(DEBUT_TOTAL);
+      }
+      const finPrewarm: number[] = [];
+      for (let i = FIN_START_FRAME; i <= FIN_TOTAL; i += Math.round(FIN_TOTAL / 8)) {
+        finPrewarm.push(i);
+      }
       const criticalSrcs = [
         ...debutPrewarm.map((i) => debutFrame(i)),
         ...finPrewarm.map((i) => finFrame(i)),
