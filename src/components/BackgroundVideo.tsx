@@ -25,8 +25,10 @@ const FIN_START_FRAME = 180;
 //                            → couvre source 3.3 → 4.5 s (frames 199 → 271)
 //   Phase 2  (1.95 s → fin) : PHASE B constante (6× native = 0.36 fpms)
 //                            → démarre PILE à source 4.5 s (frame 270)
-const NATIVE_FPMS = 0.12;       // 2× native (2 × 60 fps extract)
-const PEAK_FPMS = 0.36;         // 6× native (6 × 60 fps extract)
+const NATIVE_FPMS = 0.12;       // 2× native (2 × 60 fps extract = 120 fps display)
+const PEAK_FPMS = 0.24;         // 4× native (4 × 60 fps = 240 fps display) — abaissé de
+                                // 6× à 4× pour réduire la pression de décodage JPG pendant
+                                // le fast-forward. BM Chmouel plafonne à ~60 fps display.
 const PHASE_1A_END_MS = 1650;
 const RAMP_MS = 300;
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 1950
@@ -86,14 +88,24 @@ export function BackgroundVideo() {
       }
     };
 
-    // Frames CRITIQUES à décoder explicitement AVANT de signaler prêt :
-    //   · debut frame 1 : première image visible du hero
-    //   · fin frame FIN_START_FRAME : première image affichée après le
-    //     crossfade debut→fin, sinon flash blanc pendant la bascule
-    // Ces 2 décodages sont rapides (2 promesses en parallèle) et fiabilisent
-    // le moment critique où le bloc apparaît en même temps que le crossfade.
+    // Frames CRITIQUES à décoder explicitement AVANT de signaler prêt.
+    // On prewarme aussi des frames espacées dans debut pour que le fast-forward
+    // ne fasse pas décoder des JPG à la volée (source de saccades) —
+    // philosophie similaire à BM Chmouel qui décode tout en amont.
     (async () => {
-      const criticalSrcs = [debutFrame(1), finFrame(FIN_START_FRAME)];
+      const debutPrewarm = [1, 100, 200, 300, 400, 500, DEBUT_TOTAL].filter(
+        (i) => i >= 1 && i <= DEBUT_TOTAL
+      );
+      const finPrewarm = [
+        FIN_START_FRAME,
+        Math.round(FIN_TOTAL * 0.3),
+        Math.round(FIN_TOTAL * 0.6),
+        Math.round(FIN_TOTAL * 0.9),
+      ].filter((i) => i >= 1 && i <= FIN_TOTAL);
+      const criticalSrcs = [
+        ...debutPrewarm.map((i) => debutFrame(i)),
+        ...finPrewarm.map((i) => finFrame(i)),
+      ];
       await Promise.all(
         criticalSrcs.map(async (src) => {
           const im = new Image();
