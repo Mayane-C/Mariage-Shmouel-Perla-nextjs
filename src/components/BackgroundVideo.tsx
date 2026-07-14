@@ -4,12 +4,16 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Fond d'écran orchestré par DEUX séquences de frames JPG (« début » puis
- * « fin »), avec crossfade doux à la bascule pour que la transition ne se
- * voit pas.
+ * « fin »), avec crossfade permanent frame-à-frame façon BM Chmouel.
  *
- * Rendu : deux <img> superposés (debut / fin), chacun avec sa propre src
- * pilotée par sa phase. À la bascule, on fait fondre le layer sortant
- * (opacité 1 → 0) pendant que l'entrant apparaît (0 → 1) sur ~800 ms.
+ * Rendu = 2 <img> superposés A/B :
+ *  - A garde toujours la frame précédente (opacity 1 fixe)
+ *  - B reçoit la nouvelle frame (opacity 0 → 1 sur ~80 ms)
+ *  → Le « flip » discret d'un cut-to-cut est remplacé par un morph
+ *    permanent qui donne la sensation de motion blur, comme BM Chmouel.
+ *
+ *  Bascule debut→fin : même mécanisme, mais avec un crossfade long
+ *  (1600 ms) aligné sur la transition CSS du bloc faire-part.
  */
 
 const DEBUT_TOTAL = 596;
@@ -19,32 +23,29 @@ const FIN_TOTAL = 1191;
 const FIN_START_FRAME = 180;
 // Lecture en 3 phases avec ramp d'accélération lisse.
 // À 60 fps d'extraction, 1× native = 0.06 fpms display.
-//   Phase 1a (0 → 1.65 s)  : PHASE A constante (2× native = 0.12 fpms)
-//                            → couvre source 0 → 3.3 s (frames 1 → 199)
-//   Phase 1b (1.65 → 1.95 s): RAMP linéaire 2× → 6× native (300 ms)
-//                            → couvre source 3.3 → 4.5 s (frames 199 → 271)
-//   Phase 2  (1.95 s → fin) : PHASE B constante (6× native = 0.36 fpms)
-//                            → démarre PILE à source 4.5 s (frame 270)
 const NATIVE_FPMS = 0.12;       // 2× native (2 × 60 fps extract = 120 fps display)
-const PEAK_FPMS = 0.18;         // 3× native (3 × 60 fps = 180 fps display) — 3 décodes JPG
-                                // par frame écran 60Hz au lieu de 4. Compromis fluidité/dynamisme.
+const PEAK_FPMS = 0.18;         // 3× native (3 × 60 fps = 180 fps display)
 const PHASE_1A_END_MS = 1650;
 const RAMP_MS = 300;
 const PHASE_1B_END_MS = PHASE_1A_END_MS + RAMP_MS; // 1950
 const FRAME_AT_1A_END = 1 + NATIVE_FPMS * PHASE_1A_END_MS;
 const FRAME_AT_1B_END = FRAME_AT_1A_END + ((NATIVE_FPMS + PEAK_FPMS) * RAMP_MS) / 2;
-// Cut 0.2 s en fin de vidéo debut — on arrête l'anim 200 ms avant que la
-// dernière frame naturelle soit atteinte, pour éviter la traîne de fin.
 const DEBUT_TAIL_CUT_MS = 200;
 const PHASE_2_DURATION_MS =
   Math.round((DEBUT_TOTAL - FRAME_AT_1B_END) / PEAK_FPMS) - DEBUT_TAIL_CUT_MS;
 const DEBUT_DURATION_MS = PHASE_1B_END_MS + PHASE_2_DURATION_MS;
 const SCROLL_LERP = 0.16;
-// Aligne la durée du crossfade debut→fin sur celle du glissement du bloc
-// faire-part (transition CSS transform 1.6 s). Les deux animations démarrent
-// au même instant et finissent au même instant — perçues comme une seule
-// respiration visuelle.
-const CROSSFADE_MS = 1600;
+
+// Crossfade frame-à-frame : court pour lisser le passage, sans figer.
+// À 60 Hz rAF, dt ≈ 16 ms → opacity B s'incrémente de ~20 % / rAF.
+// Puisqu'une nouvelle frame arrive à chaque rAF pendant la phase 2 (fast-forward),
+// B tourne autour de 20-40 % en permanence : A (frame précédente) domine
+// visuellement mais B (nouvelle) est toujours partiellement présente
+// → effet motion blur qui gomme le « cut » discret.
+const FRAME_CROSSFADE_MS = 80;
+// Crossfade long pour la bascule debut→fin, aligné sur la transition
+// CSS du bloc faire-part (transform 1.6 s).
+const PHASE_CROSSFADE_MS = 1600;
 
 const debutFrame = (i: number) =>
   `/frames/debut/frame-${String(Math.max(1, Math.min(DEBUT_TOTAL, i))).padStart(4, '0')}.jpg`;
@@ -53,8 +54,8 @@ const finFrame = (i: number) =>
   `/frames/fin/frame-${String(Math.max(1, Math.min(FIN_TOTAL, i))).padStart(4, '0')}.jpg`;
 
 export function BackgroundVideo() {
-  const debutLayerRef = useRef<HTMLImageElement>(null);
-  const finLayerRef = useRef<HTMLImageElement>(null);
+  const layerARef = useRef<HTMLImageElement>(null);
+  const layerBRef = useRef<HTMLImageElement>(null);
   const currentIdxRef = useRef(1);
   const targetIdxRef = useRef(1);
   const revealedRef = useRef(false);
@@ -62,23 +63,13 @@ export function BackgroundVideo() {
   const scrubActiveRef = useRef(false);
   const scrollBaselineYRef = useRef(0);
   const phaseRef = useRef<'debut' | 'fin'>('debut');
-  // Devient true quand toutes les frames de « début » sont décodées.
-  // « fin » peut se charger en arrière-plan pendant que l'utilisateur regarde
-  // le début — inutile de bloquer le clic dessus.
   const debutReadyRef = useRef(false);
-  // Si l'utilisateur clique AVANT que debut soit prêt, on garde le clic en
-  // attente et on démarre l'intro dès que le préchargement est terminé.
   const pendingIntroRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
-    // Fonction qui démarre l'intro — assignée plus bas dans ce useEffect.
-    // Initialisée en no-op pour que le préchargement puisse l'appeler
-    // sans risque si un clic arrive avant.
     let startIntro: () => void = () => {};
 
-    // Préchargement style BM Chmouel : feu-et-oublie, sans await im.decode().
-    // Le navigateur télécharge en tâche de fond à son propre rythme.
     const kickoffPreload = (count: number, frameFn: (i: number) => string) => {
       for (let i = 1; i <= count; i++) {
         if (cancelled) return;
@@ -87,14 +78,6 @@ export function BackgroundVideo() {
       }
     };
 
-    // Frames CRITIQUES à décoder explicitement AVANT de signaler prêt.
-    // On prewarme aussi des frames espacées dans debut pour que le fast-forward
-    // ne fasse pas décoder des JPG à la volée (source de saccades) —
-    // philosophie similaire à BM Chmouel qui décode tout en amont.
-    // Prewarm decode MASSIF : toutes les frames debut espacées de 30
-     // (=~20 frames) + 8 frames fin espacées. Le browser garde ces images
-     // en mémoire GPU décodées, ce qui évite qu'il ait à décoder à la volée
-     // pendant le fast-forward (source principale des saccades).
     (async () => {
       const debutPrewarm: number[] = [];
       for (let i = 1; i <= DEBUT_TOTAL; i += 30) debutPrewarm.push(i);
@@ -129,64 +112,88 @@ export function BackgroundVideo() {
       }
     })();
 
-    // En parallèle, lance TOUS les fetches en tâche de fond sans décoder —
-    // le navigateur les récupère et les met en cache, prêts à l'affichage.
     kickoffPreload(DEBUT_TOTAL, debutFrame);
     kickoffPreload(FIN_TOTAL, finFrame);
 
-    // Helper : mute la src du layer correspondant à la phase courante.
-    const setFrameSrc = (frameIdx: number) => {
-      const el = phaseRef.current === 'debut' ? debutLayerRef.current : finLayerRef.current;
-      const key = `${phaseRef.current}-${frameIdx}`;
-      if (el && el.dataset.idx !== key) {
-        el.src = phaseRef.current === 'debut' ? debutFrame(frameIdx) : finFrame(frameIdx);
-        el.dataset.idx = key;
-      }
+    // === Ping-pong A/B état local ===
+    // A : frame précédente (opacity 1 fixe, sous B dans le DOM)
+    // B : frame courante (opacity 0 → 1, fade-in au-dessus de A)
+    // Quand une nouvelle frame arrive : A hérite de ce qui était sur B,
+    // B charge la nouvelle → crossfade repart à 0.
+    let lastA = debutFrame(1);
+    let lastB = debutFrame(1);
+    let crossfade = 1;
+    let currentCrossfadeMs = FRAME_CROSSFADE_MS;
+    let prevRafTs = 0;
+
+    const computeTargetSrc = () => {
+      const total = phaseRef.current === 'debut' ? DEBUT_TOTAL : FIN_TOTAL;
+      const frameFn = phaseRef.current === 'debut' ? debutFrame : finFrame;
+      const idx = Math.max(1, Math.min(total, Math.round(currentIdxRef.current)));
+      return frameFn(idx);
     };
 
     let rafId = 0;
-    const tick = () => {
+    const tick = (now: number) => {
+      // 1) Interpolation du scrub (uniquement hors intro — intro pilote
+      //    directement currentIdxRef pour un rendu déterministe).
       if (!introPlayingRef.current) {
         const diff = targetIdxRef.current - currentIdxRef.current;
         if (Math.abs(diff) > 0.05) {
           currentIdxRef.current += diff * SCROLL_LERP;
-          const total = phaseRef.current === 'debut' ? DEBUT_TOTAL : FIN_TOTAL;
-          const clamped = Math.max(1, Math.min(total, Math.round(currentIdxRef.current)));
-          setFrameSrc(clamped);
         }
       }
+
+      // 2) Ping-pong si la frame cible a changé.
+      const targetSrc = computeTargetSrc();
+      if (targetSrc !== lastB) {
+        const wasDebutOnB = lastB.includes('/debut/');
+        const willBeDebut = targetSrc.includes('/debut/');
+        // Détection bascule debut↔fin : crossfade long (1.6 s) au lieu du
+        // frame-à-frame court (80 ms) — aligné sur le glissement du bloc.
+        currentCrossfadeMs =
+          wasDebutOnB !== willBeDebut ? PHASE_CROSSFADE_MS : FRAME_CROSSFADE_MS;
+
+        // A hérite de la frame courante de B (celle qui vient de vivre
+        // son fade-in complet, donc affichée), B accueille la nouvelle.
+        if (layerARef.current && lastA !== lastB) {
+          layerARef.current.setAttribute('src', lastB);
+          lastA = lastB;
+        }
+        if (layerBRef.current) {
+          layerBRef.current.setAttribute('src', targetSrc);
+        }
+        lastB = targetSrc;
+        crossfade = 0;
+      }
+
+      // 3) Avancement du crossfade en fonction du dt réel du rAF.
+      if (crossfade < 1) {
+        const dt = prevRafTs === 0 ? 16 : now - prevRafTs;
+        crossfade = Math.min(1, crossfade + dt / currentCrossfadeMs);
+        if (layerBRef.current) {
+          layerBRef.current.style.opacity = String(crossfade);
+        }
+      }
+      prevRafTs = now;
+
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
 
     const activateFinLayer = () => {
+      // Simple bascule d'état : au prochain tick, computeTargetSrc renvoie
+      // une frame « fin », le ping-pong déclenche automatiquement un
+      // crossfade long (PHASE_CROSSFADE_MS) grâce à la détection debut↔fin.
       phaseRef.current = 'fin';
       currentIdxRef.current = FIN_START_FRAME;
       targetIdxRef.current = FIN_START_FRAME;
-      if (finLayerRef.current) {
-        finLayerRef.current.src = finFrame(FIN_START_FRAME);
-        finLayerRef.current.dataset.idx = `fin-${FIN_START_FRAME}`;
-      }
-      finLayerRef.current?.classList.add('is-active');
-      debutLayerRef.current?.classList.remove('is-active');
-      // Après stabilisation du crossfade + auto-scroll, activation du scrub.
       setTimeout(() => {
         scrollBaselineYRef.current = window.scrollY;
         scrubActiveRef.current = true;
       }, 1500);
     };
 
-    // Révèle uniquement le bloc + auto-scroll (pas le crossfade fin).
-    // Le crossfade vers « fin » est déclenché séparément, au vrai END de
-    // l'animation debut, pour ne pas gâcher le fast-forward phase B qui
-    // continue à jouer pendant que le bloc glisse.
-    //
-    // Isolation de la mutation classList dans un rAF dédié + lecture de
-    // offsetHeight du bloc AVANT le class change. Ces 2 mesures garantissent
-    // que le browser enregistre l'état initial (opacity 0, translateY 340px)
-    // et met en place la transition CSS proprement avant que la classe soit
-    // ajoutée. Sans ça, le browser peut « sauter » la transition parce que
-    // la mutation arrive dans le même frame que le rAF précédent.
     const doRevealBlocks = () => {
       if (revealedRef.current) return;
       revealedRef.current = true;
@@ -198,9 +205,6 @@ export function BackgroundVideo() {
     };
 
     const doScrollToInvitation = () => {
-      // Scroll immédiat via requestAnimationFrame — la transition CSS du
-      // bloc et le scroll partent au même moment, l'utilisateur voit le
-      // bloc glisser dès qu'il entre dans le viewport (pas de temps mort).
       requestAnimationFrame(() => {
         document.getElementById('invitation')?.scrollIntoView({
           behavior: 'smooth',
@@ -234,13 +238,10 @@ export function BackgroundVideo() {
         } else {
           v = DEBUT_TOTAL;
         }
-        targetIdxRef.current = v;
+        // Uniquement mettre à jour l'idx — le rAF tick s'occupe du DOM
+        // (crossfade A/B en continu).
         currentIdxRef.current = v;
-        const clamped = Math.max(1, Math.min(DEBUT_TOTAL, Math.round(v)));
-        setFrameSrc(clamped);
-        // Reveal 0.2 s AVANT la fin de la vidéo debut — le bloc glisse
-        // juste avant que le crossfade vers fin ne démarre, apparition
-        // synchronisée sans temps mort perçu.
+        targetIdxRef.current = v;
         if (!revealFired && elapsed >= DEBUT_DURATION_MS - 200) {
           revealFired = true;
           onReveal?.();
@@ -255,22 +256,15 @@ export function BackgroundVideo() {
       requestAnimationFrame(step);
     };
 
-    // Fonction extraite : démarre l'intro (fade hero, animateDebut, filet
-     // de sécurité). Appelée soit au clic si tout est prêt, soit à la fin
-     // du préchargement si l'utilisateur avait cliqué en avance.
     startIntro = () => {
       document.body.classList.add('hero-out');
       document.querySelector('.hero')?.classList.add('fading-out');
 
       animateDebut(
-        // onReveal : fin du ramp (t=1.95 s wall) — bloc glisse en parallèle
-        // du fast-forward final de la vidéo debut, pas de temps mort.
         () => {
           doRevealBlocks();
           doScrollToInvitation();
         },
-        // onComplete : vrai END de debut (t=2.85 s wall) — crossfade
-        // debut → fin. La vidéo « fin » prend le relais.
         () => {
           activateFinLayer();
         }
@@ -291,17 +285,10 @@ export function BackgroundVideo() {
       if (revealedRef.current || pendingIntroRef.current) return;
 
       if (debutReadyRef.current) {
-        // Frames prêtes → démarre tout de suite.
         startIntro();
       } else {
-        // Pas encore prêt → affiche l'indicateur de chargement et
-        // retiendra le clic. Le préchargement lancera startIntro dès qu'il
-        // aura terminé debut.
         document.body.classList.add('loading');
         pendingIntroRef.current = true;
-        // Filet de sécurité : si le chargement traîne > 2 s (réseau lent,
-        // appareil serré), on démarre quand même — mieux vaut un léger
-        // saccade au début que faire attendre l'utilisateur indéfiniment.
         setTimeout(() => {
           if (pendingIntroRef.current) {
             pendingIntroRef.current = false;
@@ -344,22 +331,21 @@ export function BackgroundVideo() {
 
   return (
     <>
-      <div className="bg-video" aria-hidden="true" style={{ ['--crossfade-ms' as string]: `${CROSSFADE_MS}ms` }}>
+      <div className="bg-video" aria-hidden="true">
         <img
-          ref={debutLayerRef}
+          ref={layerARef}
           src={debutFrame(1)}
           alt=""
-          className="bg-frame bg-frame-debut is-active"
+          className="bg-frame bg-frame-a"
           decoding="sync"
-          data-idx="debut-1"
         />
         <img
-          ref={finLayerRef}
-          src={finFrame(1)}
+          ref={layerBRef}
+          src={debutFrame(1)}
           alt=""
-          className="bg-frame bg-frame-fin"
+          className="bg-frame bg-frame-b"
           decoding="sync"
-          data-idx="fin-1"
+          style={{ opacity: 1 }}
         />
       </div>
       <div className="bg-veil" aria-hidden="true" />

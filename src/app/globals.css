@@ -141,16 +141,23 @@
     position: absolute;
     inset: 0;
   }
-  /* Crossfade entre les 2 séquences debut/fin. Chaque frame est un
-     <img> stacké — celui qui a .is-active passe à opacity 1, l'autre
-     à opacity 0, via une transition douce de --crossfade-ms. */
+  /* Ping-pong A/B façon BM Chmouel :
+     - .bg-frame-a = frame précédente, opacity 1 permanente (couche du bas)
+     - .bg-frame-b = frame courante, opacity 0→1 pilotée en JS
+     Le rAF loop fait remonter B en fondu à chaque changement de frame,
+     puis « bascule » : ce qui était sur B passe sur A quand la frame
+     suivante arrive. Résultat : morph continu au lieu de cut discret. */
   .bg-frame {
-    opacity: 0;
-    transition: opacity var(--crossfade-ms, 800ms) ease-in-out;
     will-change: opacity;
   }
-  .bg-frame.is-active {
+  .bg-frame-a {
     opacity: 1;
+    z-index: 0;
+  }
+  .bg-frame-b {
+    /* opacity et z-index pilotés dynamiquement (JS pour opacity, DOM order
+       pour l'empilement — B est déclaré après A donc rend au-dessus) */
+    z-index: 1;
   }
   /* Voile pour maintenir la lisibilité du texte au-dessus */
   .bg-veil {
