@@ -92,7 +92,7 @@ export function RSVP() {
         </label>
         <input type="text" id="nom" name="nom" autoComplete="family-name" required disabled={disabled} />
 
-        <span className="field-label">Confirmez-vous votre présence à la Houppa ?</span>
+        <span className="field-label">Confirmez-vous votre présence ?</span>
         <div className="radio-group">
           <label>
             <input
