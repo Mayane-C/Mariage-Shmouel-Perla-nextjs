@@ -1028,18 +1028,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 32px;
+    gap: 40px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 32px;
+    width: 100%;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* Reset la margin-top des .btn-hero une fois qu'ils sont dans .hero-cta
+     — sinon le margin de chaque bouton pousse indépendamment le layout. */
+  .hero-cta .btn-hero {
+    margin-top: 0;
   }
   .btn-hero-he {
-    font-family: var(--font-hebrew), "FrankRuhlLibre", serif;
-    letter-spacing: 0.05em;
-    font-size: 1.05em;
+    font-family: var(--font-hebrew), "FrankRuhlLibre", "David", serif;
+    letter-spacing: 0.04em;
+    font-size: 1.15em;
+    direction: rtl;
   }
   @media (max-width: 520px) {
-    .hero-cta { gap: 18px; }
-    .btn-hero { font-size: 0.9em; }
+    .hero-cta {
+      gap: 24px;
+      flex-direction: column;
+    }
+    .hero-cta .btn-hero { font-size: 0.95em; }
   }
 
   /* --- Bracha --- */
