@@ -3,6 +3,7 @@ import { BackgroundVideo } from '@/components/BackgroundVideo';
 import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
 import { FairePart } from '@/components/FairePart';
+import { FairePartHebrew } from '@/components/FairePartHebrew';
 import { Details } from '@/components/Details';
 import { Bracha } from '@/components/Bracha';
 import { RSVP } from '@/components/RSVP';
@@ -17,6 +18,7 @@ export default function Home() {
       <div className="page">
         <Hero />
         <FairePart />
+        <FairePartHebrew />
         <Details />
         <Bracha />
         <RSVP />
