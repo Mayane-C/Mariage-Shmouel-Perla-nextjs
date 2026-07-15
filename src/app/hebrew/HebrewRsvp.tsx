@@ -60,7 +60,7 @@ export function HebrewRsvp() {
   const numbersLocked = disabled || presence === 'non';
 
   return (
-    <section id="rsvp-he" className="rsvp block">
+    <section id="rsvp" className="rsvp block">
       <Ornament n={3} className="block-ornament-corner tr" />
       <Ornament n={1} className="block-ornament-accent tr" />
       <Ornament n={8} className="block-ornament bl" />
@@ -103,7 +103,7 @@ export function HebrewRsvp() {
           disabled={disabled}
         />
 
-        <span className="field-label">האם תגיעו לחופה?</span>
+        <span className="field-label">האם תגיעו?</span>
         <div className="radio-group">
           <label>
             <input

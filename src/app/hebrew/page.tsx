@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { content } from '@/lib/content';
 import { Ornament } from '@/components/Ornament';
 import { HebrewArc } from '@/components/HebrewArc';
+import { BackgroundVideo } from '@/components/BackgroundVideo';
+import { BackgroundMusic } from '@/components/BackgroundMusic';
+import { HebrewHero } from './HebrewHero';
 import { HebrewRsvp } from './HebrewRsvp';
 
 export const metadata: Metadata = {
@@ -11,7 +14,9 @@ export const metadata: Metadata = {
 
 export default function HebrewInvitation() {
   return (
-    <div className="hebrew-page" dir="rtl">
+    <>
+      <BackgroundVideo />
+
       <header className="site-header scrolled hebrew-header">
         <nav className="site-nav">
           <a href="/" className="brand hebrew" aria-label="חזרה לגרסה הצרפתית">
@@ -23,9 +28,11 @@ export default function HebrewInvitation() {
         </nav>
       </header>
 
-      <div className="page hebrew-content">
+      <div className="page hebrew-page" dir="rtl">
+        <HebrewHero />
+
         {/* Faire-part hébreu */}
-        <section id="invitation-he" className="invitation-formal block block-arch">
+        <section id="invitation" className="invitation-formal block block-arch">
           <Ornament n={1} className="block-ornament-accent bl" />
           <Ornament n={2} className="block-ornament tr" />
           <Ornament n={3} className="block-ornament-2 tr" />
@@ -81,7 +88,7 @@ export default function HebrewInvitation() {
         </section>
 
         {/* Save the Date hébreu */}
-        <section id="details-he" className="details block">
+        <section id="details" className="details block">
           <Ornament n={4} className="block-ornament tr" />
           <Ornament n={5} className="block-ornament-accent bl" />
 
@@ -119,7 +126,7 @@ export default function HebrewInvitation() {
         </section>
 
         {/* Bracha hébreu */}
-        <section id="bracha-he" className="bracha block">
+        <section id="bracha" className="bracha block">
           <Ornament n={6} className="block-ornament tr" />
           <Ornament n={7} className="block-ornament-accent bl" />
 
@@ -145,6 +152,8 @@ export default function HebrewInvitation() {
         </p>
         <p className="ltd-rights">{content.ltd.rights}</p>
       </footer>
-    </div>
+
+      <BackgroundMusic />
+    </>
   );
 }

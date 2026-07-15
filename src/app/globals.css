@@ -1658,28 +1658,42 @@ body:not(.revealed) .cell:not(:last-child)::after {
    d'intro). On force donc le body à scroller et on rend les .block
    directement visibles sur cette page — annulation des règles
    destinées au hero de la page principale. */
-body:has(.hebrew-page) {
-  overflow: auto !important;
-  overflow-x: hidden !important;
-  height: auto !important;
-}
-body:has(.hebrew-page) .block,
-body:has(.hebrew-page) footer {
-  opacity: 1 !important;
-  transform: none !important;
-  pointer-events: auto !important;
-}
-body:has(.hebrew-page) .invitation-formal[data-spring="on"] {
-  opacity: 1 !important;
-  transform: none !important;
-}
+/* Page hébreue : mêmes règles reveal/vidéo que la version française.
+   Pas d'override qui forcerait la visibilité — le hero Hebrew a son
+   propre bouton .btn-hero, BackgroundVideo pilote le reveal comme sur
+   la homepage. Fond transparent pour ne pas obscurcir la vidéo. */
 .hebrew-page {
   font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
-  min-height: 100vh;
-  background: #F5EFE6;
 }
-.hebrew-page .hebrew-content {
-  padding-top: 80px;
+
+/* Hero Hebrew — layout identique à Hero.tsx mais en RTL et sans
+   compteur/typewriter (la date est mise en avant en hébreu). */
+.hebrew-hero .hebrew-hero-names {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  margin-top: 12px;
+  line-height: 1.1;
+}
+.hebrew-hero .hebrew-hero-latin {
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  letter-spacing: 0.14em;
+  color: var(--taupe-mid);
+  margin-top: 8px;
+  font-weight: 400;
+}
+.hebrew-hero .hebrew-hero-date {
+  font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
+  font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+  color: var(--taupe-deep);
+  margin-top: 26px;
+  letter-spacing: 0.02em;
+}
+.hebrew-hero .hebrew-hero-date-fr {
+  font-family: "Cormorant Garamond", "EB Garamond", serif;
+  font-style: italic;
+  font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+  color: var(--taupe-mid);
+  margin-top: 6px;
+  letter-spacing: 0.06em;
 }
 .hebrew-header {
   position: fixed;
