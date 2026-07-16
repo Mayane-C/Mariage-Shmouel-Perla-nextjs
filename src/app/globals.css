@@ -1042,12 +1042,23 @@
     outline: none;
   }
   /* --- Bracha --- */
+  /* Depuis la suppression du titre « Mazal Tov », on réduit le
+     padding-top du bloc pour que la marge supérieure ne soit plus
+     visiblement plus grande que l'inférieure. */
+  .bracha.block {
+    padding-top: 44px;
+  }
+  @media (max-width: 720px) {
+    .bracha.block {
+      padding-top: 32px;
+    }
+  }
   /* Image manuscrite du Rabbi affichée à la place du texte hébreu.
      Filet aéré, largeur modérée pour rester lisible sans écraser la
      traduction française qui suit. */
   .bracha .rabbi-bracha {
     display: block;
-    margin: 24px auto 0;
+    margin: 0 auto;
     max-width: min(340px, 80%);
     width: 100%;
     height: auto;
