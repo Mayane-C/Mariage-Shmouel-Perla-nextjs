@@ -32,13 +32,12 @@ export const content = {
     suffixe: 'ז״ל',
   },
   bracha: {
-    hebrewLines: [
-      'מזל טוב!',
-      'שיהיה בניין עדי עד על אדני התורה והמצוות',
-      'ושתזכו לחיים מאושרים בכל התחומים',
-    ],
+    // Bénédiction manuscrite du Rabbi affichée en image
+    // (public/images/rabbi-bracha.png), traduction française en dessous.
+    imageAlt:
+      "Bénédiction manuscrite du Rabbi : Mazal Tov, que ce soit un édifice éternel basé sur la Thora et les Mitsvot",
     traduction:
-      "Que ce soit un édifice Éternel basé sur la Thora et les Mitsvot, et que votre vie soit heureuse dans tous les domaines.",
+      "Mazal Tov ! Que ce soit un édifice éternel basé sur la Thora et les Mitsvot et que votre vie soit heureuse dans tous les domaines.",
   },
   kolSasson: 'קול ששון וקול שמחה קול חתן וקול כלה',
   bsd: 'בס״ד',

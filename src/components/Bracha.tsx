@@ -11,14 +11,11 @@ export function Bracha() {
 
       <h2 className="script-heading">Mazal Tov</h2>
 
-      <div className="hebrew-blessing">
-        {content.bracha.hebrewLines.map((line, i) => (
-          <span key={i}>
-            {line}
-            {i < content.bracha.hebrewLines.length - 1 && <br />}
-          </span>
-        ))}
-      </div>
+      <img
+        className="rabbi-bracha"
+        src="/images/rabbi-bracha.png"
+        alt={content.bracha.imageAlt}
+      />
 
       <p className="translation">{content.bracha.traduction}</p>
     </section>
