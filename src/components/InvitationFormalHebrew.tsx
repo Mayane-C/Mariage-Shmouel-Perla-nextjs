@@ -40,24 +40,24 @@ export function InvitationFormalHebrew() {
     return () => observer.disconnect();
   }, []);
 
-  // On applique le glissement animé par framer-motion sur mobile ET desktop
-  // pour un rendu identique et sans micro-rebond (tween ease-out plutôt
-  // que spring). Le CSS body:not(.revealed) .invitation-formal-he[data-spring="on"]
-  // reset opacity/transform → framer-motion pilote l'animation seul.
-  const useSpring = !prefersReducedMotion;
+  // Même modèle que l'ancien FairePart :
+  //  - Desktop : useSpring=false → CSS .block prend la main
+  //    (translateY 340px → 0, 1.6 s cubic-bezier 0.25, 0.1, 0.25, 1)
+  //  - Mobile  : useSpring=true → framer-motion spring critiquement amorti
+  //    (stiffness 40, damping 12, mass 1) y:600 → 0
+  const useSpring = isMobile && !prefersReducedMotion;
 
   const springVariants = {
-    hidden: { opacity: 0, y: 220 },
+    hidden: { opacity: 0, y: 600 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        // Tween ease-out lent pour un glissement « en douceur » du bas
-        // vers le haut. cubic-bezier(0.22, 1, 0.36, 1) = décélération
-        // continue jusqu'à l'arrêt, sans micro-rebond.
-        duration: 2.5,
-        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-        opacity: { duration: 1.6, ease: 'easeOut' as const },
+        type: 'spring' as const,
+        stiffness: 40,
+        damping: 12,
+        mass: 1,
+        opacity: { duration: 1, ease: 'easeOut' as const },
       },
     },
   };
