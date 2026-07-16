@@ -183,16 +183,22 @@
   @media (max-width: 520px) {
     .hero-logo { width: 118px; margin-bottom: 26px; }
   }
-  /* Petite mention juste avant les noms des mariés dans le hero */
+  /* Petite mention juste avant les noms des mariés dans le hero.
+     Couleur taupe-deep (au lieu de mid) + halo crème pour se détacher
+     nettement du fond vidéo. */
   .hero-preamble {
     font-family: "Didot", Georgia, serif;
     font-style: italic;
-    font-size: clamp(14px, 2.2vw, 18px);
-    color: var(--taupe-mid);
-    letter-spacing: 0.22em;
+    font-size: clamp(15px, 2.3vw, 19px);
+    color: var(--taupe-deep);
+    letter-spacing: 0.24em;
     text-transform: lowercase;
     text-align: center;
     margin: 0 0 12px;
+    text-shadow:
+      0 0 10px rgba(245, 239, 230, 0.95),
+      0 0 22px rgba(245, 239, 230, 0.7),
+      0 1px 2px rgba(75, 63, 53, 0.15);
   }
   @media (prefers-reduced-motion: reduce) {
     .block, footer { transition: none; }
