@@ -8,6 +8,16 @@
     font-display: block;
   }
   @font-face {
+    /* Fichier variable (300→900). Déclaré ici pour rendre le poids 500
+       — utilisé sur le bloc d'invitation formelle hébreue pour un
+       trait un peu plus gras que Regular sans atteindre Bold. */
+    font-family: "FrankRuhlLibre";
+    src: url("/fonts/FrankRuhlLibre-Medium.ttf") format("truetype-variations");
+    font-weight: 500;
+    font-style: normal;
+    font-display: block;
+  }
+  @font-face {
     font-family: "FrankRuhlLibre";
     src: url("/fonts/FrankRuhlLibre-Bold.ttf") format("truetype");
     font-weight: 700;
@@ -1709,6 +1719,9 @@ body:not(.revealed) .cell:not(:last-child)::after {
 }
 .invitation-formal-he {
   font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
+  /* Poids 500 (Medium) — trait un peu plus gras que Regular, sans
+     atteindre Bold. Charge le fichier variable via @font-face. */
+  font-weight: 500;
   color: var(--taupe-deep);
   text-align: center;
   direction: rtl;
