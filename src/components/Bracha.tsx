@@ -9,8 +9,6 @@ export function Bracha() {
       <Ornament n={7} className="block-ornament tr" />
       <Ornament n={5} className="block-ornament-2 tr" />
 
-      <h2 className="script-heading">Mazal Tov</h2>
-
       <img
         className="rabbi-bracha"
         src="/images/rabbi-bracha.png"

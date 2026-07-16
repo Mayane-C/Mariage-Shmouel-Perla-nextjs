@@ -11,7 +11,7 @@ export const content = {
     marie: 'Famille Smadja',
     mariee: 'Famille Schoukroun',
   },
-  dateGrégorienne: '3 Septembre 2026',
+  dateGrégorienne: 'Jeudi 3 Septembre 2026',
   dateHebrew: 'כ״א אלול התשפ״ו',
   dateISO: '2026-09-03T17:00:00+02:00',
   deadlineRSVP: 'avant le 15 août 2026',

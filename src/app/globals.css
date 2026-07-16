@@ -687,24 +687,6 @@
     color: var(--sand);
     text-transform: uppercase;
   }
-  .scroll-hint {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    font-size: 10px;
-    letter-spacing: 0.35em;
-    color: var(--sand-deep);
-    text-transform: uppercase;
-    text-decoration: none;
-  }
-  .scroll-hint .line {
-    width: 1px;
-    height: 44px;
-    background: linear-gradient(to bottom, var(--sand), transparent);
-  }
-
   /* --- Welcome --- */
   .welcome p.body {
     max-width: 460px;
@@ -932,10 +914,13 @@
   /* --- Détails (utilisés dans le bloc invitation-formal fusionné) --- */
   .date-fr {
     font-family: "Didot", Georgia, serif;
-    font-size: clamp(38px, 6vw, 52px);
-    letter-spacing: 0.08em;
+    /* Font-size clampé pour que « Jeudi 3 Septembre 2026 » (~22 chars)
+       tienne sur une SEULE ligne même sur les plus petits mobiles. */
+    font-size: clamp(18px, 5vw, 44px);
+    letter-spacing: 0.06em;
     font-weight: 400;
     margin-top: 28px;
+    white-space: nowrap;
     background: linear-gradient(100deg,
       #6B5B4A 0%,
       #6B5B4A 40%,
@@ -1590,7 +1575,21 @@ body:not(.revealed) .cell:not(:last-child)::after {
 }
 .scroll-hint-arrow {
   animation: scroll-hint-bounce 1.7s ease-in-out infinite;
-  filter: drop-shadow(0 1px 4px rgba(122, 95, 62, 0.4));
+  /* Ombre marquée + halo blanc pour détacher les flèches du fond
+     vidéo, spécialement lisibles sur les zones claires. */
+  filter:
+    drop-shadow(0 0 3px rgba(245, 239, 230, 0.95))
+    drop-shadow(0 2px 6px rgba(75, 63, 53, 0.5));
+  width: 40px;
+  height: 40px;
+}
+@media (max-width: 720px) {
+  /* Plus grandes sur mobile pour compenser le viewport réduit et
+     être bien visibles au premier coup d'œil. */
+  .scroll-hint-arrow {
+    width: 44px;
+    height: 44px;
+  }
 }
 @keyframes scroll-hint-bounce {
   0%, 100% { transform: translateY(0); }
