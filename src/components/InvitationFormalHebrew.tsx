@@ -56,7 +56,7 @@ export function InvitationFormalHebrew() {
         // vers le haut. cubic-bezier(0.22, 1, 0.36, 1) = décélération
         // continue jusqu'à l'arrêt, sans micro-rebond.
         duration: 2.5,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
         opacity: { duration: 1.6, ease: 'easeOut' as const },
       },
     },
