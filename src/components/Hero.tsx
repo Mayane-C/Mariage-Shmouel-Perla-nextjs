@@ -11,6 +11,7 @@ export function Hero() {
           src={content.images.weddingLogo}
           alt="Monogramme Shmouel & Perla"
         />
+        <p className="hero-preamble">Mariage de</p>
         <h1 className="names">
           {content.maries.prenomLatin}{' '}
           <span className="script-amp" aria-hidden="true">&amp;</span>{' '}
