@@ -40,26 +40,14 @@ export function InvitationFormalHebrew() {
     return () => observer.disconnect();
   }, []);
 
-  // « Scroll automatique » : le bloc démarre entièrement sous le viewport
-  // (y = 100vh en dessous de sa position layout) et remonte pour venir
-  // caler sa bordure supérieure au sommet de l'écran (juste sous le
-  // header, grâce au scroll-margin-top réduit). L'ease-out simule la
-  // décélération d'un scroll doux qui s'arrête pile au bon endroit.
-  const useSpring = !prefersReducedMotion;
+  // Framer-motion désactivé — comportement identique au FairePart français :
+  //  - Desktop : CSS .block (translateY 340 → 0 + fade sur 1.6 s cubic-bezier)
+  //  - Mobile  : fade-only (media query neutralise le transform)
+  const useSpring = false;
   void isMobile;
+  void prefersReducedMotion;
 
-  const springVariants = {
-    hidden: { opacity: 0, y: '100vh' },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 2.6,
-        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-        opacity: { duration: 1.4, ease: 'easeOut' as const },
-      },
-    },
-  };
+  const springVariants = undefined;
 
   return (
     <motion.section
