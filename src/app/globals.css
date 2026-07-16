@@ -83,6 +83,21 @@
     transition: opacity 1.6s ease-out, transform 1.6s cubic-bezier(0.25, 0.1, 0.25, 1);
     will-change: transform, opacity;
   }
+  /* Les blocs pilotés par framer-motion ([data-spring="on"]) — désactive
+     la transition CSS et remet transform à l'état initial pour ne pas
+     entrer en conflit avec les inline styles animés par motion.section.
+     Règle appliquée à toutes les tailles (le bloc hébreu utilise
+     framer-motion desktop ET mobile). */
+  .invitation-formal[data-spring="on"],
+  .invitation-formal-he[data-spring="on"] {
+    transition: none !important;
+    will-change: transform, opacity;
+  }
+  body:not(.revealed) .invitation-formal[data-spring="on"],
+  body:not(.revealed) .invitation-formal-he[data-spring="on"] {
+    opacity: 0;
+    transform: initial;
+  }
   @media (max-width: 720px) {
     /* Mobile : durée du fade-in raccourcie car plus de mouvement à
        accompagner. Vitesse constante — pas de décélération en fin
@@ -90,20 +105,6 @@
     .block, footer {
       transition: opacity 1.6s linear;
       will-change: opacity;
-    }
-    /* Les blocs faire-part (FR + HE) utilisent framer-motion en mobile
-       (spring style BM Chmouel). On désactive complètement la transition
-       CSS et le fade géré par body:not(.revealed) pour ne pas entrer en
-       conflit avec les inline styles animés par motion.section. */
-    .invitation-formal[data-spring="on"],
-    .invitation-formal-he[data-spring="on"] {
-      transition: none !important;
-      will-change: transform, opacity;
-    }
-    body:not(.revealed) .invitation-formal[data-spring="on"],
-    body:not(.revealed) .invitation-formal-he[data-spring="on"] {
-      opacity: 0;
-      transform: initial;
     }
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */

@@ -40,27 +40,24 @@ export function InvitationFormalHebrew() {
     return () => observer.disconnect();
   }, []);
 
-  // Même modèle que l'ancien FairePart :
-  //  - Desktop : useSpring=false → CSS .block prend la main
-  //    (translateY 340px → 0, 1.6 s cubic-bezier 0.25, 0.1, 0.25, 1)
-  //  - Mobile  : useSpring=true → framer-motion spring critiquement amorti
-  //    (stiffness 40, damping 12, mass 1) y:600 → 0
-  const useSpring = isMobile && !prefersReducedMotion;
+  // Glissement clair et visible du bas vers le haut, desktop ET mobile.
+  // Tween ease-out (pas de spring) — la position est PILOTÉE tout du long,
+  // donc le mouvement reste perceptible sans être « avalé » par un
+  // amortissement mou. Opacity fade en parallèle mais plus lent que la
+  // fin du glissement, pour que le bloc soit encore en train de bouger
+  // quand il devient pleinement visible.
+  const useSpring = !prefersReducedMotion;
+  void isMobile;
 
   const springVariants = {
-    hidden: { opacity: 0, y: 600 },
+    hidden: { opacity: 0, y: 380 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        // Spring plus lent et plus lourd que l'ancien FairePart pour un
-        // arrivée moins soudaine (le bloc hébreu est le PREMIER visible
-        // après l'intro vidéo — il mérite une entrée qui laisse respirer).
-        type: 'spring' as const,
-        stiffness: 22,
-        damping: 14,
-        mass: 1.4,
-        opacity: { duration: 1.8, ease: 'easeOut' as const },
+        duration: 2.2,
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+        opacity: { duration: 1.6, ease: 'easeOut' as const },
       },
     },
   };
