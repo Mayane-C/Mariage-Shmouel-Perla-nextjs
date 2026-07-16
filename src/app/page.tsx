@@ -4,7 +4,6 @@ import { Header } from '@/components/Header';
 import { Hero } from '@/components/Hero';
 import { FairePart } from '@/components/FairePart';
 import { InvitationFormalHebrew } from '@/components/InvitationFormalHebrew';
-import { Details } from '@/components/Details';
 import { Bracha } from '@/components/Bracha';
 import { RSVP } from '@/components/RSVP';
 import { Footer } from '@/components/Footer';
@@ -19,7 +18,6 @@ export default function Home() {
         <Hero />
         <InvitationFormalHebrew />
         <FairePart />
-        <Details />
         <Bracha />
         <RSVP />
       </div>

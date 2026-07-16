@@ -9,7 +9,6 @@ interface NavLink {
 
 const LINKS: NavLink[] = [
   { href: '#invitation', label: 'Faire-part' },
-  { href: '#details', label: 'Save the Date' },
   { href: '#bracha', label: 'Mazal Tov' },
   { href: '#rsvp', label: 'Répondre' },
 ];
