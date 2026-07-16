@@ -29,9 +29,10 @@ function Arrow() {
 }
 
 // Durée qu'on attend après body.revealed avant d'afficher l'invite.
-// Correspond à la fin du glissement du bloc (3.4 s desktop) — la vidéo,
-// elle, se fige immédiatement à body.revealed.
-const SHOW_AFTER_REVEALED_MS = 3400;
+// Correspond à la fin du glissement du bloc hébreu (2.5 s de tween)
+// + 300 ms pour laisser l'œil se poser sur le texte avant que les
+// flèches n'apparaissent.
+const SHOW_AFTER_REVEALED_MS = 2800;
 
 export function ScrollHint() {
   const [visible, setVisible] = useState(false);
