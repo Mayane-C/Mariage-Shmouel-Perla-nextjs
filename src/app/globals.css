@@ -1691,6 +1691,13 @@ body:not(.revealed) .cell:not(:last-child)::after {
   padding: 40px 16px 70px;
   margin-top: 24px;
   overflow: visible;
+  /* Transition plus lente que les autres blocs (2.4 s au lieu de 1.6 s)
+     — arrivée moins soudaine du premier bloc après l'intro vidéo.
+     Sur mobile, le rule @media data-spring="on" désactive cette transition
+     (transition: none !important) et framer-motion prend la main. */
+  transition:
+    opacity 2.4s ease-out,
+    transform 2.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 /* Text-shadow crème doux sur toutes les lignes du bloc — halo qui
    lit le contour des lettres sur les zones où la vidéo est claire. */

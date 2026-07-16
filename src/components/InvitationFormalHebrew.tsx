@@ -53,11 +53,14 @@ export function InvitationFormalHebrew() {
       opacity: 1,
       y: 0,
       transition: {
+        // Spring plus lent et plus lourd que l'ancien FairePart pour un
+        // arrivée moins soudaine (le bloc hébreu est le PREMIER visible
+        // après l'intro vidéo — il mérite une entrée qui laisse respirer).
         type: 'spring' as const,
-        stiffness: 40,
-        damping: 12,
-        mass: 1,
-        opacity: { duration: 1, ease: 'easeOut' as const },
+        stiffness: 22,
+        damping: 14,
+        mass: 1.4,
+        opacity: { duration: 1.8, ease: 'easeOut' as const },
       },
     },
   };
