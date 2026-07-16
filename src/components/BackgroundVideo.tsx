@@ -198,11 +198,14 @@ export function BackgroundVideo() {
     };
 
     const doScrollToInvitation = () => {
+      // Cible le PREMIER .block plutôt que #invitation en dur : si un bloc
+      // (comme l'invitation formelle hébreue) est inséré avant le faire-part,
+      // l'auto-scroll atterrit dessus au lieu de sauter par-dessus.
       requestAnimationFrame(() => {
-        document.getElementById('invitation')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        const target =
+          document.querySelector<HTMLElement>('.page .block') ||
+          document.getElementById('invitation');
+        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     };
 

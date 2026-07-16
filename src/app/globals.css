@@ -81,24 +81,25 @@
       transition: opacity 1.6s linear;
       will-change: opacity;
     }
-    /* Le faire-part utilise framer-motion en mobile (spring style BM
-       Chmouel). On désactive complètement la transition CSS et le
-       fade géré par body:not(.revealed) pour ne pas entrer en conflit
-       avec les inline styles animés par motion.section. */
-    .invitation-formal[data-spring="on"] {
+    /* Les blocs faire-part (FR + HE) utilisent framer-motion en mobile
+       (spring style BM Chmouel). On désactive complètement la transition
+       CSS et le fade géré par body:not(.revealed) pour ne pas entrer en
+       conflit avec les inline styles animés par motion.section. */
+    .invitation-formal[data-spring="on"],
+    .invitation-formal-he[data-spring="on"] {
       transition: none !important;
       will-change: transform, opacity;
     }
-    /* On garde opacity:0 même quand framer-motion prend la main —
-       évite le flash de visibilité pendant l'hydratation React
-       (entre le 1er render SSR et l'ajout de data-spring='on' au 2nd).
-       framer-motion posera son inline opacity ensuite. */
-    body:not(.revealed) .invitation-formal[data-spring="on"] {
+    body:not(.revealed) .invitation-formal[data-spring="on"],
+    body:not(.revealed) .invitation-formal-he[data-spring="on"] {
       opacity: 0;
       transform: initial;
     }
   }
   /* Stagger entre blocs — décalé pour laisser respirer chaque arrivée */
+  .invitation-formal-he {
+    transition-delay: 0s, 0s;
+  }
   .invitation-formal {
     transition-delay: 0s, 0s;
   }
@@ -1628,6 +1629,87 @@ body:not(.revealed) .cell:not(:last-child)::after {
   color: var(--taupe);
   line-height: 1.6;
   text-align: center;
+}
+
+/* ─────────────────────────────────────────
+   Invitation formelle hébreue (coutume — bloc placé en tout début)
+   Typographie FrankRuhlLibre, layout centré RTL, paragraphes aérés,
+   gras subtil sur les prénoms des mariés, colonnes parents en bas.
+   ───────────────────────────────────────── */
+.invitation-formal-he {
+  font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
+  color: var(--taupe-deep);
+  text-align: center;
+  padding: 68px 40px;
+  direction: rtl;
+}
+.invitation-formal-he .ifh-bsd {
+  font-size: 15px;
+  color: var(--taupe-mid);
+  margin: 0 0 34px;
+  letter-spacing: 0.04em;
+}
+.invitation-formal-he .ifh-para {
+  margin-top: 26px;
+  font-size: clamp(16px, 2.1vw, 19px);
+  line-height: 2;
+}
+.invitation-formal-he .ifh-para:first-of-type {
+  margin-top: 0;
+}
+.invitation-formal-he .ifh-para p {
+  margin: 0;
+}
+.invitation-formal-he strong {
+  font-weight: 700;
+  color: var(--sand-deep);
+  letter-spacing: 0.02em;
+}
+.invitation-formal-he .ifh-signature {
+  margin-top: 34px;
+  font-size: clamp(15px, 2vw, 17px);
+  font-style: italic;
+  color: var(--taupe);
+}
+.invitation-formal-he .ifh-parents {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: clamp(48px, 12vw, 140px);
+  margin-top: 36px;
+  flex-wrap: wrap;
+}
+.invitation-formal-he .ifh-parents-col {
+  min-width: 200px;
+}
+.invitation-formal-he .ifh-parents-label {
+  font-size: 14px;
+  color: var(--taupe-mid);
+  margin: 0 0 4px;
+  letter-spacing: 0.06em;
+}
+.invitation-formal-he .ifh-parents-name {
+  font-size: clamp(15px, 2vw, 17px);
+  margin: 0;
+  color: var(--taupe-deep);
+}
+.invitation-formal-he .ifh-footnote {
+  margin-top: 34px;
+  font-size: 12.5px;
+  color: var(--taupe-mid);
+  letter-spacing: 0.02em;
+}
+@media (max-width: 720px) {
+  .invitation-formal-he {
+    padding: 54px 22px;
+  }
+  .invitation-formal-he .ifh-para {
+    font-size: 15.5px;
+    line-height: 1.95;
+  }
+  .invitation-formal-he .ifh-parents {
+    gap: 28px;
+  }
 }
 .hebrew-names-block {
   font-family: "FrankRuhlLibre", serif;
