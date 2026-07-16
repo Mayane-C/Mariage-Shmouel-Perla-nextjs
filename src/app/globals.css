@@ -112,12 +112,15 @@
   footer {
     transition-delay: 0.85s, 0.85s;
   }
-  /* Offset scroll pour que les sections ne collent pas au header sticky */
-  #invitation, #bracha, #rsvp {
+  /* Offset scroll pour que les sections ne collent pas au header sticky.
+     Inclut .invitation-formal-he (bloc sans id, ciblé par BackgroundVideo
+     comme premier .block) : sinon son haut passe sous le header fixe et
+     les premières lignes hébreu sont cachées. */
+  .invitation-formal-he, #invitation, #bracha, #rsvp {
     scroll-margin-top: 140px;
   }
   @media (max-width: 720px) {
-    #invitation, #bracha, #rsvp {
+    .invitation-formal-he, #invitation, #bracha, #rsvp {
       scroll-margin-top: 118px;
     }
   }
