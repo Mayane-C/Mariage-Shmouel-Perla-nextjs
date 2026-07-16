@@ -40,24 +40,23 @@ export function InvitationFormalHebrew() {
     return () => observer.disconnect();
   }, []);
 
-  // Glissement clair et visible du bas vers le haut, desktop ET mobile.
-  // Tween ease-out (pas de spring) — la position est PILOTÉE tout du long,
-  // donc le mouvement reste perceptible sans être « avalé » par un
-  // amortissement mou. Opacity fade en parallèle mais plus lent que la
-  // fin du glissement, pour que le bloc soit encore en train de bouger
-  // quand il devient pleinement visible.
+  // « Scroll automatique » : le bloc démarre entièrement sous le viewport
+  // (y = 100vh en dessous de sa position layout) et remonte pour venir
+  // caler sa bordure supérieure au sommet de l'écran (juste sous le
+  // header, grâce au scroll-margin-top réduit). L'ease-out simule la
+  // décélération d'un scroll doux qui s'arrête pile au bon endroit.
   const useSpring = !prefersReducedMotion;
   void isMobile;
 
   const springVariants = {
-    hidden: { opacity: 0, y: 380 },
+    hidden: { opacity: 0, y: '100vh' },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 2.2,
+        duration: 2.6,
         ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-        opacity: { duration: 1.6, ease: 'easeOut' as const },
+        opacity: { duration: 1.4, ease: 'easeOut' as const },
       },
     },
   };

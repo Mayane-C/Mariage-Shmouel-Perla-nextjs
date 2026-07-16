@@ -123,16 +123,26 @@
   footer {
     transition-delay: 0.85s, 0.85s;
   }
-  /* Offset scroll pour que les sections ne collent pas au header sticky.
-     Inclut .invitation-formal-he (bloc sans id, ciblé par BackgroundVideo
-     comme premier .block) : sinon son haut passe sous le header fixe et
-     les premières lignes hébreu sont cachées. */
-  .invitation-formal-he, #invitation, #bracha, #rsvp {
+  /* Offset scroll pour que les sections ne collent pas au header sticky. */
+  #invitation, #bracha, #rsvp {
     scroll-margin-top: 140px;
   }
   @media (max-width: 720px) {
-    .invitation-formal-he, #invitation, #bracha, #rsvp {
+    #invitation, #bracha, #rsvp {
       scroll-margin-top: 118px;
+    }
+  }
+  /* Le bloc hébreu (premier bloc, ciblé par l'auto-scroll de BackgroundVideo)
+     a un scroll-margin-top plus petit : sa bordure supérieure vient se
+     coller pile au sommet visible de l'écran (juste sous le header).
+     C'est ce qui donne l'effet « scroll automatique qui s'arrête quand
+     la bordure supérieure arrive en haut ». */
+  .invitation-formal-he {
+    scroll-margin-top: 88px;
+  }
+  @media (max-width: 720px) {
+    .invitation-formal-he {
+      scroll-margin-top: 72px;
     }
   }
   /* Vidéo de fond scrubbée : présente sur toute la page */
@@ -1702,13 +1712,11 @@ body:not(.revealed) .cell:not(:last-child)::after {
   padding: 40px 16px 70px;
   margin-top: 24px;
   overflow: visible;
-  /* Transition plus lente que les autres blocs (2.4 s au lieu de 1.6 s)
-     — arrivée moins soudaine du premier bloc après l'intro vidéo.
-     Sur mobile, le rule @media data-spring="on" désactive cette transition
-     (transition: none !important) et framer-motion prend la main. */
+  /* Transition CSS de fallback (utilisée si framer-motion est off).
+     2.6 s pour matcher la durée du tween framer-motion. */
   transition:
-    opacity 2.4s ease-out,
-    transform 2.4s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 2.6s ease-out,
+    transform 2.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 /* Text-shadow crème doux sur toutes les lignes du bloc — halo qui
    lit le contour des lettres sur les zones où la vidéo est claire. */
