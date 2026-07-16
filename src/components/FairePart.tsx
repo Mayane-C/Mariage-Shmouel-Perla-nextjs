@@ -42,9 +42,16 @@ export function FairePart() {
     return () => observer.disconnect();
   }, []);
 
-  // Sur desktop (ou reduced-motion), on laisse le CSS piloter — aucun style
-  // inline n'est ajouté par framer-motion.
-  const useSpring = isMobile && !prefersReducedMotion;
+  // Framer-motion désactivé : le CSS pilote entièrement le reveal.
+  // Desktop → glissement translateY(340px) + fade (transition 1.6 s ease-out).
+  // Mobile  → fade-only (via la media query qui neutralise le transform)
+  //           → évite que le bloc, hors viewport en bas, ne soit visible
+  //           pendant qu'il glisse depuis encore plus bas.
+  const useSpring = false;
+  // Références conservées pour ne pas casser le typage : isMobile et
+  // prefersReducedMotion sont détectés mais non utilisés côté animation.
+  void isMobile;
+  void prefersReducedMotion;
 
   const springVariants = {
     hidden: { opacity: 0, y: 600 },

@@ -47,7 +47,7 @@ export function InvitationFormalHebrew() {
   const useSpring = !prefersReducedMotion;
 
   const springVariants = {
-    hidden: { opacity: 0, y: 500 },
+    hidden: { opacity: 0, y: 220 },
     visible: {
       opacity: 1,
       y: 0,
