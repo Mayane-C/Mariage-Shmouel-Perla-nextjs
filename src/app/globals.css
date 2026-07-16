@@ -1633,25 +1633,38 @@ body:not(.revealed) .cell:not(:last-child)::after {
 
 /* ─────────────────────────────────────────
    Invitation formelle hébreue (coutume — bloc placé en tout début)
-   Typographie FrankRuhlLibre, layout centré RTL, paragraphes aérés,
-   gras subtil sur les prénoms des mariés, colonnes parents en bas.
+   Style « lettre posée sur la page » : aucun habillage carte (pas de
+   fond crème, pas de backdrop-blur, pas de bordure ni d'ombre), juste
+   le texte centré au milieu de la vidéo de fond.
+   Chaque ligne = white-space: nowrap + font-size clamp() pour préserver
+   les retours à la ligne EXACTS de l'image, même sur les petits viewports
+   (la taille de police rétrécit automatiquement pour tenir en largeur).
    ───────────────────────────────────────── */
+.invitation-formal-he.block {
+  background: transparent;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  padding: 90px 8px 80px;
+  margin-top: 24px;
+  overflow: visible;
+}
 .invitation-formal-he {
   font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
   color: var(--taupe-deep);
   text-align: center;
-  padding: 68px 40px;
   direction: rtl;
 }
 .invitation-formal-he .ifh-bsd {
-  font-size: 15px;
+  font-size: clamp(12px, 1.8vw, 16px);
   color: var(--taupe-mid);
   margin: 0 0 34px;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 .invitation-formal-he .ifh-para {
   margin-top: 26px;
-  font-size: clamp(16px, 2.1vw, 19px);
   line-height: 2;
 }
 .invitation-formal-he .ifh-para:first-of-type {
@@ -1659,6 +1672,10 @@ body:not(.revealed) .cell:not(:last-child)::after {
 }
 .invitation-formal-he .ifh-para p {
   margin: 0;
+  /* Une ligne du <p> = une ligne visuelle, jamais coupée par le
+     navigateur. La taille de police rétrécit pour tenir en largeur. */
+  white-space: nowrap;
+  font-size: clamp(10.5px, 2.85vw, 18px);
 }
 .invitation-formal-he strong {
   font-weight: 700;
@@ -1667,48 +1684,50 @@ body:not(.revealed) .cell:not(:last-child)::after {
 }
 .invitation-formal-he .ifh-signature {
   margin-top: 34px;
-  font-size: clamp(15px, 2vw, 17px);
+  font-size: clamp(12px, 2vw, 16px);
   font-style: italic;
   color: var(--taupe);
+  white-space: nowrap;
 }
 .invitation-formal-he .ifh-parents {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap: clamp(48px, 12vw, 140px);
+  gap: clamp(24px, 8vw, 100px);
   margin-top: 36px;
-  flex-wrap: wrap;
 }
 .invitation-formal-he .ifh-parents-col {
-  min-width: 200px;
+  flex: 0 1 auto;
 }
 .invitation-formal-he .ifh-parents-label {
-  font-size: 14px;
+  font-size: clamp(11px, 1.8vw, 14px);
   color: var(--taupe-mid);
   margin: 0 0 4px;
   letter-spacing: 0.06em;
+  white-space: nowrap;
 }
 .invitation-formal-he .ifh-parents-name {
-  font-size: clamp(15px, 2vw, 17px);
+  font-size: clamp(11px, 2vw, 16px);
   margin: 0;
   color: var(--taupe-deep);
+  white-space: nowrap;
 }
 .invitation-formal-he .ifh-footnote {
   margin-top: 34px;
-  font-size: 12.5px;
+  font-size: clamp(10px, 1.5vw, 12.5px);
   color: var(--taupe-mid);
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 @media (max-width: 720px) {
-  .invitation-formal-he {
-    padding: 54px 22px;
+  .invitation-formal-he.block {
+    padding: 70px 4px 60px;
   }
   .invitation-formal-he .ifh-para {
-    font-size: 15.5px;
-    line-height: 1.95;
+    line-height: 1.85;
   }
   .invitation-formal-he .ifh-parents {
-    gap: 28px;
+    gap: 20px;
   }
 }
 .hebrew-names-block {
