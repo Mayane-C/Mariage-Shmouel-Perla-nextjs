@@ -1674,7 +1674,9 @@ body:not(.revealed) .cell:not(:last-child)::after {
   border: none;
   box-shadow: 0 6px 24px rgba(75, 63, 53, 0.05);
   border-radius: 6px;
-  padding: 90px 16px 80px;
+  /* Padding-top réduit (40 au lieu de 90) : marge supérieure du bloc
+     visuellement resserrée, le texte commence plus haut. */
+  padding: 40px 16px 70px;
   margin-top: 24px;
   overflow: visible;
 }
@@ -1757,7 +1759,7 @@ body:not(.revealed) .cell:not(:last-child)::after {
 }
 @media (max-width: 720px) {
   .invitation-formal-he.block {
-    padding: 70px 4px 60px;
+    padding: 32px 4px 54px;
   }
   .invitation-formal-he .ifh-para {
     line-height: 1.85;

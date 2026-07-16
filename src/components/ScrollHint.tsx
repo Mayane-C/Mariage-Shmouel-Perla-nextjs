@@ -41,36 +41,37 @@ export function ScrollHint() {
   useEffect(() => {
     let pollInterval: number | null = null;
     let startTimer: number | null = null;
-    let tickInterval: number | null = null;
     let onScroll: (() => void) | null = null;
 
-    const updateVisibility = () => {
+    // Cache-uniquement : n'affiche jamais si l'utilisateur a déjà scrollé
+    // au-delà du bloc hébreu. Ne re-montre pas s'il revient en arrière
+    // (simple et prévisible, comme l'expérience BM).
+    const hideCheck = () => {
       const heBlock = document.querySelector<HTMLElement>('.invitation-formal-he');
-      if (!heBlock) {
-        setVisible(false);
-        return;
-      }
+      if (!heBlock) return;
       const rect = heBlock.getBoundingClientRect();
       const vH = window.innerHeight;
-      // Visible tant que le bloc hébreu a une portion dans le viewport
-      // ET que son bas est encore en dessous du milieu du viewport
-      // (= l'utilisateur regarde encore majoritairement le bloc).
-      const partiallyInView = rect.top < vH && rect.bottom > 0;
-      const notScrolledPast = rect.bottom > vH * 0.5;
-      setVisible(partiallyInView && notScrolledPast);
+      // Cache dès que le bas du bloc passe au-dessus de 35% du viewport
+      // (= utilisateur a scrollé significativement au-delà)
+      if (rect.bottom < vH * 0.35) {
+        setVisible(false);
+        if (onScroll) {
+          window.removeEventListener('scroll', onScroll);
+          onScroll = null;
+        }
+      }
     };
 
     const startTracking = () => {
-      onScroll = updateVisibility;
+      // Affichage inconditionnel après le délai — pas de check position
+      // initial qui pourrait retourner false à cause d'un timing subtil
+      // (fin d'animation, URL bar iOS, etc.). Les flèches DOIVENT être
+      // visibles au moment où l'utilisateur peut interagir.
+      setVisible(true);
+      onScroll = hideCheck;
       window.addEventListener('scroll', onScroll, { passive: true });
-      // Filet de sécurité : ré-évalue régulièrement au cas où le DOM
-      // ait bougé (reveal des blocs, mobile URL bar collapse, etc.)
-      tickInterval = window.setInterval(updateVisibility, 500);
-      updateVisibility();
     };
 
-    // Attend body.revealed + le délai du glissement, puis commence à
-    // tracker la position du bloc.
     pollInterval = window.setInterval(() => {
       if (document.body.classList.contains('revealed')) {
         window.clearInterval(pollInterval!);
@@ -82,7 +83,6 @@ export function ScrollHint() {
     return () => {
       if (pollInterval !== null) window.clearInterval(pollInterval);
       if (startTimer !== null) window.clearTimeout(startTimer);
-      if (tickInterval !== null) window.clearInterval(tickInterval);
       if (onScroll) window.removeEventListener('scroll', onScroll);
     };
   }, []);
