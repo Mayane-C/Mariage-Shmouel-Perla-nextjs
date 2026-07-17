@@ -52,18 +52,21 @@ export function FairePart() {
 
   const springVariants = {
     // y: '100vh' → le bloc démarre exactement en dessous du viewport,
-    // peu importe la taille d'écran (au lieu de 600 px fixe qui pouvait
-    // être visible sur les grands écrans / trop peu sur les petits).
+    // peu importe la taille d'écran.
     hidden: { opacity: 0, y: '100vh' },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
+        // Ressort ralenti (stiffness 48→28) pour laisser à l'œil le
+        // temps de voir le bloc arriver depuis le bas. Mêmes proportions
+        // ζ que BM (léger rebond conservé), fréquence naturelle réduite
+        // ~30 % → durée ~2.6 s au lieu de ~2 s.
         type: 'spring' as const,
-        stiffness: 48,
-        damping: 13,
-        mass: 1.1,
-        opacity: { duration: 1, ease: 'easeOut' as const },
+        stiffness: 28,
+        damping: 11,
+        mass: 1.2,
+        opacity: { duration: 1.4, ease: 'easeOut' as const },
       },
     },
   };
