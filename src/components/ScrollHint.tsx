@@ -32,7 +32,7 @@ function Arrow() {
   );
 }
 
-const REVEAL_DELAY_MS = 2600;
+const REVEAL_DELAY_MS = 2000;
 
 export function ScrollHint() {
   const [visible, setVisible] = useState(false);

@@ -51,21 +51,22 @@ export function FairePart() {
   void isMobile;
 
   const springVariants = {
-    // y: '100vh' → le bloc démarre exactement en dessous du viewport,
-    // peu importe la taille d'écran.
-    hidden: { opacity: 0, y: '100vh' },
+    // Params STRICTEMENT identiques à BM Chmouel (Announcement.tsx) :
+    //   type: spring, stiffness 48, damping 13, mass 1.1
+    //   y: 600 → 0 (offset fixe, pas '100vh')
+    //   opacity: { duration: 1, ease: 'easeOut' }
+    // ζ ≈ 0.89 (théoriquement sous-amorti) mais overshoot ≈ 0.19 %
+    // → visuellement imperceptible, aucun rebond perçu.
+    hidden: { opacity: 0, y: 600 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        // Tween ease-out (au lieu d'un spring) : décélération continue
-        // jusqu'à l'arrêt, GARANTI sans overshoot. Le ressort BM
-        // précédent, même bien calibré, dépassait de quelques pixels
-        // sa position finale en montant — le haut du bloc pouvait
-        // brièvement sortir par le haut de l'écran.
-        duration: 2.6,
-        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-        opacity: { duration: 1.4, ease: 'easeOut' as const },
+        type: 'spring' as const,
+        stiffness: 48,
+        damping: 13,
+        mass: 1.1,
+        opacity: { duration: 1, ease: 'easeOut' as const },
       },
     },
   };
