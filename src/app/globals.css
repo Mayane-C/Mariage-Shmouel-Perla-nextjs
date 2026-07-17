@@ -850,34 +850,41 @@
     margin: 12px auto 0;
     max-width: 460px;
   }
-  /* Familles empilées verticalement : chaque famille est une colonne
-     de noms (les grand-parents + parents), séparées par un & centré.
-     Adapté aux mariages où plusieurs générations sont mentionnées. */
+  /* Familles disposées en 2 colonnes façon BM Chmouel : famille du
+     marié à gauche, famille de la mariée à droite. Chaque nom sur sa
+     propre ligne. Pas de séparateur entre les colonnes — la grille
+     porte la structure. Alignement top-start pour que les hauteurs
+     inégales (2 vs 3 noms) restent lisibles. */
   .families-formal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 40px;
+    max-width: 640px;
     margin: 40px auto 24px;
     font-family: "Didot", Georgia, serif;
     color: var(--taupe-deep);
+    align-items: start;
   }
   .families-formal .fam-side {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .families-formal .fam {
-    font-size: clamp(15px, 2.2vw, 20px);
-    letter-spacing: 0.06em;
-    line-height: 1.35;
+    font-size: clamp(14px, 2vw, 18px);
+    letter-spacing: 0.05em;
+    line-height: 1.4;
     text-align: center;
+    margin: 0;
   }
-  .families-formal .amp {
-    font-style: italic;
-    color: var(--sand-deep);
-    font-size: 24px;
+  @media (max-width: 520px) {
+    .families-formal {
+      gap: 16px 20px;
+    }
+    .families-formal .fam-side {
+      gap: 6px;
+    }
   }
   .names-formal {
     font-family: "Didot", Georgia, serif;

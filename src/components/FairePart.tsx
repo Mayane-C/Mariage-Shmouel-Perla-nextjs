@@ -108,13 +108,12 @@ export function FairePart() {
       <div className="families-formal">
         <div className="fam-side">
           {content.familles.marie.map((nom) => (
-            <span key={nom} className="fam">{nom}</span>
+            <p key={nom} className="fam">{nom}</p>
           ))}
         </div>
-        <span className="amp">&amp;</span>
         <div className="fam-side">
           {content.familles.mariee.map((nom) => (
-            <span key={nom} className="fam">{nom}</span>
+            <p key={nom} className="fam">{nom}</p>
           ))}
         </div>
       </div>
