@@ -881,31 +881,30 @@
     margin: 0;
   }
   @media (max-width: 640px) {
-    /* Mobile : une seule colonne — évite que les noms longs comme
-       « Rav Menache & Sterna Schoukroun » ne wrappent en 2 lignes,
-       ce qui déséquilibrait visuellement la grille. Petit trait de
-       séparation entre les deux familles pour distinguer les côtés. */
+    /* Mobile : on garde le tableau 2 colonnes façon BM, mais on réduit
+       la police et le gap pour que les noms longs (comme « Rav Menache &
+       Sterna Schoukroun ») tiennent au mieux. Ceux qui dépassent quand
+       même wrappent en 2 lignes — align-items: start gère les hauteurs
+       inégales. */
     .families-formal {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
+      gap: 16px 14px;
     }
     .families-formal .fam-side {
-      gap: 4px;
-    }
-    .families-formal .fam-side:first-child::after {
-      content: '';
-      display: block;
-      width: 32px;
-      height: 1px;
-      background: var(--sand, #B8935F);
-      opacity: 0.55;
-      margin: 12px auto 0;
+      gap: 5px;
     }
     .families-formal .fam {
-      font-size: 16px;
-      letter-spacing: 0.04em;
+      font-size: 12.5px;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+    }
+  }
+  @media (max-width: 380px) {
+    /* Écrans très étroits : encore plus serré. */
+    .families-formal {
+      gap: 12px 10px;
+    }
+    .families-formal .fam {
+      font-size: 11.5px;
     }
   }
   .names-formal {
