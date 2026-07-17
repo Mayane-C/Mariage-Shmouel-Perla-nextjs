@@ -16,8 +16,8 @@ export default function Home() {
       <Header />
       <div className="page">
         <Hero />
-        <InvitationFormalHebrew />
         <FairePart />
+        <InvitationFormalHebrew />
         <Bracha />
         <RSVP />
       </div>

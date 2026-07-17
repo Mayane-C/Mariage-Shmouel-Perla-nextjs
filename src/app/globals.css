@@ -850,18 +850,29 @@
     margin: 12px auto 0;
     max-width: 460px;
   }
+  /* Familles empilées verticalement : chaque famille est une colonne
+     de noms (les grand-parents + parents), séparées par un & centré.
+     Adapté aux mariages où plusieurs générations sont mentionnées. */
   .families-formal {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 24px;
+    gap: 14px;
     margin: 40px auto 24px;
     font-family: "Didot", Georgia, serif;
     color: var(--taupe-deep);
   }
+  .families-formal .fam-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
   .families-formal .fam {
-    font-size: 20px;
-    letter-spacing: 0.08em;
+    font-size: clamp(15px, 2.2vw, 20px);
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+    text-align: center;
   }
   .families-formal .amp {
     font-style: italic;
@@ -1684,30 +1695,9 @@ body:not(.revealed) .cell:not(:last-child)::after {
    les retours à la ligne EXACTS de l'image, même sur les petits viewports
    (la taille de police rétrécit automatiquement pour tenir en largeur).
    ───────────────────────────────────────── */
-.invitation-formal-he.block {
-  /* Voile crème semi-transparent + backdrop-filter pour donner du
-     contraste au texte sans lui coller une carte marquée. La vidéo
-     transparaît encore mais est atténuée sous le bloc. */
-  background: rgba(245, 239, 230, 0.42);
-  backdrop-filter: blur(6px) saturate(1.05);
-  -webkit-backdrop-filter: blur(6px) saturate(1.05);
-  border: none;
-  box-shadow: 0 6px 24px rgba(75, 63, 53, 0.05);
-  border-radius: 6px;
-  /* Padding-top réduit (40 au lieu de 90) : marge supérieure du bloc
-     visuellement resserrée, le texte commence plus haut. */
-  padding: 40px 16px 70px;
-  margin-top: 24px;
-  overflow: visible;
-}
-/* Text-shadow crème doux sur toutes les lignes du bloc — halo qui
-   lit le contour des lettres sur les zones où la vidéo est claire. */
-.invitation-formal-he p,
-.invitation-formal-he strong {
-  text-shadow:
-    0 0 8px rgba(245, 239, 230, 0.85),
-    0 1px 2px rgba(75, 63, 53, 0.06);
-}
+/* Le bloc hébreu utilise désormais l'habillage carte standard de .block
+   (background crème, backdrop-blur, bordure, ombre, padding). Aucun
+   override nécessaire ici. */
 .invitation-formal-he {
   font-family: "FrankRuhlLibre", "Frank Ruhl Libre", "David", serif;
   /* Poids 500 (Medium) — trait un peu plus gras que Regular, sans
@@ -1781,9 +1771,6 @@ body:not(.revealed) .cell:not(:last-child)::after {
   white-space: nowrap;
 }
 @media (max-width: 720px) {
-  .invitation-formal-he.block {
-    padding: 32px 4px 54px;
-  }
   .invitation-formal-he .ifh-para {
     line-height: 1.85;
   }

@@ -4,16 +4,15 @@ import { useEffect, useState } from 'react';
 
 /**
  * Deux flèches or fixées sur les côtés gauche et droit du viewport.
- * Visibilité pilotée par la POSITION du bloc hébreu dans le viewport
- * (approche BM Chmouel) plutôt que par un event scroll one-shot — ce
- * dernier était fragile sur iOS Safari où la barre d'URL qui se cache
- * en scroll auto déclenchait un scroll fantôme qui faisait disparaître
- * les flèches instantanément.
+ * Visibilité pilotée par la POSITION du premier bloc (le faire-part
+ * français) dans le viewport, approche BM Chmouel — plus fragile qu'un
+ * simple scroll event one-shot qui pouvait fire à cause de la barre
+ * d'URL iOS Safari.
  *
- * Règle : flèches visibles pendant que le bloc hébreu occupe (au moins
- * partiellement) le viewport, cachées dès qu'on a scrollé au-delà.
- * Décalage initial : 2.4 s après body.revealed pour laisser le
- * glissement du bloc se terminer avant que les flèches n'apparaissent.
+ * Règle : flèches visibles tant que le faire-part est encore présent
+ * dans le viewport (bas > 35% de vH), cachées dès qu'on a scrollé
+ * au-delà. Décalage : 2 s après body.revealed pour laisser le
+ * glissement du bloc se terminer.
  */
 function Arrow() {
   return (
@@ -47,7 +46,7 @@ export function ScrollHint() {
     // au-delà du bloc hébreu. Ne re-montre pas s'il revient en arrière
     // (simple et prévisible, comme l'expérience BM).
     const hideCheck = () => {
-      const heBlock = document.querySelector<HTMLElement>('.invitation-formal-he');
+      const heBlock = document.querySelector<HTMLElement>('.invitation-formal');
       if (!heBlock) return;
       const rect = heBlock.getBoundingClientRect();
       const vH = window.innerHeight;

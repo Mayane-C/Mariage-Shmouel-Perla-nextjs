@@ -8,8 +8,17 @@ export const content = {
     prenomHebrew: 'שמואל ופערלה',
   },
   familles: {
-    marie: 'Famille Smadja',
-    mariee: 'Famille Schoukroun',
+    // Grands-parents et parents des mariés — chaque tableau se rend en
+    // colonne verticale, séparés par un ampersand centré.
+    marie: [
+      'Mme Irène Liebman',
+      'Mr et Mme Éric Smadja',
+    ],
+    mariee: [
+      'Mme Tova Schoukroun',
+      'Mr & Mme Mordehai Berrebi',
+      'Rav Menache & Sterna Schoukroun',
+    ],
   },
   dateGrégorienne: 'Jeudi 3 Septembre 2026',
   dateHebrew: 'כ״א אלול התשפ״ו',

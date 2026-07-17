@@ -106,13 +106,23 @@ export function FairePart() {
       </div>
 
       <div className="families-formal">
-        <span className="fam">{content.familles.marie}</span>
+        <div className="fam-side">
+          {content.familles.marie.map((nom) => (
+            <span key={nom} className="fam">{nom}</span>
+          ))}
+        </div>
         <span className="amp">&amp;</span>
-        <span className="fam">{content.familles.mariee}</span>
+        <div className="fam-side">
+          {content.familles.mariee.map((nom) => (
+            <span key={nom} className="fam">{nom}</span>
+          ))}
+        </div>
       </div>
 
       <p className="preamble script-preamble">
-        remercient Hachem de vous faire part
+        Remercient Hachem de vous faire part
+        <br />
+        du mariage de leurs enfants et petits-enfants
       </p>
 
       <div className="names-formal">
