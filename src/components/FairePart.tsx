@@ -58,14 +58,13 @@ export function FairePart() {
       opacity: 1,
       y: 0,
       transition: {
-        // Ressort ralenti (stiffness 48→28) pour laisser à l'œil le
-        // temps de voir le bloc arriver depuis le bas. Mêmes proportions
-        // ζ que BM (léger rebond conservé), fréquence naturelle réduite
-        // ~30 % → durée ~2.6 s au lieu de ~2 s.
-        type: 'spring' as const,
-        stiffness: 28,
-        damping: 11,
-        mass: 1.2,
+        // Tween ease-out (au lieu d'un spring) : décélération continue
+        // jusqu'à l'arrêt, GARANTI sans overshoot. Le ressort BM
+        // précédent, même bien calibré, dépassait de quelques pixels
+        // sa position finale en montant — le haut du bloc pouvait
+        // brièvement sortir par le haut de l'écran.
+        duration: 2.6,
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
         opacity: { duration: 1.4, ease: 'easeOut' as const },
       },
     },
