@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Ornament } from './Ornament';
 
 /**
  * Bloc d'invitation formel en hébreu — coutume placée en tout début
@@ -58,6 +59,13 @@ export function InvitationFormalHebrew() {
       animate={useSpring ? (revealed ? 'visible' : 'hidden') : undefined}
       variants={useSpring ? springVariants : undefined}
     >
+      {/* Ornements floraux — variations de motifs pour éviter la
+          répétition avec le faire-part français juste avant. */}
+      <Ornament n={7} className="block-ornament tr" />
+      <Ornament n={5} className="block-ornament-2 tr" />
+      <Ornament n={4} className="block-ornament-accent bl" />
+      <Ornament n={8} className="block-ornament-3 tr-a" />
+
       <p className="ifh-bsd">בס״ד</p>
 
       <div className="ifh-para">

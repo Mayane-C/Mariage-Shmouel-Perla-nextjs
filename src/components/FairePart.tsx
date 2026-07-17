@@ -42,16 +42,13 @@ export function FairePart() {
     return () => observer.disconnect();
   }, []);
 
-  // Framer-motion désactivé : le CSS pilote entièrement le reveal.
-  // Desktop → glissement translateY(340px) + fade (transition 1.6 s ease-out).
-  // Mobile  → fade-only (via la media query qui neutralise le transform)
-  //           → évite que le bloc, hors viewport en bas, ne soit visible
-  //           pendant qu'il glisse depuis encore plus bas.
-  const useSpring = false;
-  // Références conservées pour ne pas casser le typage : isMobile et
-  // prefersReducedMotion sont détectés mais non utilisés côté animation.
+  // Apparition identique à BM Chmouel : spring y=600 → 0 avec léger
+  // rebond en fin de course, opacité fade-in en 1 s en parallèle.
+  // Appliqué desktop ET mobile (framer-motion pilote tout ; la règle
+  // CSS [data-spring="on"] neutralise la transition/transform CSS pour
+  // qu'il n'y ait pas de double animation).
+  const useSpring = !prefersReducedMotion;
   void isMobile;
-  void prefersReducedMotion;
 
   const springVariants = {
     hidden: { opacity: 0, y: 600 },
@@ -60,9 +57,9 @@ export function FairePart() {
       y: 0,
       transition: {
         type: 'spring' as const,
-        stiffness: 40,
-        damping: 12,
-        mass: 1,
+        stiffness: 48,
+        damping: 13,
+        mass: 1.1,
         opacity: { duration: 1, ease: 'easeOut' as const },
       },
     },
