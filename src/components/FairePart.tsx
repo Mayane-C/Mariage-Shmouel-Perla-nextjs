@@ -51,7 +51,10 @@ export function FairePart() {
   void isMobile;
 
   const springVariants = {
-    hidden: { opacity: 0, y: 600 },
+    // y: '100vh' → le bloc démarre exactement en dessous du viewport,
+    // peu importe la taille d'écran (au lieu de 600 px fixe qui pouvait
+    // être visible sur les grands écrans / trop peu sur les petits).
+    hidden: { opacity: 0, y: '100vh' },
     visible: {
       opacity: 1,
       y: 0,

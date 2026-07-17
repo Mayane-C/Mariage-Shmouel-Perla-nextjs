@@ -880,12 +880,32 @@
     text-align: center;
     margin: 0;
   }
-  @media (max-width: 520px) {
+  @media (max-width: 640px) {
+    /* Mobile : une seule colonne — évite que les noms longs comme
+       « Rav Menache & Sterna Schoukroun » ne wrappent en 2 lignes,
+       ce qui déséquilibrait visuellement la grille. Petit trait de
+       séparation entre les deux familles pour distinguer les côtés. */
     .families-formal {
-      gap: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
     .families-formal .fam-side {
-      gap: 6px;
+      gap: 4px;
+    }
+    .families-formal .fam-side:first-child::after {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--sand, #B8935F);
+      opacity: 0.55;
+      margin: 12px auto 0;
+    }
+    .families-formal .fam {
+      font-size: 16px;
+      letter-spacing: 0.04em;
     }
   }
   .names-formal {
