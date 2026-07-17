@@ -365,6 +365,7 @@
   }
   .block-ornament.tr { top: -18px; right: -40px; }
   .block-ornament.bl { bottom: -20px; left: -56px; transform: scaleX(-1); }
+  .block-ornament.br { bottom: -20px; right: -56px; }
   .bracha .block-ornament.tr { top: -42px; right: -50px; }
   .bracha .block-ornament-2.tr { top: -68px; right: 30px; }
   .block-ornament-2 {
@@ -469,6 +470,7 @@
     .block-ornament { width: 105px; }
     .block-ornament.tr { top: -18px; right: -22px; }
     .block-ornament.bl { bottom: -18px; left: -22px; }
+    .block-ornament.br { bottom: -18px; right: -22px; }
     .block-ornament-2 { width: 85px; }
     .block-ornament-2.tr { top: -38px; right: 32px; }
     .block-ornament-2.bl { bottom: -38px; left: 32px; }

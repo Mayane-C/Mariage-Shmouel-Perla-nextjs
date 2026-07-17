@@ -82,6 +82,7 @@ export function FairePart() {
       <Ornament n={3} className="block-ornament-2 tr" />
       <Ornament n={4} className="block-ornament-3 tr-a" />
       <Ornament n={5} className="block-ornament-3 tr-b" />
+      <Ornament n={6} className="block-ornament br" />
 
       <HebrewArc />
 
