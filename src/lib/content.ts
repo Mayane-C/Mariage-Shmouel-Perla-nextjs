@@ -52,7 +52,7 @@ export const content = {
   bsd: 'בס״ד',
   rsvp: {
     endpoint:
-      'https://script.google.com/macros/s/AKfycbzF0zM5bkhBpLp5e9QkkjibP0VHPpqyVQCBzKUXaZBpIPPbfCV7yA6OQ20wTLM7JEwFTg/exec',
+      'https://script.google.com/macros/s/AKfycby5zGIYh549kfqRYynqAvn2ECKd2SV8_E8u32DSNHgVgsscMtHuyevUAxJW-dfsC_m0tA/exec',
     token: 'shmouel-perla-2026',
   },
   ltd: {
