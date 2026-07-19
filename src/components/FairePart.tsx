@@ -28,18 +28,34 @@ export function FairePart() {
   }, []);
 
   useEffect(() => {
+    // Délai après body.revealed pour laisser le smooth-scroll auto de
+    // BackgroundVideo se terminer AVANT de démarrer le spring — sinon
+    // les deux animations se combinent visuellement (scroll de la page
+    // + glissement du bloc) et le rendu ne ressemble plus à BM Chmouel
+    // (qui n'a QUE le spring, aucun scroll pendant l'apparition).
+    const SCROLL_SETTLE_MS = 600;
+    let timer: number | undefined;
+    const scheduleReveal = () => {
+      timer = window.setTimeout(() => setRevealed(true), SCROLL_SETTLE_MS);
+    };
+
     if (document.body.classList.contains('revealed')) {
-      setRevealed(true);
-      return;
+      scheduleReveal();
+      return () => {
+        if (timer) window.clearTimeout(timer);
+      };
     }
     const observer = new MutationObserver(() => {
       if (document.body.classList.contains('revealed')) {
-        setRevealed(true);
+        scheduleReveal();
         observer.disconnect();
       }
     });
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timer) window.clearTimeout(timer);
+    };
   }, []);
 
   // Apparition identique à BM Chmouel : spring y=600 → 0 avec léger

@@ -32,7 +32,8 @@ function Arrow() {
   );
 }
 
-const REVEAL_DELAY_MS = 2000;
+// = 600 ms d'attente du scroll settle + ~2 s de spring BM = ~2.6 s
+const REVEAL_DELAY_MS = 2600;
 
 export function ScrollHint() {
   const [visible, setVisible] = useState(false);
