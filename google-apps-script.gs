@@ -215,10 +215,64 @@ function setup() {
   var sheet = getDataSheet_(ss);
   buildHeader_(sheet);
   updateSummary(ss);
+  installOnChangeTrigger_(ss);
   Logger.log('Setup terminé.');
   Logger.log('Feuille RSVP : ' + ss.getUrl());
 }
 
 function lienDuSheet() {
   Logger.log('FEUILLE RSVP : ' + getSpreadsheet_().getUrl());
+}
+
+/**
+ * Installe le trigger onChange (nécessaire pour détecter les
+ * suppressions manuelles de lignes — le simple onEdit ne fire pas
+ * sur les changements structurels). Idempotent : ne réinstalle pas
+ * si un trigger existe déjà.
+ */
+function installOnChangeTrigger_(ss) {
+  ss = ss || getSpreadsheet_();
+  var existing = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < existing.length; i++) {
+    if (existing[i].getHandlerFunction() === 'onSheetChange') return;
+  }
+  ScriptApp.newTrigger('onSheetChange')
+    .forSpreadsheet(ss)
+    .onChange()
+    .create();
+}
+
+/**
+ * Handler du trigger onChange — rafraîchit le récapitulatif à chaque
+ * modification structurelle du sheet (ligne ajoutée, supprimée,
+ * cellule editée). Silencieux en cas d'erreur pour ne pas bloquer.
+ */
+function onSheetChange(e) {
+  try {
+    updateSummary();
+  } catch (err) {
+    Logger.log('onSheetChange error: ' + err);
+  }
+}
+
+/**
+ * Ajoute un menu personnalisé « RSVP » quand le sheet est ouvert.
+ * Simple trigger (installé automatiquement, pas besoin d'autorisation).
+ * Permet de rafraîchir manuellement le récap en cas de besoin.
+ */
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('RSVP')
+    .addItem('Actualiser le récapitulatif', 'refreshSummary')
+    .addSeparator()
+    .addItem('Voir le lien du sheet', 'lienDuSheet')
+    .addToUi();
+}
+
+/**
+ * Rafraîchit manuellement le récap (bouton menu).
+ */
+function refreshSummary() {
+  updateSummary();
+  SpreadsheetApp.getActive().toast('Récapitulatif mis à jour.', 'RSVP', 3);
 }
