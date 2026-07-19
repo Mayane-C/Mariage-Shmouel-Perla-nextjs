@@ -123,12 +123,21 @@
   footer {
     transition-delay: 0.85s, 0.85s;
   }
-  /* Offset scroll pour que les sections ne collent pas au header sticky. */
-  .invitation-formal-he, #invitation, #bracha, #rsvp {
+  /* Offset scroll pour que les sections ne collent pas au header sticky.
+     FairePart (#invitation) a un offset plus grand : le HebrewArc à
+     l'intérieur du bloc (arche hébraïque) déborde vers le haut à cause
+     de la géométrie du path SVG et se retrouvait tronqué par le header. */
+  #invitation {
+    scroll-margin-top: 200px;
+  }
+  .invitation-formal-he, #bracha, #rsvp {
     scroll-margin-top: 140px;
   }
   @media (max-width: 720px) {
-    .invitation-formal-he, #invitation, #bracha, #rsvp {
+    #invitation {
+      scroll-margin-top: 160px;
+    }
+    .invitation-formal-he, #bracha, #rsvp {
       scroll-margin-top: 118px;
     }
   }
