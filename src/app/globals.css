@@ -909,11 +909,16 @@
   }
   .names-formal {
     font-family: "Didot", Georgia, serif;
-    font-size: clamp(40px, 10vw, 82px);
+    /* Clamp calibré pour que « Shmouel & Perla » (~15 chars) tienne
+       dans le contenu du bloc (.page max-width 640 px → contenu bloc
+       ≈ 528 px) sans jamais déborder à droite.
+       62 px max → texte ≈ 495 px = safe. */
+    font-size: clamp(30px, 7.5vw, 62px);
     font-weight: 400;
     line-height: 1.5;
     margin: 32px 0 16px;
     letter-spacing: -0.005em;
+    overflow-wrap: normal;
     /* Même gradient que les numéros du compte à rebours (.cell .num).
        Aucun filtre, aucun effet supplémentaire. */
     background: linear-gradient(135deg, #7A5A2C 0%, #A47F4A 22%, #C69E68 48%, #B4894F 62%, #8F6C3A 82%, #5F4522 100%);
