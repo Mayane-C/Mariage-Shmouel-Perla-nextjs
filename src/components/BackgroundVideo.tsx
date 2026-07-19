@@ -198,14 +198,23 @@ export function BackgroundVideo() {
     };
 
     const doScrollToInvitation = () => {
-      // Cible le PREMIER .block plutôt que #invitation en dur : si un bloc
-      // (comme l'invitation formelle hébreue) est inséré avant le faire-part,
-      // l'auto-scroll atterrit dessus au lieu de sauter par-dessus.
+      // Utilise offsetTop (position LAYOUT, non affectée par les
+      // transforms framer-motion) plutôt que scrollIntoView (qui
+      // utilise la position VISUELLE post-transform). Sinon avec un
+      // bloc initial à transform: translateY(100vh), le navigateur
+      // scrollerait 100vh trop loin et le bloc atterrirait hors écran
+      // par le haut une fois le transform enlevé.
+      const SCROLL_OFFSET = 80; // = html scroll-padding-top: 5rem
       requestAnimationFrame(() => {
         const target =
           document.querySelector<HTMLElement>('.page .block') ||
           document.getElementById('invitation');
-        target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!target) return;
+        const layoutTop = target.offsetTop;
+        window.scrollTo({
+          top: Math.max(0, layoutTop - SCROLL_OFFSET),
+          behavior: 'smooth',
+        });
       });
     };
 
