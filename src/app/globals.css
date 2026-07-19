@@ -124,18 +124,21 @@
     transition-delay: 0.85s, 0.85s;
   }
   /* Offset scroll pour que les sections ne collent pas au header sticky.
-     FairePart (#invitation) a un offset un peu plus grand que les
-     autres blocs pour laisser le HebrewArc (arche SVG dont le pic
-     dépasse au-dessus du haut du bloc) bien visible sous le header. */
+     FairePart (#invitation) : offset serré (comme BM Chmouel) pour que
+     le haut du bloc-arche vienne se caler juste sous le header, sans
+     laisser un gros vide au-dessus. Le HebrewArc reste bien à l'intérieur
+     du bloc (padding-top 168 px + margin-top -96 = arc à +72 px du haut
+     du bloc, donc à viewport 172 px avec cette scroll-margin — bien
+     en-dessous du header). */
   #invitation {
-    scroll-margin-top: 150px;
+    scroll-margin-top: 100px;
   }
   .invitation-formal-he, #bracha, #rsvp {
     scroll-margin-top: 140px;
   }
   @media (max-width: 720px) {
     #invitation {
-      scroll-margin-top: 130px;
+      scroll-margin-top: 85px;
     }
     .invitation-formal-he, #bracha, #rsvp {
       scroll-margin-top: 118px;
