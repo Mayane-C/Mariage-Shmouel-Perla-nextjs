@@ -883,8 +883,11 @@
     gap: 8px;
   }
   .families-formal .fam {
-    font-size: clamp(14px, 2vw, 18px);
-    letter-spacing: 0.05em;
+    /* Clamp calibré pour que « Rav Menache & Sterna Schoukroun » (30
+       chars) tienne sur une seule ligne dans une demi-largeur de bloc
+       (~244 px) sans wrapper — 15 px × 0.53em avg = ~238 px. */
+    font-size: clamp(12px, 1.7vw, 15px);
+    letter-spacing: 0.03em;
     line-height: 1.4;
     text-align: center;
     margin: 0;
@@ -978,10 +981,11 @@
   /* --- Détails (utilisés dans le bloc invitation-formal fusionné) --- */
   .date-fr {
     font-family: "Didot", Georgia, serif;
-    /* Font-size clampé pour que « Jeudi 3 Septembre 2026 » (~22 chars)
-       tienne sur une SEULE ligne même sur les plus petits mobiles.
-       Bumpé pour plus de présence visuelle. */
-    font-size: clamp(22px, 6vw, 50px);
+    /* Clamp calibré pour tenir « Jeudi 3 Septembre 2026 » (~22 chars)
+       sur une seule ligne dans le contenu du bloc (max ≈ 528 px sur
+       .page 640 max-width). 42 px × 0.54em avg ≈ 499 px = safe.
+       (Avant : 50 px max produisait ~594 px = débordait à droite.) */
+    font-size: clamp(22px, 5vw, 42px);
     letter-spacing: 0.04em;
     font-weight: 400;
     margin-top: 28px;
