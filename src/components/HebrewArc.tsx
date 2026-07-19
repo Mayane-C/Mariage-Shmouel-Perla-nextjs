@@ -1,12 +1,33 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { content } from '@/lib/content';
 
 /**
- * Phrase hébraïque courbe en SVG textPath — chaîne inversée pour
- * compenser l'absence de reordering RTL le long d'un path.
+ * Phrase hébraïque courbe en SVG textPath.
+ * - Desktop : chaîne inversée pour compenser l'absence de reordering
+ *   RTL le long d'un path (Chrome/Firefox desktop rendent LTR).
+ * - Mobile  : chaîne dans l'ordre naturel (Safari iOS et Chrome mobile
+ *   appliquent le reordering RTL automatiquement → si on inverse,
+ *   ça donne un double reversal = illisible).
  */
-const arcText = Array.from(content.kolSasson).reverse().join('');
+const arcTextReversed = Array.from(content.kolSasson).reverse().join('');
+const arcTextNatural = content.kolSasson;
 
 export function HebrewArc() {
+  // SSR-safe : rendu initial = version desktop (inversée). Basculé
+  // vers naturel côté client si mobile détecté.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  const arcText = isMobile ? arcTextNatural : arcTextReversed;
+
   return (
     <svg
       className="arc-wrap"
