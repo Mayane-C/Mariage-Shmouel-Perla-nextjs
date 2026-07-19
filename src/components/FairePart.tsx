@@ -67,17 +67,22 @@ export function FairePart() {
   void isMobile;
 
   const springVariants = {
-    // Params STRICTEMENT identiques à BM Chmouel (Announcement.tsx) :
-    //   type: spring, stiffness 48, damping 13, mass 1.1
-    //   y: 600 → 0 (offset fixe, pas '100vh')
-    //   opacity: { duration: 1, ease: 'easeOut' }
-    // ζ ≈ 0.89 (théoriquement sous-amorti) mais overshoot ≈ 0.19 %
-    // → visuellement imperceptible, aucun rebond perçu.
-    hidden: { opacity: 0, y: 600 },
+    // y: '100vh' → le bloc démarre TOTALEMENT sous le viewport, peu
+    // importe la taille d'écran. (y: 600 fixe de BM laissait le bloc
+    // partiellement visible sur les grands écrans desktop où le viewport
+    // dépasse 700 px de haut.)
+    // Position finale : y=0 → bloc à sa position layout, top à 80 px
+    // du viewport (grâce au scroll-padding-top: 5rem de html), donc
+    // pile sous le header — tout le bloc reste visible en dessous.
+    hidden: { opacity: 0, y: '100vh' },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
+        // Spring BM (stiffness 48, damping 13, mass 1.1). ζ ≈ 0.89
+        // (théoriquement sous-amorti) mais overshoot < 0.2 % =
+        // imperceptible → le bloc s'arrête pile à y=0, aucun risque
+        // que son haut passe au-dessus du header.
         type: 'spring' as const,
         stiffness: 48,
         damping: 13,
