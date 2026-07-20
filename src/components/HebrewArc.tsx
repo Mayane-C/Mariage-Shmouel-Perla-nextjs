@@ -26,7 +26,7 @@ export function HebrewArc() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  const arcText = isMobile ? arcTextNatural : arcTextReversed;
+  const arcText = isMobile ? arcTextReversed : arcTextNatural;
 
   return (
     <svg
