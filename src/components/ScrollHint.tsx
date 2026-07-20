@@ -43,32 +43,21 @@ export function ScrollHint() {
     let startTimer: number | null = null;
     let onScroll: (() => void) | null = null;
 
-    // Cache-uniquement : n'affiche jamais si l'utilisateur a déjà scrollé
-    // au-delà du bloc hébreu. Ne re-montre pas s'il revient en arrière
-    // (simple et prévisible, comme l'expérience BM).
-    const hideCheck = () => {
-      const heBlock = document.querySelector<HTMLElement>('.invitation-formal');
-      if (!heBlock) return;
-      const rect = heBlock.getBoundingClientRect();
-      const vH = window.innerHeight;
-      // Cache dès que le bas du bloc passe au-dessus de 35% du viewport
-      // (= utilisateur a scrollé significativement au-delà)
-      if (rect.bottom < vH * 0.35) {
-        setVisible(false);
-        if (onScroll) {
-          window.removeEventListener('scroll', onScroll);
-          onScroll = null;
-        }
-      }
-    };
-
     const startTracking = () => {
-      // Affichage inconditionnel après le délai — pas de check position
-      // initial qui pourrait retourner false à cause d'un timing subtil
-      // (fin d'animation, URL bar iOS, etc.). Les flèches DOIVENT être
-      // visibles au moment où l'utilisateur peut interagir.
       setVisible(true);
-      onScroll = hideCheck;
+      // Cache dès le premier scroll significatif (> 30 px du point
+      // initial) — seuil pour ignorer les scrolls fantômes iOS Safari
+      // (URL bar qui se cache/apparaît génère de faux scroll events).
+      const initialScrollY = window.scrollY;
+      onScroll = () => {
+        if (Math.abs(window.scrollY - initialScrollY) > 30) {
+          setVisible(false);
+          if (onScroll) {
+            window.removeEventListener('scroll', onScroll);
+            onScroll = null;
+          }
+        }
+      };
       window.addEventListener('scroll', onScroll, { passive: true });
     };
 
