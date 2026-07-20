@@ -78,8 +78,8 @@ export function RSVP() {
         </label>
         <select id="famille" name="famille" required disabled={disabled}>
           <option value="">— Choisir —</option>
-          <option>La famille du marié</option>
-          <option>La famille de la mariée</option>
+          <option>Famille Smadja</option>
+          <option>Famille Schoukroun</option>
         </select>
 
         <label className="field-label" htmlFor="prenom">
